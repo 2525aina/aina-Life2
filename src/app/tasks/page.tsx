@@ -5,7 +5,6 @@ import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTasks, Task } from '@/hooks/useTasks';
 import { usePetSelection } from '@/contexts/PetSelectionContext';
-import { PetSwitcher } from '@/components/PetSwitcher';
 import { TaskForm } from '@/components/TaskForm';
 import { Button } from '@/components/ui/button';
 import {
@@ -25,7 +24,7 @@ import {
 } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy, useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { MenuIcon } from 'lucide-react';
+import { MenuIcon, PlusIcon } from 'lucide-react';
 import { arrayMove } from '@dnd-kit/sortable';
 
 // Sortableなタスクアイテムコンポーネント
@@ -134,22 +133,16 @@ export default function TasksPage() {
   }
 
   return (
-    <div className="container mx-auto p-4">
+    <div className="container mx-auto px-4 pt-0">
       <header className="flex justify-between items-center mb-8">
-        <h1 className="text-4xl font-bold">タスク管理</h1>
-        <Link href="/">
-          <Button variant="outline">ホームへ戻る</Button>
-        </Link>
       </header>
-
-      <div className="mb-8">
-        <PetSwitcher />
-      </div>
 
       {selectedPet ? (
         <div>
           <div className="flex justify-end mb-4">
-            <Button onClick={handleAddTask}>新しいタスクを追加</Button>
+            <Button variant="ghost" size="icon" onClick={handleAddTask}>
+              <PlusIcon className="h-5 w-5" />
+            </Button>
           </div>
           {tasksLoading ? (
             <p>タスクをロード中...</p>

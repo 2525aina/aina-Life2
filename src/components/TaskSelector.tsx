@@ -1,22 +1,23 @@
-'use client';
+"use client";
 
-import { useTasks } from '@/hooks/useTasks';
-import { useLogs } from '@/hooks/useLogs';
-import { Button } from '@/components/ui/button';
+import { useTasks } from "@/hooks/useTasks";
+import { useLogs, useLogActions } from "@/hooks/useLogs";
+import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { useMemo } from 'react';
+import { useMemo } from "react";
+import Link from "next/link";
 
 export function TaskSelector() {
   const { tasks, loading: tasksLoading } = useTasks();
   const today = useMemo(() => new Date(), []);
-  const { addLog } = useLogs(today); // Logs for today
+  const { addLog } = useLogActions(); // Use useLogActions
 
-  const handleTaskClick = async (task: typeof tasks[0]) => {
+  const handleTaskClick = async (task: (typeof tasks)[0]) => {
     try {
-      await addLog(task);
+      await addLog(task, new Date());
       toast.success(`ログを記録しました: ${task.name}`);
     } catch (error) {
-      console.error('ログの記録に失敗しました', error);
+      console.error("ログの記録に失敗しました", error);
       toast.error("ログの記録に失敗しました。");
     }
   };
@@ -26,12 +27,19 @@ export function TaskSelector() {
   }
 
   if (tasks.length === 0) {
-    return <p>記録できるタスクがありません。まずはタスク管理ページでタスクを作成してください。</p>;
+    return (
+      <div className="text-center space-y-4">
+        <p>②記録するタスクがありません。</p>
+        <Link href="/tasks">
+          <Button>②タスクを作成する</Button>
+        </Link>
+      </div>
+    );
   }
 
   return (
     <div className="flex flex-wrap gap-2">
-      {tasks.map(task => (
+      {tasks.map((task) => (
         <Button
           key={task.id}
           style={{ backgroundColor: task.color, color: task.textColor }}

@@ -20,10 +20,12 @@ export default function RootLayout({
     <html lang="ja">
       <body className="flex flex-col min-h-screen">
         <AuthProvider>
-          <Header />
-          <div className="flex-grow pb-16"> {/* Add padding-bottom equal to footer height */}
-            <PetSelectionProvider>{children}</PetSelectionProvider>
-          </div>
+          <PetSelectionProvider>
+            <Header />
+            <div className="flex-grow pb-16"> {/* Add padding-bottom equal to footer height */}
+              {children}
+            </div>
+          </PetSelectionProvider>
         </AuthProvider>
         <Toaster />
         <FooterNav />

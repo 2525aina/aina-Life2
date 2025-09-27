@@ -1,120 +1,98 @@
-'use client';
+import React, { useState, useEffect } from 'react';
+import { useLogActions, Log } from '@/hooks/useLogs';
+import { toast } from 'sonner';
 
-import { useState, useEffect } from 'react';
-import { useLogs, Log } from '@/hooks/useLogs';
-import { useTasks, Task } from '@/hooks/useTasks';
-import { usePetSelection } from '@/contexts/PetSelectionContext';
+import { useTasks } from '@/hooks/useTasks';
+
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Button } from '@/components/ui/button';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { format, parseISO, setHours, setMinutes } from 'date-fns';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { PlusIcon, CalendarIcon } from 'lucide-react';
+import { format } from 'date-fns';
+import { ja } from 'date-fns/locale';
+import { cn } from '@/lib/utils';
+import { usePetSelection } from '../contexts/PetSelectionContext';
 
 interface LogFormModalProps {
   isOpen: boolean;
   onClose: () => void;
   logToEdit?: Log | null;
-  initialDate?: Date; // For manual addition to a specific date
+  initialDate?: Date;
 }
 
 export function LogFormModal({ isOpen, onClose, logToEdit, initialDate }: LogFormModalProps) {
   const { selectedPet } = usePetSelection();
   const { tasks } = useTasks();
-  const { addLog, updateLog } = useLogs(initialDate || new Date()); // Pass initialDate to useLogs
+  const { addLog, updateLog } = useLogActions(); // Get updateLog here
 
-  const [formData, setFormData] = useState({
-    taskId: '',
-    note: '',
-    date: format(initialDate || new Date(), 'yyyy-MM-dd'),
-    time: format(initialDate || new Date(), 'HH:mm'),
-  });
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(initialDate || new Date());
+  const [selectedTime, setSelectedTime] = useState<string>(format(initialDate || new Date(), 'HH:mm:ss'));
+  const [selectedTaskId, setSelectedTaskId] = useState<string | undefined>(undefined);
+  const [note, setNote] = useState<string>('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
       if (logToEdit) {
-        setFormData({
-          taskId: logToEdit.taskId,
-          note: logToEdit.note || '',
-          date: format(logToEdit.timestamp.toDate(), 'yyyy-MM-dd'),
-          time: format(logToEdit.timestamp.toDate(), 'HH:mm'),
-        });
+        setSelectedDate(logToEdit.timestamp.toDate());
+        setSelectedTaskId(logToEdit.taskId);
+        setNote(logToEdit.note || '');
+        setSelectedTime(format(logToEdit.timestamp.toDate(), 'HH:mm:ss'));
       } else {
-        setFormData({
-          taskId: '',
-          note: '',
-          date: format(initialDate || new Date(), 'yyyy-MM-dd'),
-          time: format(initialDate || new Date(), 'HH:mm'),
-        });
+        // Reset form for new log entry
+        setSelectedDate(initialDate || new Date());
+        setSelectedTaskId(undefined);
+        setNote('');
+        setSelectedTime(format(initialDate || new Date(), 'HH:mm:ss'));
       }
     }
   }, [isOpen, logToEdit, initialDate]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-  };
-
-  const handleSelectChange = (value: string) => {
-    setFormData(prev => ({ ...prev, taskId: value }));
-  };
+  useEffect(() => {
+    if (isOpen && selectedPet && tasks.length > 0 && !selectedTaskId) {
+      setSelectedTaskId(tasks[0].id); // Auto-select first task if available
+    }
+  }, [isOpen, selectedPet, tasks, selectedTaskId]);
 
   const handleSubmit = async () => {
     if (!selectedPet) {
-      alert('ペットが選択されていません。');
+      toast.error('ログを記録するペットを選択してください。');
       return;
     }
-    if (!formData.taskId) {
-      alert('タスクを選択してください。');
+    if (!selectedTaskId) {
+      toast.error('記録するタスクを選択してください。');
+      return;
+    }
+    if (!selectedDate) {
+      toast.error('ログを記録する日付を選択してください。');
       return;
     }
 
     setIsSubmitting(true);
     try {
-      const selectedTask = tasks.find(task => task.id === formData.taskId);
-      if (!selectedTask) {
-        alert('選択されたタスクが見つかりません。');
-        setIsSubmitting(false);
-        return;
+      const task = tasks.find(t => t.id === selectedTaskId);
+      if (task) {
+        if (logToEdit) {
+          // Update existing log
+          await updateLog(logToEdit.id, { taskId: task.id, taskName: task.name, timestamp: selectedDate, note });
+          toast.success(`ログを更新しました: ${task.name} (${format(selectedDate, 'yyyy/MM/dd')})`);
+        } else {
+          // Add new log
+          await addLog(task, selectedDate, note);
+          toast.success(`ログを記録しました: ${task.name} (${format(selectedDate, 'yyyy/MM/dd')})`);
+        }
+        if (typeof onClose === 'function') {
+          onClose(); // Close dialog on success
+        }
       }
-
-      // Combine date and time
-      let logDateTime = parseISO(formData.date);
-      const [hours, minutes] = formData.time.split(':').map(Number);
-      logDateTime = setHours(logDateTime, hours);
-      logDateTime = setMinutes(logDateTime, minutes);
-
-      if (logToEdit) {
-        await updateLog(logToEdit.id, {
-          taskId: formData.taskId,
-          taskName: selectedTask.name,
-          timestamp: logDateTime,
-          note: formData.note,
-        });
-        alert('ログを更新しました！');
-      } else {
-        await addLog(selectedTask, formData.note, logDateTime);
-        alert('ログを追加しました！');
-      }
-      onClose();
     } catch (error) {
-      console.error(error);
-      alert('ログの保存に失敗しました。');
+      console.error('ログの保存に失敗しました', error);
+      toast.error('ログの保存に失敗しました。');
     } finally {
       setIsSubmitting(false);
     }
@@ -122,17 +100,87 @@ export function LogFormModal({ isOpen, onClose, logToEdit, initialDate }: LogFor
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogTrigger asChild>
+        <Button variant="ghost" size="icon" disabled={!selectedPet}>
+          <PlusIcon className="h-5 w-5" />
+        </Button>
+      </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>{logToEdit ? 'ログを編集' : '新しいログを追加'}</DialogTitle>
+          <DialogTitle>{logToEdit ? 'ログを編集' : '手動でログを追加'}</DialogTitle>
           <DialogDescription>
-            ログの詳細を入力してください。
+            {logToEdit ? 'ログの情報を編集します。' : '日付とタスクを選択してログを記録します。'}
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
           <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="task" className="text-right">タスク *</Label>
-            <Select onValueChange={handleSelectChange} value={formData.taskId}>
+            <Label htmlFor="pet" className="text-right">ペット</Label>
+            <Input id="pet" value={selectedPet?.name || 'ペットが選択されていません'} readOnly className="col-span-3" />
+          </div>
+
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="date" className="text-right">日付</Label>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant={"outline"}
+                  className={cn(
+                    "col-span-3 justify-start text-left font-normal",
+                    !selectedDate && "text-muted-foreground"
+                  )}
+                >
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  {selectedDate ? format(selectedDate, "yyyy/MM/dd") : <span>日付を選択</span>}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0">
+                <Calendar
+                  mode="single"
+                  selected={selectedDate}
+                  onSelect={(date) => {
+                    if (date) {
+                      const newDate = new Date(date);
+                      if (selectedDate) {
+                        newDate.setHours(selectedDate.getHours());
+                        newDate.setMinutes(selectedDate.getMinutes());
+                      }
+                      setSelectedDate(newDate);
+                    }
+                  }}
+                  initialFocus
+                />
+              </PopoverContent>
+            </Popover>
+          </div>
+
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="time" className="text-right">時刻</Label>
+            <Input
+              id="time"
+              type="time"
+              value={selectedTime}
+              onChange={(e) => {
+                const timeParts = e.target.value.split(':').map(Number);
+                const hours = timeParts[0];
+                const minutes = timeParts[1];
+                const seconds = timeParts[2] || 0; // Default to 0 if seconds are not provided
+
+                if (selectedDate) {
+                  const newDate = new Date(selectedDate);
+                  newDate.setHours(hours);
+                  newDate.setMinutes(minutes);
+                  newDate.setSeconds(seconds);
+                  setSelectedDate(newDate);
+                }
+                setSelectedTime(e.target.value);
+              }}
+              className="col-span-3"
+            />
+          </div>
+
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="task" className="text-right">タスク</Label>
+            <Select onValueChange={setSelectedTaskId} value={selectedTaskId}>
               <SelectTrigger className="col-span-3">
                 <SelectValue placeholder="タスクを選択" />
               </SelectTrigger>
@@ -145,22 +193,15 @@ export function LogFormModal({ isOpen, onClose, logToEdit, initialDate }: LogFor
               </SelectContent>
             </Select>
           </div>
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="date" className="text-right">日付</Label>
-            <Input id="date" name="date" type="date" value={formData.date} onChange={handleChange} className="col-span-3" />
-          </div>
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="time" className="text-right">時刻</Label>
-            <Input id="time" name="time" type="time" value={formData.time} onChange={handleChange} className="col-span-3" />
-          </div>
+
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="note" className="text-right">メモ</Label>
-            <Textarea id="note" name="note" value={formData.note} onChange={handleChange} className="col-span-3" placeholder="ログに関するメモ" />
+            <Textarea id="note" name="note" value={note} onChange={(e) => setNote(e.target.value)} className="col-span-3" placeholder="ログに関するメモ" />
           </div>
         </div>
         <DialogFooter>
           <Button onClick={onClose} variant="outline">キャンセル</Button>
-          <Button type="submit" onClick={handleSubmit} disabled={isSubmitting}>
+          <Button type="submit" onClick={handleSubmit} disabled={isSubmitting || !selectedPet || !selectedTaskId || !selectedDate}>
             {isSubmitting ? '保存中...' : '保存'}
           </Button>
         </DialogFooter>

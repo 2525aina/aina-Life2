@@ -51,18 +51,14 @@ export default function PetsPage() {
   return (
     <div className="container mx-auto p-4">
       <header className="flex justify-between items-center mb-8">
-        <h1 className="text-4xl font-bold">ペット管理</h1>
         <div className="flex gap-4">
           <PetAddForm />
-          <Link href="/">
-            <Button variant="outline">ホームへ戻る</Button>
-          </Link>
         </div>
       </header>
 
       {pets.length === 0 ? (
         <div className="text-center">
-          <p>まだペットが登録されていません。</p>
+          <p>まだペットが登録されていません。新しいペットを登録しましょう！</p>
           <p>最初のペットを追加しましょう！</p>
         </div>
       ) : (

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import {
   collection,
   query,
@@ -36,6 +36,56 @@ export interface Log {
   taskTextColor?: string; // タスクの文字色を追加
 }
 
+// ログの追加、更新、削除アクションを提供するフック
+export const useLogActions = () => {
+  const { user } = useAuth();
+  const { selectedPet } = usePetSelection();
+
+  // ログを追加
+  const addLog = useCallback(async (task: Task, timestamp?: Date, note?: string) => {
+    if (!user || !selectedPet) throw new Error('ユーザーまたはペットが選択されていません。');
+    
+    const logData = {
+      petId: selectedPet.id,
+      taskId: task.id,
+      taskName: task.name,
+      timestamp: timestamp ? Timestamp.fromDate(timestamp) : serverTimestamp(),
+      note: note || '',
+      createdBy: user.uid,
+      updatedBy: user.uid,
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+    };
+
+    const logsCollection = collection(db, 'dogs', selectedPet.id, 'logs');
+    await addDoc(logsCollection, logData);
+  }, [user, selectedPet]);
+
+  // ログを更新
+  const updateLog = useCallback(async (logId: string, updatedData: Partial<Omit<Log, 'id' | 'petId' | 'createdBy' | 'createdAt'>>) => {
+    if (!user || !selectedPet) throw new Error('ユーザーまたはペットが選択されていません。');
+    const logRef = doc(db, 'dogs', selectedPet.id, 'logs', logId);
+    await updateDoc(logRef, {
+      ...updatedData,
+      updatedBy: user.uid,
+      updatedAt: serverTimestamp(),
+      // timestampがDateオブジェクトで渡された場合、Timestamp型に変換
+      ...(updatedData.timestamp && { timestamp: Timestamp.fromDate(updatedData.timestamp as unknown as Date) }),
+    });
+  }, [user, selectedPet]);
+
+  // ログを削除
+  const deleteLog = useCallback(async (logId: string) => {
+    if (!user || !selectedPet) throw new Error('ユーザーまたはペットが選択されていません。');
+    if (!confirm('本当にこのログを削除しますか？')) return;
+    const logRef = doc(db, 'dogs', selectedPet.id, 'logs', logId);
+    await deleteDoc(logRef);
+  }, [user, selectedPet]);
+
+  return { addLog, updateLog, deleteLog };
+};
+
+// 特定の日付のログをフェッチするフック
 export const useLogs = (targetDate: Date) => {
   const { user } = useAuth();
   const { selectedPet } = usePetSelection();
@@ -81,6 +131,8 @@ export const useLogs = (targetDate: Date) => {
         };
       });
       const enrichedLogs = await Promise.all(fetchedLogsPromises);
+      // Client-side sort to ensure correct order
+      enrichedLogs.sort((a, b) => b.timestamp.toMillis() - a.timestamp.toMillis());
       setLogs(enrichedLogs);
       setLoading(false);
     }, (error) => {
@@ -91,46 +143,5 @@ export const useLogs = (targetDate: Date) => {
     return () => unsubscribe();
   }, [user, selectedPet, targetDate]);
 
-  // ログを追加
-  const addLog = async (task: Task, note?: string, timestamp?: Date) => {
-    if (!user || !selectedPet) throw new Error('ユーザーまたはペットが選択されていません。');
-    
-    const logData = {
-      petId: selectedPet.id,
-      taskId: task.id,
-      taskName: task.name,
-      timestamp: timestamp ? Timestamp.fromDate(timestamp) : serverTimestamp(),
-      note: note || '',
-      createdBy: user.uid,
-      updatedBy: user.uid,
-      createdAt: serverTimestamp(),
-      updatedAt: serverTimestamp(),
-    };
-
-    const logsCollection = collection(db, 'dogs', selectedPet.id, 'logs');
-    await addDoc(logsCollection, logData);
-  };
-
-  // ログを更新
-  const updateLog = async (logId: string, updatedData: Partial<Omit<Log, 'id' | 'petId' | 'createdBy' | 'createdAt'>>) => {
-    if (!user || !selectedPet) throw new Error('ユーザーまたはペットが選択されていません。');
-    const logRef = doc(db, 'dogs', selectedPet.id, 'logs', logId);
-    await updateDoc(logRef, {
-      ...updatedData,
-      updatedBy: user.uid,
-      updatedAt: serverTimestamp(),
-      // timestampがDateオブジェクトで渡された場合、Timestamp型に変換
-      ...(updatedData.timestamp && { timestamp: Timestamp.fromDate(updatedData.timestamp as unknown as Date) }),
-    });
-  };
-
-  // ログを削除
-  const deleteLog = async (logId: string) => {
-    if (!user || !selectedPet) throw new Error('ユーザーまたはペットが選択されていません。');
-    if (!confirm('本当にこのログを削除しますか？')) return;
-    const logRef = doc(db, 'dogs', selectedPet.id, 'logs', logId);
-    await deleteDoc(logRef);
-  };
-
-  return { logs, loading, addLog, updateLog, deleteLog };
+  return { logs, loading };
 };

@@ -54,6 +54,7 @@ aina-Life2は、Next.jsとFirebaseで構築された、ペットの健康と日�
         ```
     *   Firebaseエミュレータを使用する場合は、`firebase.json` と `.firebaserc` がプロジェクトルートに存在することを確認し、以下のコマンドで起動します。
         ```bash
+        npm install -g firebase-tools
         firebase emulators:start
         ```
 
@@ -74,9 +75,9 @@ aina-Life2は、Next.jsとFirebaseで構築された、ペットの健康と日�
 
 ## 今後の展望
 
--   ペットの共有機能の強化
--   タスクの並び替え機能
+-   ペットの共有機能の実装
 -   ユーザープロフィール編集機能
 -   通知機能の実装
+-   ユーザー同士のチャット
 
 ---

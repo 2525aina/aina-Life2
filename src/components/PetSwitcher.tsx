@@ -1,16 +1,18 @@
-'use client';
+"use client";
 
-import { useEffect } from 'react';
-import { usePets } from '@/hooks/usePets';
-import { usePetSelection } from '@/contexts/PetSelectionContext';
+import { useEffect } from "react";
+import { usePets } from "@/hooks/usePets";
+import { usePetSelection } from "@/contexts/PetSelectionContext";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { Label } from '@/components/ui/label';
+} from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 export function PetSwitcher() {
   const { pets, loading: petsLoading } = usePets();
@@ -22,13 +24,13 @@ export function PetSwitcher() {
       setSelectedPet(pets[0]);
     }
     // If the currently selected pet is no longer in the list, clear it
-    if (selectedPet && !pets.find(p => p.id === selectedPet.id)) {
+    if (selectedPet && !pets.find((p) => p.id === selectedPet.id)) {
       setSelectedPet(null);
     }
   }, [pets, selectedPet, setSelectedPet]);
 
   const handleValueChange = (petId: string) => {
-    const pet = pets.find(p => p.id === petId) || null;
+    const pet = pets.find((p) => p.id === petId) || null;
     setSelectedPet(pet);
   };
 
@@ -37,18 +39,24 @@ export function PetSwitcher() {
   }
 
   if (pets.length === 0) {
-    return <p>ペットが登録されていません。まずはペットを追加してください。</p>;
+    return (
+      <div className="text-center space-y-4">
+        <p>①ペットがまだ登録されていません。</p>
+        <Link href="/pets">
+          <Button>①ペットを登録する</Button>
+        </Link>
+      </div>
+    );
   }
 
   return (
     <div className="w-full max-w-xs">
-      <Label htmlFor="pet-switcher">ペットを選択</Label>
-      <Select onValueChange={handleValueChange} value={selectedPet?.id || ''}>
+      <Select onValueChange={handleValueChange} value={selectedPet?.id || ""}>
         <SelectTrigger id="pet-switcher">
           <SelectValue placeholder="ペットを選択..." />
         </SelectTrigger>
         <SelectContent>
-          {pets.map(pet => (
+          {pets.map((pet) => (
             <SelectItem key={pet.id} value={pet.id}>
               {pet.name}
             </SelectItem>

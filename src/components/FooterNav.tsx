@@ -45,7 +45,7 @@ export function FooterNav() {
               className="flex flex-col items-center justify-center flex-grow text-sm"
             >
               <Icon className={cn(
-                "h-6 w-6",
+                "h-8 w-8",
                 isActive ? "text-primary" : "text-muted-foreground"
               )} />
               <span className={cn(

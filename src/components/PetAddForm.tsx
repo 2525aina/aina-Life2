@@ -22,6 +22,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
+import { PlusIcon } from 'lucide-react';
 
 interface PetAddFormProps {
   isOpen?: boolean; // Optional for when used as a standalone trigger
@@ -100,7 +101,11 @@ export function PetAddForm({ isOpen: propIsOpen, onClose: propOnClose, petToEdit
   return (
     <Dialog open={isModalOpen} onOpenChange={(open) => { if (!open) closeModal(); else setInternalIsOpen(true); }}>
       <DialogTrigger asChild>
-        {!petToEdit && <Button onClick={() => setInternalIsOpen(true)}>新しいペットを追加</Button>}
+        {!petToEdit && (
+          <Button variant="ghost" size="icon" onClick={() => setInternalIsOpen(true)}>
+            <PlusIcon className="h-5 w-5" />
+          </Button>
+        )}
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>

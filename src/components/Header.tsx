@@ -6,6 +6,7 @@ import { auth } from '@/lib/firebase';
 import { signOut } from 'firebase/auth';
 import { Button } from '@/components/ui/button';
 import { HomeIcon, PawPrintIcon, ClipboardListIcon, LogOutIcon } from 'lucide-react';
+import { PetSwitcher } from '@/components/PetSwitcher';
 
 export function Header() {
   const { user } = useAuth();
@@ -26,17 +27,7 @@ export function Header() {
         <Link href="/" className="text-2xl font-bold">
           aina-Life
         </Link>
-
-        {user ? (
-          <nav className="flex items-center gap-2 sm:gap-4">
-            {/* Placeholder for user info or settings if needed */}
-            <Button onClick={handleLogout} variant="secondary">ログアウト</Button>
-          </nav>
-        ) : (
-          <Link href="/login">
-            <Button variant="secondary">ログイン</Button>
-          </Link>
-        )}
+        {user && <PetSwitcher />}
       </div>
     </header>
   );
