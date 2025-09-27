@@ -7,14 +7,12 @@ import { signOut } from 'firebase/auth';
 import { Button } from '@/components/ui/button';
 import { TaskSelector } from '@/components/TaskSelector';
 import { LogTimeline } from '@/components/LogTimeline';
-import { LogFormModal } from '@/components/LogFormModal';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react'; // Import useState
+import { useEffect } from 'react';
 
 export default function Home() {
   const { user, loading } = useAuth();
   const router = useRouter();
-  const [isLogFormModalOpen, setIsLogFormModalOpen] = useState(false); // State for modal visibility
 
   const handleLogout = async () => {
     try {
@@ -24,14 +22,6 @@ export default function Home() {
       console.error('ログアウトに失敗しました', error);
       alert('ログアウトに失敗しました');
     }
-  };
-
-  const handleOpenLogFormModal = () => {
-    setIsLogFormModalOpen(true);
-  };
-
-  const handleCloseLogFormModal = () => {
-    setIsLogFormModalOpen(false);
   };
 
   useEffect(() => {
@@ -45,15 +35,10 @@ export default function Home() {
   }
 
   return (
-    <main className="flex min-h-screen flex-col items-center px-4 md:px-8 pt-0">
+    <main className="flex min-h-screen flex-col items-center px-4 md:px-8 pt-16">
       {user ? (
         <div className="w-full max-w-4xl space-y-8">
           <div className="flex justify-between items-center">
-            <Button onClick={handleOpenLogFormModal}>ログを追加</Button> {/* Button to open the modal */}
-            <LogFormModal
-              isOpen={isLogFormModalOpen}
-              onClose={handleCloseLogFormModal}
-            />
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">

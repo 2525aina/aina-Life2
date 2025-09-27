@@ -97,14 +97,17 @@ export function LogTimeline() {
           {logs.map((log) => (
             <Card
               key={log.id}
+              className={cn(
+                log.isTaskDeleted && "bg-gray-200 text-gray-500 opacity-60",
+              )}
               style={{
-                backgroundColor: log.taskColor,
-                color: log.taskTextColor,
+                backgroundColor: log.isTaskDeleted ? undefined : log.taskColor,
+                color: log.isTaskDeleted ? undefined : log.taskTextColor,
               }}
             >
               <CardHeader>
                 <CardTitle className="flex flex-wrap justify-between items-center">
-                  <span>{log.taskName}</span>
+                  <span className="max-w-[calc(100%-6rem)] truncate">{log.taskName}</span>
                   <div className="flex gap-2 mt-2 sm:mt-0">
                     <Button
                       variant="secondary"

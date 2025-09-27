@@ -26,6 +26,8 @@ export interface Task {
   color: string;
   order: number;
   textColor?: string;
+  deleted?: boolean; // 論理削除フラグ
+  deletedAt?: Timestamp | null; // 削除日時
 }
 
 export const useTasks = () => {
@@ -51,7 +53,7 @@ export const useTasks = () => {
       const fetchedTasks = snapshot.docs.map((doc) => ({
         id: doc.id,
         ...(doc.data() as Omit<Task, 'id'>),
-      }));
+      })).filter(task => !task.deleted); // クライアント側で論理削除されたタスクを除外
       setTasks(fetchedTasks);
       setLoading(false);
     }, (error) => {
@@ -68,6 +70,7 @@ export const useTasks = () => {
     const tasksCollection = collection(db, 'dogs', selectedPet.id, 'tasks');
     await addDoc(tasksCollection, {
       ...taskData,
+      deleted: false, // 新規タスクは論理削除されていない状態
       createdBy: user.uid,
       createdAt: serverTimestamp(),
       updatedBy: user.uid,
@@ -78,20 +81,70 @@ export const useTasks = () => {
   // タスクを更新
   const updateTask = async (taskId: string, updatedData: Partial<Omit<Task, 'id'>>) => {
     if (!user || !selectedPet) throw new Error('ユーザーまたはペットが選択されていません。');
+
+    const batch = writeBatch(db);
     const taskRef = doc(db, 'dogs', selectedPet.id, 'tasks', taskId);
-    await updateDoc(taskRef, {
+
+    // Update the task document
+    batch.update(taskRef, {
       ...updatedData,
       updatedBy: user.uid,
       updatedAt: serverTimestamp(),
     });
+
+    // If task name is updated, update all associated logs
+    if (updatedData.name) {
+      const logsQuery = query(
+        collection(db, 'dogs', selectedPet.id, 'logs'),
+        where('taskId', '==', taskId)
+      );
+      const logsSnapshot = await getDocs(logsQuery);
+
+      logsSnapshot.forEach((logDoc) => {
+        batch.update(logDoc.ref, {
+          taskName: updatedData.name,
+          updatedBy: user.uid,
+          updatedAt: serverTimestamp(),
+        });
+      });
+    }
+
+    await batch.commit();
   };
 
   // タスクを削除
   const deleteTask = async (taskId: string) => {
     if (!user || !selectedPet) throw new Error('ユーザーまたはペットが選択されていません。');
-    if (!confirm('本当にこのタスクを削除しますか？関連するログは削除されません。')) return;
+    if (!confirm('本当にこのタスクを削除しますか？関連するログも非表示になります。')) return;
+
+    const batch = writeBatch(db);
     const taskRef = doc(db, 'dogs', selectedPet.id, 'tasks', taskId);
-    await deleteDoc(taskRef);
+
+    // タスクを論理削除
+    batch.update(taskRef, {
+      deleted: true,
+      deletedAt: serverTimestamp(),
+      updatedBy: user.uid,
+      updatedAt: serverTimestamp(),
+    });
+
+    // 関連するログも論理削除
+    const logsQuery = query(
+      collection(db, 'dogs', selectedPet.id, 'logs'),
+      where('taskId', '==', taskId)
+    );
+    const logsSnapshot = await getDocs(logsQuery);
+
+    logsSnapshot.forEach((logDoc) => {
+      batch.update(logDoc.ref, {
+        deleted: true,
+        deletedAt: serverTimestamp(),
+        updatedBy: user.uid,
+        updatedAt: serverTimestamp(),
+      });
+    });
+
+    await batch.commit();
   };
 
   // タスクの並び順を更新する関数

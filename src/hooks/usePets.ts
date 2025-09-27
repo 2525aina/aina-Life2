@@ -37,6 +37,8 @@ export interface Pet {
   microchipId?: string;
   medicalNotes?: string;
   vetInfo?: VetInfo[];
+  deleted?: boolean; // 論理削除フラグ
+  deletedAt?: Timestamp | null; // 削除日時
 }
 
 // 共有メンバーのデータ型定義
@@ -104,7 +106,7 @@ export const usePets = () => {
       uniquePetIds.forEach(petId => {
         const petDocRef = doc(db, 'dogs', petId);
         const unsubscribePet = onSnapshot(petDocRef, (petSnapshot) => {
-          if (petSnapshot.exists()) {
+          if (petSnapshot.exists() && !petSnapshot.data()?.deleted) {
             currentPetsMap.set(petId, { id: petSnapshot.id, ...(petSnapshot.data() as Omit<Pet, 'id'>) });
           } else {
             currentPetsMap.delete(petId);
@@ -195,27 +197,48 @@ export const usePets = () => {
       alert('ログインが必要です。');
       return;
     }
-    if (!confirm('⚠️本当にこのペットを完全に削除しますか？この操作は元に戻せません。\n関連するタスクやログも全て削除されます。')) {
+    if (!confirm('⚠️本当にこのペットを削除しますか？この操作は元に戻せません。\n関連するタスクやログも全て論理削除されます。')) {
       return;
     }
     try {
-      // 1. サブコレクション (tasks) のドキュメントを全て削除
+      const batch = writeBatch(db);
+      const petRef = doc(db, 'dogs', petId);
+
+      // 論理削除フラグを設定
+      batch.update(petRef, {
+        deleted: true,
+        deletedAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
+      });
+
+      // 関連するタスクを論理削除
       const tasksRef = collection(db, 'dogs', petId, 'tasks');
       const taskDocs = await getDocs(tasksRef);
-      const deleteTasksPromises = taskDocs.docs.map(d => deleteDoc(d.ref));
-      await Promise.all(deleteTasksPromises);
+      taskDocs.docs.forEach(d => {
+        batch.update(d.ref, {
+          deleted: true,
+          deletedAt: serverTimestamp(),
+          updatedAt: serverTimestamp(),
+        });
+      });
 
-      // 2. サブコレクション (logs) のドキュメントを全て削除
+      // 関連するログを論理削除
       const logsRef = collection(db, 'dogs', petId, 'logs');
       const logDocs = await getDocs(logsRef);
-      const deleteLogsPromises = logDocs.docs.map(d => deleteDoc(d.ref));
-      await Promise.all(deleteLogsPromises);
+      logDocs.docs.forEach(d => {
+        batch.update(d.ref, {
+          deleted: true,
+          deletedAt: serverTimestamp(),
+          updatedAt: serverTimestamp(),
+        });
+      });
 
-      await deleteDoc(doc(db, 'dogs', petId));
+      await batch.commit();
+      alert('ペットと関連データが論理削除されました。');
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : "不明なエラー";
-      console.error('usePets: ペットの削除に失敗しました:', errorMessage);
-      alert('ペットの削除に失敗しました。');
+      console.error('usePets: ペットの論理削除に失敗しました:', errorMessage);
+      alert('ペットの論理削除に失敗しました。');
     }
   };
 

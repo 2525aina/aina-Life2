@@ -44,6 +44,7 @@ export function TaskSelector() {
           key={task.id}
           style={{ backgroundColor: task.color, color: task.textColor }}
           onClick={() => handleTaskClick(task)}
+          className="max-w-[calc(100%-0.5rem)] truncate" // Added max-width and truncate
         >
           {task.name}
         </Button>

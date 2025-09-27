@@ -24,16 +24,19 @@ import { Task } from './useTasks';
 export interface Log {
   id: string;
   petId: string;
-  taskName: string;
   taskId: string;
+  taskName: string;
   timestamp: Timestamp;
   note?: string;
   createdBy: string;
   updatedBy: string;
   createdAt: Timestamp;
   updatedAt: Timestamp;
-  taskColor?: string; // タスクの色を追加
-  taskTextColor?: string; // タスクの文字色を追加
+  taskColor?: string;
+  taskTextColor?: string;
+  deleted?: boolean; // 論理削除フラグ (ログ自体の削除用)
+  deletedAt?: Timestamp | null; // 削除日時 (ログ自体の削除用)
+  isTaskDeleted?: boolean; // 関連タスクが削除されているか
 }
 
 // ログの追加、更新、削除アクションを提供するフック
@@ -123,11 +126,13 @@ export const useLogs = (targetDate: Date) => {
         const taskRef = doc(db, 'dogs', petId, 'tasks', logData.taskId);
         const taskSnap = await getDoc(taskRef);
         const task = taskSnap.exists() ? (taskSnap.data() as Task) : null;
+        const isTaskDeleted = !taskSnap.exists() || (task?.deleted === true); // タスクが存在しない、または論理削除されている
 
         return {
           ...logData,
           taskColor: task?.color || '#cccccc', // デフォルト色
           taskTextColor: task?.textColor || '#000000', // デフォルト文字色
+          isTaskDeleted: isTaskDeleted,
         };
       });
       const enrichedLogs = await Promise.all(fetchedLogsPromises);

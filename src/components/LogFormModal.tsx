@@ -100,11 +100,7 @@ export function LogFormModal({ isOpen, onClose, logToEdit, initialDate }: LogFor
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogTrigger asChild>
-        <Button variant="ghost" size="icon" disabled={!selectedPet}>
-          <PlusIcon className="h-5 w-5" />
-        </Button>
-      </DialogTrigger>
+
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>{logToEdit ? 'ログを編集' : '手動でログを追加'}</DialogTitle>

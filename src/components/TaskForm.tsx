@@ -48,6 +48,10 @@ export function TaskForm({ isOpen, onClose, taskToEdit }: TaskFormProps) {
       alert('タスク名は必須です。');
       return;
     }
+    if (formData.name.length > 15) {
+      alert('タスク名は15文字以内で入力してください。');
+      return;
+    }
     setIsSubmitting(true);
     try {
       if (taskToEdit) {
