@@ -43,7 +43,7 @@ export function PetSwitcher() {
   return (
     <div className="w-full max-w-xs">
       <Label htmlFor="pet-switcher">ペットを選択</Label>
-      <Select onValueChange={handleValueChange} value={selectedPet?.id}>
+      <Select onValueChange={handleValueChange} value={selectedPet?.id || ''}>
         <SelectTrigger id="pet-switcher">
           <SelectValue placeholder="ペットを選択..." />
         </SelectTrigger>

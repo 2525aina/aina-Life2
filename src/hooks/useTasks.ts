@@ -94,5 +94,24 @@ export const useTasks = () => {
     await deleteDoc(taskRef);
   };
 
-  return { tasks, loading, addTask, updateTask, deleteTask };
+  // タスクの並び順を更新する関数
+  const reorderTasks = async (reorderedTasks: Task[]) => {
+    if (!user || !selectedPet) throw new Error('ユーザーまたはペットが選択されていません。');
+    try {
+      for (const task of reorderedTasks) {
+        const taskRef = doc(db, 'dogs', selectedPet.id, 'tasks', task.id);
+        await updateDoc(taskRef, {
+          order: task.order,
+          updatedBy: user.uid,
+          updatedAt: serverTimestamp(),
+        });
+      }
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : "不明なエラー";
+      console.error('タスクの並び順の更新に失敗しました:', errorMessage);
+      alert('タスクの並び順の更新に失敗しました。');
+    }
+  };
+
+  return { tasks, loading, addTask, updateTask, deleteTask, reorderTasks };
 };
