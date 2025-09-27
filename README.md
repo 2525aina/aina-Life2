@@ -1,36 +1,82 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# aina-Life2 - ペットケア管理アプリ
 
-## Getting Started
+## 概要
 
-First, run the development server:
+aina-Life2は、Next.jsとFirebaseで構築された、ペットの健康と日々の活動を管理するためのモダンなWebアプリケーションです。大切なペットとの生活をより豊かに、そして楽しくサポートすることを目的としています。
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## 主な機能
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+-   **ユーザー認証:** メールアドレス/パスワード、Googleアカウントによる安全なログイン機能を提供します。
+-   **ペット管理:** 複数のペットを登録し、名前、種類、誕生日などの情報を編集・削除できます。
+-   **タスク管理:** 各ペットに紐づく日々のタスク（例: ご飯、散歩、投薬）を登録、編集、削除できます。
+-   **日々の記録（ログブック）:** 登録したタスクの実行ログを簡単に記録し、タイムライン形式で閲覧できます。日付ナビゲーションにより、過去の記録もスムーズに確認可能です。
+-   **レスポンシブデザイン:** スマートフォンからデスクトップまで、様々な画面サイズに対応した直感的で使いやすいUIを提供します。
+-   **モダンなUI:** Shadcn/ui を活用し、洗練されたデザインと優れたユーザーエクスペリエンスを実現しています。
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 使用技術
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+-   **フレームワーク:** Next.js (App Router)
+-   **言語:** TypeScript
+-   **UIライブラリ:** React
+-   **CSSフレームワーク:** Tailwind CSS
+-   **UIコンポーネント:** Shadcn/ui
+-   **バックエンド:** Firebase (Authentication, Firestore)
+-   **日付操作:** date-fns
+-   **アイコン:** lucide-react
 
-## Learn More
+## セットアップ方法
 
-To learn more about Next.js, take a look at the following resources:
+プロジェクトをローカル環境でセットアップし、実行するための手順です。
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+1.  **リポジトリをクローンします:**
+    ```bash
+    git clone https://github.com/2525aina/aina-Life2.git
+    cd aina-Life2
+    ```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+2.  **依存関係をインストールします:**
+    ```bash
+    npm install
+    ```
 
-## Deploy on Vercel
+3.  **Firebaseプロジェクトの設定:**
+    *   [Firebaseコンソール](https://console.firebase.google.com/)で新しいプロジェクトを作成し、Webアプリを追加します。
+    *   プロジェクトのルートディレクトリに `.env.local` ファイルを作成し、Firebaseの構成情報を設定します。以下は例です。
+        ```
+        NEXT_PUBLIC_FIREBASE_API_KEY="YOUR_API_KEY"
+        NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN="YOUR_AUTH_DOMAIN"
+        NEXT_PUBLIC_FIREBASE_PROJECT_ID="YOUR_PROJECT_ID"
+        NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET="YOUR_STORAGE_BUCKET"
+        NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID="YOUR_MESSAGING_SENDER_ID"
+        NEXT_PUBLIC_FIREBASE_APP_ID="YOUR_APP_ID"
+        NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID="YOUR_MEASUREMENT_ID"
+        NEXT_PUBLIC_USE_FIREBASE_EMULATOR=true # エミュレータを使用する場合
+        ```
+    *   Firebaseエミュレータを使用する場合は、`firebase.json` と `.firebaserc` がプロジェクトルートに存在することを確認し、以下のコマンドで起動します。
+        ```bash
+        firebase emulators:start
+        ```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+4.  **開発サーバーを起動します:**
+    ```bash
+    npm run dev
+    ```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+5.  ブラウザで `http://localhost:3000` にアクセスすると、アプリケーションが表示されます。
+
+## 使い方
+
+1.  ログインページから新しいアカウントを作成するか、既存のGoogleアカウントでログインします。
+2.  ログイン後、ヘッダーのナビゲーションから「ペット管理」ページへ移動し、新しいペットを登録します。
+3.  「タスク管理」ページで、登録したペットに日々のタスク（例: ご飯、散歩）を登録します。
+4.  ホーム画面に戻ると、選択中のペットのタスクボタンが表示されます。タスクボタンをクリックすると、そのタスクの実行ログが記録されます。
+5.  ホーム画面の日付ナビゲーションを使って、過去の記録を確認したり、手動でログを追加・編集・削除したりできます。
+
+## 今後の展望
+
+-   ペットの共有機能の強化
+-   タスクの並び替え機能
+-   ユーザープロフィール編集機能
+-   通知機能の実装
+
+---
