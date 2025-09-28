@@ -93,11 +93,6 @@ export default function TasksPage() {
     console.log("Editing task:", task);
   };
 
-  const handleDeleteTask = async (taskId: string) => {
-    console.log("Attempting to delete task:", taskId);
-    await deleteTask(taskId);
-  };
-
   const handleDragEnd = async (event: DragEndEvent) => {
     const { active, over } = event;
 
