@@ -22,7 +22,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { PlusIcon } from "lucide-react";
+import { PlusIcon, Loader2 } from 'lucide-react';
 
 interface PetAddFormProps {
   isOpen?: boolean; // Optional for when used as a standalone trigger
@@ -331,7 +331,14 @@ export function PetAddForm({
         <DialogFooter>
           <Button onClick={closeModal} variant="outline">キャンセル</Button>
           <Button type="submit" onClick={handleSubmit} disabled={isSubmitting}>
-            {isSubmitting ? '保存中...' : '保存'}
+            {isSubmitting ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                保存中...
+              </>
+            ) : (
+              '保存'
+            )}
           </Button>
         </DialogFooter>
       </DialogContent>
