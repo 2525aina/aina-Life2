@@ -106,11 +106,25 @@ export function LogTimeline() {
               }}
             >
               <CardHeader>
-                <div className="flex justify-between items-start"> {/* Use items-start to align top */}
-                  <CardTitle className="flex-grow max-w-[calc(100%-6rem)] truncate">
-                    {log.taskName}
-                  </CardTitle>
-                  <div className="flex gap-2"> {/* Buttons on the right */}
+                <div className="flex justify-between items-start">
+                  <div className="flex-grow">
+                    {log.createdByName && (
+                      <p className="text-xs text-muted-foreground">
+                        {log.createdByName}
+                        {log.updatedByName && log.createdByName !== log.updatedByName && (
+                          <span> (更新者: {log.updatedByName})</span>
+                        )}
+                      </p>
+                    )}
+                    <div className="flex items-baseline gap-1">
+                      <p className="text-sm font-medium">{format(log.timestamp.toDate(), "HH:mm:ss")}</p>
+                      <CardTitle className="text-base font-semibold truncate">
+                        {log.taskName}
+                      </CardTitle>
+                      {log.note && <p className="text-sm text-muted-foreground">({log.note})</p>}
+                    </div>
+                  </div>
+                  <div className="flex gap-2">
                     <Button
                       variant="secondary"
                       size="sm"
@@ -127,20 +141,9 @@ export function LogTimeline() {
                     </Button>
                   </div>
                 </div>
-                <div className="text-sm text-muted-foreground mt-1"> {/* Margin top for spacing */}
-                  <p className="text-xs">{format(log.timestamp.toDate(), "HH:mm:ss")}</p> {/* Time below task name */}
-                  {log.createdByName && (
-                    <p className="text-xs">
-                      {log.createdByName}
-                      {log.updatedByName && log.createdByName !== log.updatedByName && (
-                        <span> (更新者: {log.updatedByName})</span>
-                      )}
-                    </p>
-                  )}
-                </div>
               </CardHeader>
               <CardContent>
-                {log.note && <p className="text-sm mt-2">メモ: {log.note}</p>} {/* Note in CardContent */}
+                {/* CardContent is now empty as note is moved */}
               </CardContent>
             </Card>
           ))}
