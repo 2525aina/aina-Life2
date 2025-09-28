@@ -8,7 +8,7 @@ export function Header() {
   const { user } = useAuth();
 
   return (
-    <header className="bg-primary text-primary-foreground p-4 shadow-md">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-primary text-primary-foreground p-4 shadow-md">
       <div className="container mx-auto flex justify-between items-center">
         <Link href="/" className="text-2xl font-bold">
           aina-Life

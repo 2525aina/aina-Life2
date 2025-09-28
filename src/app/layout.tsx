@@ -22,7 +22,7 @@ export default function RootLayout({
         <AuthProvider>
           <PetSelectionProvider>
             <Header />
-            <main className="flex-grow pb-16"> {/* Add padding-bottom equal to footer height */}
+            <main className="flex-grow pt-16 pb-16"> {/* Add padding-top for fixed header, padding-bottom for fixed footer */}
               {children}
             </main>
             <FooterNav />
