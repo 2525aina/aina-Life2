@@ -106,9 +106,11 @@ export function LogTimeline() {
               }}
             >
               <CardHeader>
-                <CardTitle className="flex flex-wrap justify-between items-center">
-                  <span className="max-w-[calc(100%-6rem)] truncate">{log.taskName}</span>
-                  <div className="flex gap-2 mt-2 sm:mt-0">
+                <div className="flex justify-between items-start"> {/* Use items-start to align top */}
+                  <CardTitle className="flex-grow max-w-[calc(100%-6rem)] truncate">
+                    {log.taskName}
+                  </CardTitle>
+                  <div className="flex gap-2"> {/* Buttons on the right */}
                     <Button
                       variant="secondary"
                       size="sm"
@@ -124,24 +126,21 @@ export function LogTimeline() {
                       削除
                     </Button>
                   </div>
-                </CardTitle>
-                <div className="text-sm text-muted-foreground">
+                </div>
+                <div className="text-sm text-muted-foreground mt-1"> {/* Margin top for spacing */}
+                  <p className="text-xs">{format(log.timestamp.toDate(), "HH:mm:ss")}</p> {/* Time below task name */}
                   {log.createdByName && (
-                    <p>
+                    <p className="text-xs">
                       {log.createdByName}
                       {log.updatedByName && log.createdByName !== log.updatedByName && (
                         <span> (更新者: {log.updatedByName})</span>
                       )}
                     </p>
                   )}
-                  <p>{format(log.timestamp.toDate(), "HH:mm:ss")}</p>
                 </div>
               </CardHeader>
               <CardContent>
-                <p className="text-sm text-gray-500">
-                  {format(log.timestamp.toDate(), "HH:mm:ss.SSS")}
-                </p>
-                {log.note && <p className="mt-2">メモ: {log.note}</p>}
+                {log.note && <p className="text-sm mt-2">メモ: {log.note}</p>} {/* Note in CardContent */}
               </CardContent>
             </Card>
           ))}
