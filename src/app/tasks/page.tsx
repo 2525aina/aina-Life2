@@ -25,7 +25,7 @@ import {
 } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy, useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { MenuIcon, PlusIcon, Loader2, ClipboardListIcon } from 'lucide-react';
+import { MenuIcon, PlusIcon, Loader2, ClipboardListIcon, PawPrintIcon } from 'lucide-react';
 import { arrayMove } from '@dnd-kit/sortable';
 
 // Sortableなタスクアイテムコンポーネント
@@ -169,8 +169,12 @@ export default function TasksPage() {
             </DndContext>
           )}
         </div>
-      ) : (
-        <p>タスクを表示するには、まずペットを選択してください。</p>
+      ) : ( // This is the "no selected pet" display
+        <div className="flex flex-col items-center justify-center py-12 text-gray-500">
+          <PawPrintIcon className="h-16 w-16 mb-4 text-gray-400" />
+          <p className="text-lg font-semibold mb-2">タスクを表示するには、まずペットを選択してください。</p>
+          <p className="text-md">ペットが登録されていない場合は、ペット管理画面から追加してください。</p>
+        </div>
       )}
 
       {isFormOpen && (
