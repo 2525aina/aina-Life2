@@ -73,7 +73,7 @@ export const useLogActions = () => {
       updatedBy: user.uid,
       updatedAt: serverTimestamp(),
       // timestampがDateオブジェクトで渡された場合、Timestamp型に変換
-      ...(updatedData.timestamp && { timestamp: Timestamp.fromDate(updatedData.timestamp as unknown as Date) }),
+      ...(updatedData.timestamp && { timestamp: updatedData.timestamp }),
     });
   }, [user, selectedPet]);
 
