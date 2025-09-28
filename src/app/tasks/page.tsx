@@ -25,7 +25,7 @@ import {
 } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy, useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { MenuIcon, PlusIcon } from 'lucide-react';
+import { MenuIcon, PlusIcon, Loader2 } from 'lucide-react';
 import { arrayMove } from '@dnd-kit/sortable';
 
 // Sortableなタスクアイテムコンポーネント
@@ -114,7 +114,12 @@ export default function TasksPage() {
   };
 
   if (authLoading) {
-    return <p>ロード中...</p>;
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <Loader2 className="h-8 w-8 animate-spin" />
+        <p className="ml-2">ロード中...</p>
+      </div>
+    );
   }
 
   if (!user) {
@@ -141,7 +146,10 @@ export default function TasksPage() {
             </Button>
           </div>
           {tasksLoading ? (
-            <p>タスクをロード中...</p>
+            <div className="flex items-center justify-center py-8">
+              <Loader2 className="h-6 w-6 animate-spin" />
+              <p className="ml-2">タスクをロード中...</p>
+            </div>
           ) : orderedTasks.length === 0 ? (
             <p>このペットにはタスクがありません。最初のタスクを追加しましょう。</p>
           ) : (
