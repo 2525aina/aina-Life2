@@ -6,7 +6,7 @@ import { useLogs, Log, useLogActions } from "@/hooks/useLogs";
 import { Button } from "@/components/ui/button";
 import { format, addDays, subDays } from "date-fns";
 import { ja } from "date-fns/locale";
-import { CalendarIcon, ClipboardListIcon } from "lucide-react";
+import { CalendarIcon, ClipboardListIcon, PawPrintIcon } from "lucide-react";
 import {
   Popover,
   PopoverContent,
@@ -19,7 +19,7 @@ import { LogFormModal } from "@/components/LogFormModal";
 export function LogTimeline() {
   const { selectedPet } = usePetSelection();
   const [currentDate, setCurrentDate] = useState(new Date());
-  const { logs, loading } = useLogs(currentDate);
+  const { logs } = useLogs(currentDate);
   const { deleteLog } = useLogActions();
   const [isLogFormOpen, setIsLogFormOpen] = useState(false);
   const [logToEdit, setLogToEdit] = useState<Log | null>(null);
@@ -38,7 +38,13 @@ export function LogTimeline() {
   };
 
   if (!selectedPet) {
-    return <p>③ログを表示するには、①と②を完了してください。</p>;
+    return (
+      <div className="flex flex-col items-center justify-center py-12 text-gray-500">
+        <PawPrintIcon className="h-16 w-16 mb-4 text-gray-400" />
+        <p className="text-lg font-semibold mb-2">ログを表示するには、まずペットを選択してください。</p>
+        <p className="text-md">ペットが登録されていない場合は、ペット管理画面から追加してください。</p>
+      </div>
+    );
   }
 
   if (logs.length === 0) {

@@ -5,7 +5,6 @@ import { usePets } from "@/hooks/usePets";
 import { usePetSelection } from "@/contexts/PetSelectionContext";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
 import { Loader2 } from 'lucide-react';
 
 export function PetSwitcher() {
@@ -39,12 +38,9 @@ export function PetSwitcher() {
 
   if (pets.length === 0) {
     return (
-      <div className="text-center space-y-4">
-        <p>①ペットがまだ登録されていません。</p>
-        <Link href="/pets">
-          <Button>①ペットを登録する</Button>
-        </Link>
-      </div>
+      <Link href="/pets" className="text-sm text-muted-foreground hover:text-primary">
+        ペットを追加
+      </Link>
     );
   }
 

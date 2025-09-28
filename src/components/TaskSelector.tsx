@@ -5,6 +5,7 @@ import { useLogActions } from "@/hooks/useLogs";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import Link from "next/link";
+import { ClipboardListIcon } from 'lucide-react';
 
 export function TaskSelector() {
   const { tasks, loading: tasksLoading } = useTasks();
@@ -26,10 +27,11 @@ export function TaskSelector() {
 
   if (tasks.length === 0) {
     return (
-      <div className="text-center space-y-4">
-        <p>②記録するタスクがありません。</p>
+      <div className="flex flex-col items-center justify-center py-12 text-gray-500">
+        <ClipboardListIcon className="h-16 w-16 mb-4 text-gray-400" />
+        <p className="text-lg font-semibold mb-2">記録するタスクがありません。</p>
         <Link href="/tasks">
-          <Button>②タスクを作成する</Button>
+          <Button>タスクを作成する</Button>
         </Link>
       </div>
     );
