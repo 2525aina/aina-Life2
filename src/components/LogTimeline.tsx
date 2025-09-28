@@ -109,16 +109,33 @@ export function LogTimeline() {
             >
               <div className="flex flex-col items-center mr-4">
                 {/* 作成者/更新者名 */}
-                {log.createdByName && (
-                  <span className="text-base text-gray-500 mb-1 bg-gray-100 px-2 py-1 rounded">
-                    {log.createdByName}
-                    {log.updatedByName && log.createdByName !== log.updatedByName && (
-                      <span> (更新者: {log.updatedByName})</span>
-                    )}
-                  </span>
-                )}
+                {(() => {
+                  const primaryName = log.createdByName || "unknown";
+                  const truncatedPrimaryName = primaryName.substring(0, 6);
+                  return (
+                    <span
+                      className="font-mono text-sm mb-1 px-2 py-1 rounded"
+                      style={{
+                        backgroundColor: log.creatorNameBgColor,
+                        color: log.creatorNameTextColor,
+                      }}
+                    >
+                      {truncatedPrimaryName}
+                      {log.updatedByName &&
+                        log.createdByName !== log.createdByName && (
+                          <span> (更新者: {log.updatedByName})</span>
+                        )}
+                    </span>
+                  );
+                })()}
                 {/* 時刻表示 */}
-                <span className="font-mono text-base text-gray-700 bg-gray-100 px-2 py-1 rounded">
+                <span
+                  className="font-mono text-sm px-2 py-1 rounded"
+                  style={{
+                    backgroundColor: log.timeBgColor,
+                    color: log.timeTextColor,
+                  }}
+                >
                   {format(log.timestamp.toDate(), "HH:mm:ss")}
                 </span>
               </div>
@@ -126,9 +143,7 @@ export function LogTimeline() {
                 {log.taskName}
               </span>
               {log.note && (
-                <span className="ml-2 text-sm text-gray-500">
-                  ({log.note})
-                </span>
+                <span className="ml-2 text-sm text-gray-500">({log.note})</span>
               )}
               <div className="ml-auto flex space-x-2">
                 <Button

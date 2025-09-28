@@ -18,13 +18,18 @@ export interface UserProfile {
   lastLoginAt?: Timestamp; // Timestamp of last login
   createdAt: Timestamp;
   updatedAt: Timestamp;
-  settings: {
-    notifications: {
-      dailySummary: boolean;
-    };
-    theme: 'system' | 'light' | 'dark';
-  };
-}
+      settings: {
+        notifications: {
+          dailySummary: boolean;
+        };
+        theme: 'system' | 'light' | 'dark';
+        logDisplayColors?: {
+          creatorNameBg?: string;
+          creatorNameText?: string;
+          timeBg?: string;
+          timeText?: string;
+        };
+      };}
 
 export const useUser = () => {
   const { user } = useAuth();

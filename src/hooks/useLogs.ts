@@ -40,6 +40,10 @@ export interface Log {
   isTaskDeleted?: boolean; // 関連タスクが削除されているか
   createdByName?: string; // ログを作成したユーザーの表示名
   updatedByName?: string; // ログを更新したユーザーの表示名
+  creatorNameBgColor?: string;
+  creatorNameTextColor?: string;
+  timeBgColor?: string;
+  timeTextColor?: string;
 }
 
 // ログの追加、更新、削除アクションを提供するフック
@@ -161,6 +165,26 @@ export const useLogs = (targetDate: Date) => {
           updatedByName = userProfileData.nickname || userProfileData.authName || userProfileData.authEmail;
         }
 
+        // Fetch user-specific log display colors
+        let creatorNameBgColor: string | undefined;
+        let creatorNameTextColor: string | undefined;
+        let timeBgColor: string | undefined;
+        let timeTextColor: string | undefined;
+
+        if (logData.createdBy && userProfilesCache[logData.createdBy]) {
+          const userProfileData = userProfilesCache[logData.createdBy];
+          creatorNameBgColor = userProfileData.settings?.logDisplayColors?.creatorNameBg || '#e5e7eb'; // Default gray-100
+          creatorNameTextColor = userProfileData.settings?.logDisplayColors?.creatorNameText || '#6b7280'; // Default gray-500
+          timeBgColor = userProfileData.settings?.logDisplayColors?.timeBg || '#e5e7eb'; // Default gray-100
+          timeTextColor = userProfileData.settings?.logDisplayColors?.timeText || '#4b5563'; // Default gray-700
+        } else {
+          // Fallback for unknown users or if createdBy is missing
+          creatorNameBgColor = '#e5e7eb'; // Default gray-100
+          creatorNameTextColor = '#6b7280'; // Default gray-500
+          timeBgColor = '#e5e7eb'; // Default gray-100
+          timeTextColor = '#4b5563'; // Default gray-700
+        }
+
         // Fetch task details
         const taskRef = doc(db, 'dogs', petId, 'tasks', logData.taskId);
         const taskSnap = await getDoc(taskRef);
@@ -174,6 +198,10 @@ export const useLogs = (targetDate: Date) => {
           isTaskDeleted: isTaskDeleted,
           createdByName: createdByName,
           updatedByName: updatedByName,
+          creatorNameBgColor: creatorNameBgColor,
+          creatorNameTextColor: creatorNameTextColor,
+          timeBgColor: timeBgColor,
+          timeTextColor: timeTextColor,
         };
       });
 
