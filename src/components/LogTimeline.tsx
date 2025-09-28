@@ -125,6 +125,11 @@ export function LogTimeline() {
                     </Button>
                   </div>
                 </CardTitle>
+                {log.createdByName && (
+                  <p className="text-sm text-muted-foreground">
+                    記録者: {log.createdByName}
+                  </p>
+                )}
               </CardHeader>
               <CardContent>
                 <p className="text-sm text-gray-500">

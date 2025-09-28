@@ -19,6 +19,7 @@ import { db } from '@/lib/firebase';
 import { useAuth } from '@/contexts/AuthContext';
 import { usePetSelection } from '@/contexts/PetSelectionContext';
 import { Task } from './useTasks';
+import { UserProfile } from './useUser';
 
 // ログデータ型定義
 export interface Log {
@@ -37,6 +38,7 @@ export interface Log {
   deleted?: boolean; // 論理削除フラグ (ログ自体の削除用)
   deletedAt?: Timestamp | null; // 削除日時 (ログ自体の削除用)
   isTaskDeleted?: boolean; // 関連タスクが削除されているか
+  createdByName?: string; // ログを作成したユーザーの表示名
 }
 
 // ログの追加、更新、削除アクションを提供するフック
@@ -120,23 +122,50 @@ export const useLogs = (targetDate: Date) => {
     );
 
     const unsubscribe = onSnapshot(logsQuery, async (snapshot) => {
-      const fetchedLogsPromises = snapshot.docs.map(async (logDoc) => {
-        const logData = { id: logDoc.id, ...(logDoc.data() as Omit<Log, 'id'>) };
-        // タスクの色と文字色を取得
+      const fetchedLogs = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...(doc.data() as Omit<Log, 'id'>),
+      }));
+
+      const uniqueUserIds = Array.from(new Set(fetchedLogs.map(log => log.createdBy)));
+      const userProfilesCache: { [uid: string]: UserProfile } = {};
+
+      // Fetch all unique user profiles
+      const userProfilePromises = uniqueUserIds.map(async (uid) => {
+        if (uid) {
+          const userProfileRef = doc(db, 'users', uid);
+          const userProfileSnap = await getDoc(userProfileRef);
+          if (userProfileSnap.exists()) {
+            userProfilesCache[uid] = userProfileSnap.data() as UserProfile;
+          }
+        }
+      });
+      await Promise.all(userProfilePromises);
+
+      const enrichedLogsPromises = fetchedLogs.map(async (logData) => {
+        // Get createdByName from cache
+        let createdByName: string | undefined;
+        if (logData.createdBy && userProfilesCache[logData.createdBy]) {
+          const userProfileData = userProfilesCache[logData.createdBy];
+          createdByName = userProfileData.nickname || userProfileData.authName || userProfileData.authEmail;
+        }
+
+        // Fetch task details
         const taskRef = doc(db, 'dogs', petId, 'tasks', logData.taskId);
         const taskSnap = await getDoc(taskRef);
         const task = taskSnap.exists() ? (taskSnap.data() as Task) : null;
-        const isTaskDeleted = !taskSnap.exists() || (task?.deleted === true); // タスクが存在しない、または論理削除されている
+        const isTaskDeleted = !taskSnap.exists() || (task?.deleted === true);
 
         return {
           ...logData,
-          taskColor: task?.color || '#cccccc', // デフォルト色
-          taskTextColor: task?.textColor || '#000000', // デフォルト文字色
+          taskColor: task?.color || '#cccccc',
+          taskTextColor: task?.textColor || '#000000',
           isTaskDeleted: isTaskDeleted,
+          createdByName: createdByName,
         };
       });
-      const enrichedLogs = await Promise.all(fetchedLogsPromises);
-      // Client-side sort to ensure correct order
+
+      const enrichedLogs = await Promise.all(enrichedLogsPromises);
       enrichedLogs.sort((a, b) => b.timestamp.toMillis() - a.timestamp.toMillis());
       setLogs(enrichedLogs);
       setLoading(false);
