@@ -262,7 +262,7 @@ export default function ProfilePage() {
               </SelectTrigger>
               <SelectContent>
                 {pets.length === 0 ? (
-                  <SelectItem value="" disabled>
+                  <SelectItem value="no-pets" disabled>
                     ペットがいません
                   </SelectItem>
                 ) : (
