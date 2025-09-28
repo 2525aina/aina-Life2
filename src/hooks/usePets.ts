@@ -19,6 +19,7 @@ import {
 } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { useAuth } from '@/contexts/AuthContext';
+import { toast } from 'sonner';
 
 // ペットの獣医情報
 export interface VetInfo {
@@ -147,7 +148,7 @@ export const usePets = () => {
   // 新しいペットを追加する関数
   const addPet = async (petData: Omit<Pet, 'id'>) => {
     if (!user) {
-      alert('ログインが必要です。');
+      toast.error('ログインが必要です。');
       return;
     }
     try {
@@ -172,14 +173,14 @@ export const usePets = () => {
       return newPetRef.id;
     } catch (error) {
       console.error('ペットの追加に失敗しました:', error);
-      alert('ペットの追加に失敗しました。');
+      toast.error('ペットの追加に失敗しました。');
     }
   };
 
   // ペット情報を更新する関数
   const updatePet = async (petId: string, petData: Partial<Omit<Pet, 'id'>>) => {
     if (!user) {
-      alert('ログインが必要です。');
+      toast.error('ログインが必要です。');
       return;
     }
     try {
@@ -189,14 +190,14 @@ export const usePets = () => {
       });
     } catch (error) {
       console.error('usePets: ペットの更新に失敗しました:', error);
-      alert('ペットの更新に失敗しました。');
+      toast.error('ペットの更新に失敗しました。');
     }
   };
 
   // ペットを削除する関数
   const deletePet = async (petId: string) => {
     if (!user) {
-      alert('ログインが必要です。');
+      toast.error('ログインが必要です。');
       return;
     }
     if (!confirm('⚠️本当にこのペットを削除しますか？この操作は元に戻せません。\n関連するタスクやログも全て論理削除されます。')) {
@@ -236,11 +237,11 @@ export const usePets = () => {
       });
 
       await batch.commit();
-      alert('ペットと関連データが論理削除されました。');
+      toast.success('ペットと関連データが論理削除されました。');
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : "不明なエラー";
       console.error('usePets: ペットの論理削除に失敗しました:', errorMessage);
-      alert('ペットの論理削除に失敗しました。');
+      toast.error('ペットの論理削除に失敗しました。');
     }
   };
 
@@ -268,6 +269,7 @@ export const usePets = () => {
   // メンバーを招待する関数
   const inviteMember = async (petId: string, email: string) => {
     if (!user) {
+      toast.error('ログインが必要です。');
       throw new Error('ログインが必要です。');
     }
     try {
@@ -286,6 +288,7 @@ export const usePets = () => {
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : "不明なエラー";
       console.error('メンバーの招待に失敗しました:', errorMessage);
+      toast.error('メンバーの招待に失敗しました。');
       throw new Error('メンバーの招待に失敗しました。');
     }
   };
@@ -324,6 +327,7 @@ export const usePets = () => {
   // 招待のステータスを更新する関数
   const updateInvitationStatus = useCallback(async (petId: string, memberId: string, newStatus: 'active' | 'declined' | 'removed') => {
     if (!user) {
+      toast.error('ログインが必要です。');
       throw new Error('ログインが必要です。');
     }
     try {
@@ -345,6 +349,7 @@ export const usePets = () => {
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : "不明なエラー";
       console.error('招待ステータスの更新に失敗しました:', errorMessage);
+      toast.error('招待ステータスの更新に失敗しました。');
       throw new Error('招待ステータスの更新に失敗しました。');
     }
   }, [user]);
@@ -352,6 +357,7 @@ export const usePets = () => {
   // 共有メンバーを削除する関数
   const removeMember = useCallback(async (petId: string, memberId: string) => {
     if (!user) {
+      toast.error('ログインが必要です。');
       throw new Error('ログインが必要です。');
     }
     try {
@@ -360,6 +366,7 @@ export const usePets = () => {
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : "不明なエラー";
       console.error('メンバーの削除に失敗しました:', errorMessage);
+      toast.error('メンバーの削除に失敗しました。');
       throw new Error('メンバーの削除に失敗しました。');
     }
   }, [user]);
