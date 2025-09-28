@@ -1,15 +1,13 @@
 "use client";
 
 import { useTasks } from "@/hooks/useTasks";
-import { useLogs, useLogActions } from "@/hooks/useLogs";
+import { useLogActions } from "@/hooks/useLogs";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { useMemo } from "react";
 import Link from "next/link";
 
 export function TaskSelector() {
   const { tasks, loading: tasksLoading } = useTasks();
-  const today = useMemo(() => new Date(), []);
   const { addLog } = useLogActions(); // Use useLogActions
 
   const handleTaskClick = async (task: (typeof tasks)[0]) => {
