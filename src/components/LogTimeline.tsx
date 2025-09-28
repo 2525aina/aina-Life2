@@ -47,16 +47,6 @@ export function LogTimeline() {
     );
   }
 
-  if (logs.length === 0) {
-    return (
-      <div className="flex flex-col items-center justify-center py-12 text-gray-500">
-        <ClipboardListIcon className="h-16 w-16 mb-4 text-gray-400" />
-        <p className="text-lg font-semibold mb-2">{emptyMessageText}</p>
-        <p className="text-md">手動でログを追加するか、タスクを実行して記録しましょう！</p>
-      </div>
-    );
-  }
-
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-center gap-2 mb-4"> {/* Added flex-wrap, changed justify-between to justify-center, added gap-2 */}
@@ -105,7 +95,11 @@ export function LogTimeline() {
       </div>
 
       {logs.length === 0 ? (
-        <p>この日の記録はありません。</p>
+        <div className="flex flex-col items-center justify-center py-12 text-gray-500">
+          <ClipboardListIcon className="h-16 w-16 mb-4 text-gray-400" />
+          <p className="text-lg font-semibold mb-2">{emptyMessageText}</p>
+          <p className="text-md">手動でログを追加するか、タスクを実行して記録しましょう！</p>
+        </div>
       ) : (
         <ul className="space-y-2">
           {logs.map((log) => (
