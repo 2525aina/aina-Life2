@@ -165,6 +165,12 @@ export const useLogs = (targetDate: Date) => {
           updatedByName = userProfileData.nickname || userProfileData.authName || userProfileData.authEmail;
         }
 
+        // Fetch task details FIRST, so 'task' is available for color assignment
+        const taskRef = doc(db, 'dogs', petId, 'tasks', logData.taskId);
+        const taskSnap = await getDoc(taskRef);
+        const task = taskSnap.exists() ? (taskSnap.data() as Task) : null;
+        const isTaskDeleted = !taskSnap.exists() || (task?.deleted === true);
+
         // Fetch user-specific log display colors
         let creatorNameBgColor: string | undefined;
         let creatorNameTextColor: string | undefined;
@@ -173,10 +179,20 @@ export const useLogs = (targetDate: Date) => {
 
         if (logData.createdBy && userProfilesCache[logData.createdBy]) {
           const userProfileData = userProfilesCache[logData.createdBy];
-          creatorNameBgColor = userProfileData.settings?.logDisplayColors?.creatorNameBg || '#e5e7eb'; // Default gray-100
-          creatorNameTextColor = userProfileData.settings?.logDisplayColors?.creatorNameText || '#6b7280'; // Default gray-500
-          timeBgColor = userProfileData.settings?.logDisplayColors?.timeBg || '#e5e7eb'; // Default gray-100
-          timeTextColor = userProfileData.settings?.logDisplayColors?.timeText || '#4b5563'; // Default gray-700
+          const customColorsEnabled = userProfileData.settings?.logDisplayColors?.enabled ?? true;
+
+          if (customColorsEnabled) {
+            creatorNameBgColor = userProfileData.settings?.logDisplayColors?.creatorNameBg || '#e5e7eb'; // Default gray-100
+            creatorNameTextColor = userProfileData.settings?.logDisplayColors?.creatorNameText || '#6b7280'; // Default gray-500
+            timeBgColor = userProfileData.settings?.logDisplayColors?.timeBg || '#e5e7eb'; // Default gray-100
+            timeTextColor = userProfileData.settings?.logDisplayColors?.timeText || '#4b5563'; // Default gray-700
+          } else {
+            // If custom colors are disabled, use task colors
+            creatorNameBgColor = task?.color || '#cccccc';
+            creatorNameTextColor = task?.textColor || '#000000';
+            timeBgColor = task?.color || '#cccccc';
+            timeTextColor = task?.textColor || '#000000';
+          }
         } else {
           // Fallback for unknown users or if createdBy is missing
           creatorNameBgColor = '#e5e7eb'; // Default gray-100
@@ -184,12 +200,6 @@ export const useLogs = (targetDate: Date) => {
           timeBgColor = '#e5e7eb'; // Default gray-100
           timeTextColor = '#4b5563'; // Default gray-700
         }
-
-        // Fetch task details
-        const taskRef = doc(db, 'dogs', petId, 'tasks', logData.taskId);
-        const taskSnap = await getDoc(taskRef);
-        const task = taskSnap.exists() ? (taskSnap.data() as Task) : null;
-        const isTaskDeleted = !taskSnap.exists() || (task?.deleted === true);
 
         return {
           ...logData,

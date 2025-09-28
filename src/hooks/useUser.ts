@@ -24,6 +24,7 @@ export interface UserProfile {
         };
         theme: 'system' | 'light' | 'dark';
         logDisplayColors?: {
+          enabled?: boolean;
           creatorNameBg?: string;
           creatorNameText?: string;
           timeBg?: string;

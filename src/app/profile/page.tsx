@@ -59,6 +59,7 @@ export default function ProfilePage() {
             creatorNameText: userProfile.settings?.logDisplayColors?.creatorNameText || "#6b7280",
             timeBg: userProfile.settings?.logDisplayColors?.timeBg || "#e5e7eb",
             timeText: userProfile.settings?.logDisplayColors?.timeText || "#4b5563",
+            enabled: userProfile.settings?.logDisplayColors?.enabled ?? true, // Default to true
           },
         },
       });
@@ -95,6 +96,27 @@ export default function ProfilePage() {
           logDisplayColors: {
             ...currentLogDisplayColors,
             [`${category}${type}`]: value,
+          },
+        },
+      };
+    });
+  };
+
+  const handleToggleChange = (checked: boolean) => {
+    setFormData((prev) => {
+      const currentSettings = prev.settings || {
+        notifications: { dailySummary: false },
+        theme: 'system',
+      };
+      const currentLogDisplayColors = currentSettings.logDisplayColors || {};
+
+      return {
+        ...prev,
+        settings: {
+          ...currentSettings,
+          logDisplayColors: {
+            ...currentLogDisplayColors,
+            enabled: checked,
           },
         },
       };
@@ -252,6 +274,16 @@ export default function ProfilePage() {
           {/* ログ表示色設定 */}
           <div className="grid gap-4 mt-6">
             <h3 className="text-lg font-semibold">ログ表示色設定</h3>
+            <div className="flex items-center justify-between space-x-2">
+              <Label htmlFor="enableCustomColors">カスタム色を有効にする</Label>
+              <input
+                id="enableCustomColors"
+                type="checkbox"
+                checked={formData.settings?.logDisplayColors?.enabled || false}
+                onChange={(e) => handleToggleChange(e.target.checked)}
+                className="h-5 w-5 text-blue-600 focus:ring-blue-500 border-gray-300 rounded" // Basic styling
+              />
+            </div>
             <div className="grid gap-2">
               <Label htmlFor="creatorNameBg">作成者名 背景色</Label>
               <div className="flex gap-2">
@@ -261,6 +293,7 @@ export default function ProfilePage() {
                   value={formData.settings?.logDisplayColors?.creatorNameBg || "#e5e7eb"}
                   onChange={(e) => handleChangeColor("creatorName", "Bg", e.target.value)}
                   className="w-1/2"
+                  disabled={!formData.settings?.logDisplayColors?.enabled}
                 />
                 <Input
                   type="text"
@@ -268,6 +301,7 @@ export default function ProfilePage() {
                   onChange={(e) => handleChangeColor("creatorName", "Bg", e.target.value)}
                   placeholder="#RRGGBB"
                   className="w-1/2"
+                  disabled={!formData.settings?.logDisplayColors?.enabled}
                 />
               </div>
             </div>
@@ -280,6 +314,7 @@ export default function ProfilePage() {
                   value={formData.settings?.logDisplayColors?.creatorNameText || "#6b7280"}
                   onChange={(e) => handleChangeColor("creatorName", "Text", e.target.value)}
                   className="w-1/2"
+                  disabled={!formData.settings?.logDisplayColors?.enabled}
                 />
                 <Input
                   type="text"
@@ -287,6 +322,7 @@ export default function ProfilePage() {
                   onChange={(e) => handleChangeColor("creatorName", "Text", e.target.value)}
                   placeholder="#RRGGBB"
                   className="w-1/2"
+                  disabled={!formData.settings?.logDisplayColors?.enabled}
                 />
               </div>
             </div>
@@ -299,6 +335,7 @@ export default function ProfilePage() {
                   value={formData.settings?.logDisplayColors?.timeBg || "#e5e7eb"}
                   onChange={(e) => handleChangeColor("time", "Bg", e.target.value)}
                   className="w-1/2"
+                  disabled={!formData.settings?.logDisplayColors?.enabled}
                 />
                 <Input
                   type="text"
@@ -306,6 +343,7 @@ export default function ProfilePage() {
                   onChange={(e) => handleChangeColor("time", "Bg", e.target.value)}
                   placeholder="#RRGGBB"
                   className="w-1/2"
+                  disabled={!formData.settings?.logDisplayColors?.enabled}
                 />
               </div>
             </div>
@@ -318,6 +356,7 @@ export default function ProfilePage() {
                   value={formData.settings?.logDisplayColors?.timeText || "#4b5563"}
                   onChange={(e) => handleChangeColor("time", "Text", e.target.value)}
                   className="w-1/2"
+                  disabled={!formData.settings?.logDisplayColors?.enabled}
                 />
                 <Input
                   type="text"
@@ -325,6 +364,7 @@ export default function ProfilePage() {
                   onChange={(e) => handleChangeColor("time", "Text", e.target.value)}
                   placeholder="#RRGGBB"
                   className="w-1/2"
+                  disabled={!formData.settings?.logDisplayColors?.enabled}
                 />
               </div>
             </div>
