@@ -400,7 +400,7 @@ export default function ProfilePage() {
           </Button>
           <Button
             className="w-full mt-2"
-            variant="outline"
+            variant="destructive"
             onClick={handleLogout}
           >
             <LogOutIcon className="mr-2 h-4 w-4" />
