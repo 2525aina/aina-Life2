@@ -254,39 +254,79 @@ export default function ProfilePage() {
             <h3 className="text-lg font-semibold">ログ表示色設定</h3>
             <div className="grid gap-2">
               <Label htmlFor="creatorNameBg">作成者名 背景色</Label>
-              <Input
-                id="creatorNameBg"
-                type="color"
-                value={formData.settings?.logDisplayColors?.creatorNameBg || "#e5e7eb"}
-                onChange={(e) => handleChangeColor("creatorName", "Bg", e.target.value)}
-              />
+              <div className="flex gap-2">
+                <Input
+                  id="creatorNameBg"
+                  type="color"
+                  value={formData.settings?.logDisplayColors?.creatorNameBg || "#e5e7eb"}
+                  onChange={(e) => handleChangeColor("creatorName", "Bg", e.target.value)}
+                  className="w-1/2"
+                />
+                <Input
+                  type="text"
+                  value={formData.settings?.logDisplayColors?.creatorNameBg || "#e5e7eb"}
+                  onChange={(e) => handleChangeColor("creatorName", "Bg", e.target.value)}
+                  placeholder="#RRGGBB"
+                  className="w-1/2"
+                />
+              </div>
             </div>
             <div className="grid gap-2">
               <Label htmlFor="creatorNameText">作成者名 文字色</Label>
-              <Input
-                id="creatorNameText"
-                type="color"
-                value={formData.settings?.logDisplayColors?.creatorNameText || "#6b7280"}
-                onChange={(e) => handleChangeColor("creatorName", "Text", e.target.value)}
-              />
+              <div className="flex gap-2">
+                <Input
+                  id="creatorNameText"
+                  type="color"
+                  value={formData.settings?.logDisplayColors?.creatorNameText || "#6b7280"}
+                  onChange={(e) => handleChangeColor("creatorName", "Text", e.target.value)}
+                  className="w-1/2"
+                />
+                <Input
+                  type="text"
+                  value={formData.settings?.logDisplayColors?.creatorNameText || "#6b7280"}
+                  onChange={(e) => handleChangeColor("creatorName", "Text", e.target.value)}
+                  placeholder="#RRGGBB"
+                  className="w-1/2"
+                />
+              </div>
             </div>
             <div className="grid gap-2">
               <Label htmlFor="timeBg">時刻 背景色</Label>
-              <Input
-                id="timeBg"
-                type="color"
-                value={formData.settings?.logDisplayColors?.timeBg || "#e5e7eb"}
-                onChange={(e) => handleChangeColor("time", "Bg", e.target.value)}
-              />
+              <div className="flex gap-2">
+                <Input
+                  id="timeBg"
+                  type="color"
+                  value={formData.settings?.logDisplayColors?.timeBg || "#e5e7eb"}
+                  onChange={(e) => handleChangeColor("time", "Bg", e.target.value)}
+                  className="w-1/2"
+                />
+                <Input
+                  type="text"
+                  value={formData.settings?.logDisplayColors?.timeBg || "#e5e7eb"}
+                  onChange={(e) => handleChangeColor("time", "Bg", e.target.value)}
+                  placeholder="#RRGGBB"
+                  className="w-1/2"
+                />
+              </div>
             </div>
             <div className="grid gap-2">
               <Label htmlFor="timeText">時刻 文字色</Label>
-              <Input
-                id="timeText"
-                type="color"
-                value={formData.settings?.logDisplayColors?.timeText || "#4b5563"}
-                onChange={(e) => handleChangeColor("time", "Text", e.target.value)}
-              />
+              <div className="flex gap-2">
+                <Input
+                  id="timeText"
+                  type="color"
+                  value={formData.settings?.logDisplayColors?.timeText || "#4b5563"}
+                  onChange={(e) => handleChangeColor("time", "Text", e.target.value)}
+                  className="w-1/2"
+                />
+                <Input
+                  type="text"
+                  value={formData.settings?.logDisplayColors?.timeText || "#4b5563"}
+                  onChange={(e) => handleChangeColor("time", "Text", e.target.value)}
+                  placeholder="#RRGGBB"
+                  className="w-1/2"
+                />
+              </div>
             </div>
           </div>
         </CardContent>
