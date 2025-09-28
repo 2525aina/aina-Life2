@@ -52,6 +52,15 @@ export default function ProfilePage() {
         gender: userProfile.gender || "other",
         introduction: userProfile.introduction || "",
         primaryPetId: userProfile.primaryPetId || "",
+        settings: {
+          ...userProfile.settings,
+          logDisplayColors: {
+            creatorNameBg: userProfile.settings?.logDisplayColors?.creatorNameBg || "#e5e7eb",
+            creatorNameText: userProfile.settings?.logDisplayColors?.creatorNameText || "#6b7280",
+            timeBg: userProfile.settings?.logDisplayColors?.timeBg || "#e5e7eb",
+            timeText: userProfile.settings?.logDisplayColors?.timeText || "#4b5563",
+          },
+        },
       });
     }
   }, [authLoading, user, router, userProfile, pets]);
@@ -65,6 +74,31 @@ export default function ProfilePage() {
 
   const handleSelectChange = (name: string, value: string) => {
     setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleChangeColor = (
+    category: 'creatorName' | 'time',
+    type: 'Bg' | 'Text',
+    value: string
+  ) => {
+    setFormData((prev) => {
+      const currentSettings = prev.settings || {
+        notifications: { dailySummary: false },
+        theme: 'system',
+      };
+      const currentLogDisplayColors = currentSettings.logDisplayColors || {};
+
+      return {
+        ...prev,
+        settings: {
+          ...currentSettings,
+          logDisplayColors: {
+            ...currentLogDisplayColors,
+            [`${category}${type}`]: value,
+          },
+        },
+      };
+    });
   };
 
   const handleUpdateProfile = async () => {
@@ -214,6 +248,47 @@ export default function ProfilePage() {
               </p>
             </div>
           )}
+
+          {/* ログ表示色設定 */}
+          <div className="grid gap-4 mt-6">
+            <h3 className="text-lg font-semibold">ログ表示色設定</h3>
+            <div className="grid gap-2">
+              <Label htmlFor="creatorNameBg">作成者名 背景色</Label>
+              <Input
+                id="creatorNameBg"
+                type="color"
+                value={formData.settings?.logDisplayColors?.creatorNameBg || "#e5e7eb"}
+                onChange={(e) => handleChangeColor("creatorName", "Bg", e.target.value)}
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="creatorNameText">作成者名 文字色</Label>
+              <Input
+                id="creatorNameText"
+                type="color"
+                value={formData.settings?.logDisplayColors?.creatorNameText || "#6b7280"}
+                onChange={(e) => handleChangeColor("creatorName", "Text", e.target.value)}
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="timeBg">時刻 背景色</Label>
+              <Input
+                id="timeBg"
+                type="color"
+                value={formData.settings?.logDisplayColors?.timeBg || "#e5e7eb"}
+                onChange={(e) => handleChangeColor("time", "Bg", e.target.value)}
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="timeText">時刻 文字色</Label>
+              <Input
+                id="timeText"
+                type="color"
+                value={formData.settings?.logDisplayColors?.timeText || "#4b5563"}
+                onChange={(e) => handleChangeColor("time", "Text", e.target.value)}
+              />
+            </div>
+          </div>
         </CardContent>
         <CardFooter>
           <Button
