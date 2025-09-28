@@ -6,6 +6,7 @@ import { usePetSelection } from "@/contexts/PetSelectionContext";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { Loader2 } from 'lucide-react';
 
 export function PetSwitcher() {
   const { pets, loading: petsLoading } = usePets();
@@ -28,7 +29,12 @@ export function PetSwitcher() {
   };
 
   if (petsLoading) {
-    return <div>ペット情報をロード中...</div>;
+    return (
+      <div className="flex items-center justify-center py-2">
+        <Loader2 className="h-5 w-5 animate-spin" />
+        <p className="ml-2 text-sm">ペット情報をロード中...</p>
+      </div>
+    );
   }
 
   if (pets.length === 0) {
