@@ -116,9 +116,9 @@ export function LogTimeline() {
                         )}
                       </p>
                     )}
-                    <div className="flex items-baseline gap-1">
+                    <div className="flex items-center gap-1 flex-wrap"> {/* Changed items-baseline to items-center, added flex-wrap */}
                       <p className="text-sm font-medium">{format(log.timestamp.toDate(), "HH:mm:ss")}</p>
-                      <CardTitle className="text-base font-semibold truncate">
+                      <CardTitle className="text-base font-semibold"> {/* Removed truncate */}
                         {log.taskName}
                       </CardTitle>
                       {log.note && <p className="text-sm text-muted-foreground">({log.note})</p>}
