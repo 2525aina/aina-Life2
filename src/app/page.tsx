@@ -5,6 +5,7 @@ import { TaskSelector } from '@/components/TaskSelector';
 import { LogTimeline } from '@/components/LogTimeline';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
+import { Loader2 } from 'lucide-react';
 
 export default function Home() {
   const { user, loading } = useAuth();
@@ -17,7 +18,12 @@ export default function Home() {
   }, [loading, user, router]);
 
   if (loading) {
-    return <p>ロード中...</p>;
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <Loader2 className="h-8 w-8 animate-spin" />
+        <p className="ml-2">ロード中...</p>
+      </div>
+    );
   }
 
   return (
