@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { toast } from 'sonner';
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -36,7 +37,7 @@ export default function LoginPage() {
       const errorMessage = err instanceof Error ? err.message : "不明なエラー";
       setError(errorMessage);
       console.error(err);
-      alert(`ログインに失敗しました: ${errorMessage}`);
+      toast.error(`ログインに失敗しました: ${errorMessage}`);
     }
   };
 
@@ -51,7 +52,7 @@ export default function LoginPage() {
       const errorMessage = err instanceof Error ? err.message : "不明なエラー";
       setError(errorMessage);
       console.error(err);
-      alert(`Googleログインに失敗しました: ${errorMessage}`);
+      toast.error(`Googleログインに失敗しました: ${errorMessage}`);
     }
   };
 
