@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { PlusIcon, Loader2 } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface PetAddFormProps {
   isOpen?: boolean; // Optional for when used as a standalone trigger
@@ -121,17 +122,17 @@ export function PetAddForm({
 
   const handleSubmit = async () => {
     if (!formData.name) {
-      alert("ペットの名前は必須です。");
+      toast.error("ペットの名前は必須です。");
       return;
     }
     setIsSubmitting(true);
     try {
       if (petToEdit) {
         await updatePet(petToEdit.id, formData);
-        alert("ペット情報を更新しました！");
+        toast.success("ペット情報を更新しました！");
       } else {
         await addPet(formData);
-        alert("新しいペットを追加しました！");
+        toast.success("新しいペットを追加しました！");
       }
       closeModal(); // Close dialog on success
       // Reset form if adding new pet
@@ -143,11 +144,14 @@ export function PetAddForm({
           gender: "other",
           adoptionDate: "",
           medicalNotes: "",
+          profileImageUrl: "",
+          microchipId: "",
+          vetInfo: [],
         });
       }
     } catch (error) {
       console.error(error);
-      alert("ペット情報の保存に失敗しました。");
+      toast.error("ペット情報の保存に失敗しました。");
     } finally {
       setIsSubmitting(false);
     }
