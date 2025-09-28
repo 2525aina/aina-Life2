@@ -106,37 +106,24 @@ export function LogTimeline() {
               }}
             >
               <CardHeader>
-                <div className="flex justify-between items-start w-full"> {/* Main container for header content */}
-                  <div className="flex-grow grid grid-cols-2 gap-x-2"> {/* Grid for name/time/task/note */}
-                    {/* Row 1: Display Name */}
-                    <div className="col-span-2">
-                      {log.createdByName && (
-                        <p className="text-xs text-muted-foreground">
-                          {log.createdByName}
-                          {log.updatedByName && log.createdByName !== log.updatedByName && (
-                            <span> (更新者: {log.updatedByName})</span>
-                          )}
-                        </p>
-                      )}
-                    </div>
-
-                    {/* Row 2: Time and Task Name */}
-                    <div className="col-span-1 flex items-center"> {/* Time */}
-                      <p className="text-sm font-medium">{format(log.timestamp.toDate(), "HH:mm:ss")}</p>
-                    </div>
-                    <div className="col-span-1 flex items-center"> {/* Task Name */}
-                      <CardTitle className="text-base font-semibold">
-                        {log.taskName}
-                      </CardTitle>
-                    </div>
-
-                    {/* Row 3: Note */}
-                    <div className="col-span-2">
-                      {log.note && <p className="text-sm text-muted-foreground">({log.note})</p>}
-                    </div>
+                <div className="grid grid-cols-[auto_1fr_1fr_auto_auto] items-center gap-x-2 gap-y-1 w-full"> {/* 5 columns: A, B, C, D, E */}
+                  {/* Row 1 */}
+                  <div className="col-start-1 col-end-2 row-start-1 row-end-2"> {/* A1: Display Name */}
+                    {log.createdByName && (
+                      <p className="text-xs text-muted-foreground">
+                        {log.createdByName}
+                        {log.updatedByName && log.createdByName !== log.updatedByName && (
+                          <span> (更新者: {log.updatedByName})</span>
+                        )}
+                      </p>
+                    )}
                   </div>
-
-                  <div className="flex flex-col gap-2 ml-auto"> {/* Buttons on the right, aligned to top */}
+                  <div className="col-start-2 col-end-4 row-start-1 row-end-2"> {/* B1-C1: Task Name */}
+                    <CardTitle className="text-base font-semibold leading-tight"> {/* leading-tight for better line spacing */}
+                      {log.taskName}
+                    </CardTitle>
+                  </div>
+                  <div className="col-start-4 col-end-5 row-start-1 row-end-3 flex flex-col gap-2 justify-center"> {/* D1-D2: Edit Button */}
                     <Button
                       variant="secondary"
                       size="sm"
@@ -144,6 +131,8 @@ export function LogTimeline() {
                     >
                       編集
                     </Button>
+                  </div>
+                  <div className="col-start-5 col-end-6 row-start-1 row-end-3 flex flex-col gap-2 justify-center"> {/* E1-E2: Delete Button */}
                     <Button
                       variant="destructive"
                       size="sm"
@@ -151,6 +140,14 @@ export function LogTimeline() {
                     >
                       削除
                     </Button>
+                  </div>
+
+                  {/* Row 2 */}
+                  <div className="col-start-1 col-end-2 row-start-2 row-end-3"> {/* A2: Time */}
+                    <p className="text-sm font-medium">{format(log.timestamp.toDate(), "HH:mm:ss")}</p>
+                  </div>
+                  <div className="col-start-2 col-end-4 row-start-2 row-end-3"> {/* B2-C2: Note */} 
+                    {log.note && <p className="text-sm text-muted-foreground leading-tight">({log.note})</p>}
                   </div>
                 </div>
               </CardHeader>
