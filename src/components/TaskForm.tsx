@@ -13,6 +13,8 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { toast } from 'sonner';
+import { Loader2 } from 'lucide-react';
 
 interface TaskFormProps {
   isOpen: boolean;
@@ -45,29 +47,29 @@ export function TaskForm({ isOpen, onClose, taskToEdit }: TaskFormProps) {
 
   const handleSubmit = async () => {
     if (!formData.name) {
-      alert('タスク名は必須です。');
+      toast.error('タスク名は必須です。');
       return;
     }
     if (formData.name.length > 15) {
-      alert('タスク名は15文字以内で入力してください。');
+      toast.error('タスク名は15文字以内で入力してください。');
       return;
     }
     setIsSubmitting(true);
     try {
       if (taskToEdit) {
         await updateTask(taskToEdit.id, { name: formData.name, color: formData.color, textColor: formData.textColor });
-        alert('タスクを更新しました。');
+        toast.success('タスクを更新しました。');
       } else {
         // The order property needs to be handled properly.
         // For now, setting a default value.
         const taskData = { ...formData, order: new Date().getTime() };
         await addTask(taskData);
-        alert('タスクを追加しました。');
+        toast.success('タスクを追加しました。');
       }
       onClose();
     } catch (error) {
       console.error(error);
-      alert('タスクの保存に失敗しました。');
+      toast.error('タスクの保存に失敗しました。');
     } finally {
       setIsSubmitting(false);
     }
@@ -99,7 +101,14 @@ export function TaskForm({ isOpen, onClose, taskToEdit }: TaskFormProps) {
         <DialogFooter>
           <Button onClick={onClose} variant="outline">キャンセル</Button>
           <Button onClick={handleSubmit} disabled={isSubmitting}>
-            {isSubmitting ? '保存中...' : '保存'}
+            {isSubmitting ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                保存中...
+              </>
+            ) : (
+              '保存'
+            )}
           </Button>
         </DialogFooter>
       </DialogContent>
