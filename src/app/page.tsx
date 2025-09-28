@@ -1,10 +1,6 @@
 'use client';
 
-import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
-import { auth } from '@/lib/firebase';
-import { signOut } from 'firebase/auth';
-import { Button } from '@/components/ui/button';
 import { TaskSelector } from '@/components/TaskSelector';
 import { LogTimeline } from '@/components/LogTimeline';
 import { useRouter } from 'next/navigation';
@@ -13,16 +9,6 @@ import { useEffect } from 'react';
 export default function Home() {
   const { user, loading } = useAuth();
   const router = useRouter();
-
-  const handleLogout = async () => {
-    try {
-      await signOut(auth);
-      alert('ログアウトしました');
-    } catch (error) {
-      console.error('ログアウトに失敗しました', error);
-      alert('ログアウトに失敗しました');
-    }
-  };
 
   useEffect(() => {
     if (!loading && !user) {
