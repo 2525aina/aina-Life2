@@ -6,6 +6,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { usePets, Pet } from '@/hooks/usePets';
 import { PetAddForm } from '@/components/PetAddForm';
 import { Button } from '@/components/ui/button';
+import { Loader2 } from 'lucide-react';
 import {
   Card,
   CardContent,
@@ -34,7 +35,12 @@ export default function PetsPage() {
   };
 
   if (isLoading) {
-    return <p>ロード中...</p>;
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <Loader2 className="h-8 w-8 animate-spin" />
+        <p className="ml-2">ロード中...</p>
+      </div>
+    );
   }
 
   if (!user) {
