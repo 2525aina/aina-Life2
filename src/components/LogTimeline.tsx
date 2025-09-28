@@ -106,25 +106,37 @@ export function LogTimeline() {
               }}
             >
               <CardHeader>
-                <div className="flex justify-between items-start">
-                  <div className="flex-grow">
-                    {log.createdByName && (
-                      <p className="text-xs text-muted-foreground">
-                        {log.createdByName}
-                        {log.updatedByName && log.createdByName !== log.updatedByName && (
-                          <span> (更新者: {log.updatedByName})</span>
-                        )}
-                      </p>
-                    )}
-                    <div className="flex items-center gap-1 flex-wrap"> {/* Changed items-baseline to items-center, added flex-wrap */}
+                <div className="flex justify-between items-start w-full"> {/* Main container for header content */}
+                  <div className="flex-grow grid grid-cols-2 gap-x-2"> {/* Grid for name/time/task/note */}
+                    {/* Row 1: Display Name */}
+                    <div className="col-span-2">
+                      {log.createdByName && (
+                        <p className="text-xs text-muted-foreground">
+                          {log.createdByName}
+                          {log.updatedByName && log.createdByName !== log.updatedByName && (
+                            <span> (更新者: {log.updatedByName})</span>
+                          )}
+                        </p>
+                      )}
+                    </div>
+
+                    {/* Row 2: Time and Task Name */}
+                    <div className="col-span-1 flex items-center"> {/* Time */}
                       <p className="text-sm font-medium">{format(log.timestamp.toDate(), "HH:mm:ss")}</p>
-                      <CardTitle className="text-base font-semibold"> {/* Removed truncate */}
+                    </div>
+                    <div className="col-span-1 flex items-center"> {/* Task Name */}
+                      <CardTitle className="text-base font-semibold">
                         {log.taskName}
                       </CardTitle>
+                    </div>
+
+                    {/* Row 3: Note */}
+                    <div className="col-span-2">
                       {log.note && <p className="text-sm text-muted-foreground">({log.note})</p>}
                     </div>
                   </div>
-                  <div className="flex gap-2">
+
+                  <div className="flex flex-col gap-2 ml-auto"> {/* Buttons on the right, aligned to top */}
                     <Button
                       variant="secondary"
                       size="sm"
@@ -143,7 +155,7 @@ export function LogTimeline() {
                 </div>
               </CardHeader>
               <CardContent>
-                {/* CardContent is now empty as note is moved */}
+                {/* CardContent is now empty */}
               </CardContent>
             </Card>
           ))}
