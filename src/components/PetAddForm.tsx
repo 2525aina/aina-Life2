@@ -81,7 +81,7 @@ export function PetAddForm({
         });
       }
     }
-  }, [propIsOpen, internalIsOpen, petToEdit]);
+  }, [isModalOpen, petToEdit]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
