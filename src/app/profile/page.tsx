@@ -1,9 +1,9 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -20,10 +20,14 @@ import { Loader2 } from 'lucide-react';
 export default function ProfilePage() {
   const { user, loading } = useAuth();
   const router = useRouter();
+  const [displayName, setDisplayName] = useState('');
 
   useEffect(() => {
     if (!loading && !user) {
       router.push('/login');
+    }
+    if (user) {
+      setDisplayName(user.displayName || '');
     }
   }, [loading, user, router]);
 
@@ -61,7 +65,7 @@ export default function ProfilePage() {
           </div>
           <div className="grid gap-2">
             <Label htmlFor="displayName">表示名</Label>
-            <Input id="displayName" type="text" value={user.displayName || ''} />
+            <Input id="displayName" type="text" value={displayName} onChange={(e) => setDisplayName(e.target.value)} />
           </div>
           {/* 他のプロフィール項目を追加 */}
         </CardContent>
