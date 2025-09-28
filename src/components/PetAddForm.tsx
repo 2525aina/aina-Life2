@@ -168,11 +168,10 @@ export function PetAddForm({
       <DialogTrigger asChild>
         {!petToEdit && (
           <Button
-            variant="ghost"
-            size="icon"
             onClick={() => setInternalIsOpen(true)}
           >
-            <PlusIcon className="h-5 w-5" />
+            <PlusIcon className="mr-2 h-5 w-5" />
+            新しいペットを追加
           </Button>
         )}
       </DialogTrigger>

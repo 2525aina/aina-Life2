@@ -57,10 +57,12 @@ export default function PetsPage() {
   return (
     <div className="container mx-auto p-4">
       <header className="flex justify-between items-center mb-8">
-        <div className="flex gap-4">
-          <PetAddForm />
-        </div>
+        {/* Removed PetAddForm from here */}
       </header>
+
+      <div className="flex justify-end mb-4"> {/* New div for PetAddForm */}
+        <PetAddForm />
+      </div>
 
       {pets.length === 0 ? (
         <div className="text-center">

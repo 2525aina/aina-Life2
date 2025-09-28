@@ -141,8 +141,9 @@ export default function TasksPage() {
       {selectedPet ? (
         <div>
           <div className="flex justify-end mb-4">
-            <Button variant="ghost" size="icon" onClick={handleAddTask}>
-              <PlusIcon className="h-5 w-5" />
+            <Button onClick={handleAddTask}>
+              <PlusIcon className="mr-2 h-5 w-5" />
+              新しいタスクを追加
             </Button>
           </div>
           {tasksLoading ? (
