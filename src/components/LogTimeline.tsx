@@ -125,11 +125,17 @@ export function LogTimeline() {
                     </Button>
                   </div>
                 </CardTitle>
-                {log.createdByName && (
-                  <p className="text-sm text-muted-foreground">
-                    記録者: {log.createdByName}
-                  </p>
-                )}
+                <div className="text-sm text-muted-foreground">
+                  {log.createdByName && (
+                    <p>
+                      {log.createdByName}
+                      {log.updatedByName && log.createdByName !== log.updatedByName && (
+                        <span> (更新者: {log.updatedByName})</span>
+                      )}
+                    </p>
+                  )}
+                  <p>{format(log.timestamp.toDate(), "HH:mm:ss")}</p>
+                </div>
               </CardHeader>
               <CardContent>
                 <p className="text-sm text-gray-500">

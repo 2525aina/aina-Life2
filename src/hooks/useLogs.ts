@@ -39,6 +39,7 @@ export interface Log {
   deletedAt?: Timestamp | null; // 削除日時 (ログ自体の削除用)
   isTaskDeleted?: boolean; // 関連タスクが削除されているか
   createdByName?: string; // ログを作成したユーザーの表示名
+  updatedByName?: string; // ログを更新したユーザーの表示名
 }
 
 // ログの追加、更新、削除アクションを提供するフック
@@ -127,7 +128,10 @@ export const useLogs = (targetDate: Date) => {
         ...(doc.data() as Omit<Log, 'id'>),
       }));
 
-      const uniqueUserIds = Array.from(new Set(fetchedLogs.map(log => log.createdBy)));
+      const uniqueUserIds = Array.from(new Set([
+        ...fetchedLogs.map(log => log.createdBy),
+        ...fetchedLogs.map(log => log.updatedBy) // Include updatedBy
+      ]));
       const userProfilesCache: { [uid: string]: UserProfile } = {};
 
       // Fetch all unique user profiles
@@ -150,6 +154,13 @@ export const useLogs = (targetDate: Date) => {
           createdByName = userProfileData.nickname || userProfileData.authName || userProfileData.authEmail;
         }
 
+        // Get updatedByName from cache
+        let updatedByName: string | undefined;
+        if (logData.updatedBy && userProfilesCache[logData.updatedBy]) {
+          const userProfileData = userProfilesCache[logData.updatedBy];
+          updatedByName = userProfileData.nickname || userProfileData.authName || userProfileData.authEmail;
+        }
+
         // Fetch task details
         const taskRef = doc(db, 'dogs', petId, 'tasks', logData.taskId);
         const taskSnap = await getDoc(taskRef);
@@ -162,6 +173,7 @@ export const useLogs = (targetDate: Date) => {
           taskTextColor: task?.textColor || '#000000',
           isTaskDeleted: isTaskDeleted,
           createdByName: createdByName,
+          updatedByName: updatedByName,
         };
       });
 
