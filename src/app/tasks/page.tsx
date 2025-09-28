@@ -25,7 +25,7 @@ import {
 } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy, useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { MenuIcon, PlusIcon, Loader2 } from 'lucide-react';
+import { MenuIcon, PlusIcon, Loader2, ClipboardListIcon } from 'lucide-react';
 import { arrayMove } from '@dnd-kit/sortable';
 
 // Sortableなタスクアイテムコンポーネント
@@ -152,7 +152,11 @@ export default function TasksPage() {
               <p className="ml-2">タスクをロード中...</p>
             </div>
           ) : orderedTasks.length === 0 ? (
-            <p>このペットにはタスクがありません。最初のタスクを追加しましょう。</p>
+            <div className="flex flex-col items-center justify-center py-12 text-gray-500">
+              <ClipboardListIcon className="h-16 w-16 mb-4 text-gray-400" />
+              <p className="text-lg font-semibold mb-2">このペットにはタスクがありません。</p>
+              <p className="text-md">最初のタスクを追加して、管理を始めましょう！</p>
+            </div>
           ) : (
             <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
               <SortableContext items={orderedTasks.map(task => task.id)} strategy={verticalListSortingStrategy}>

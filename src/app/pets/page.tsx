@@ -6,7 +6,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { usePets, Pet } from '@/hooks/usePets';
 import { PetAddForm } from '@/components/PetAddForm';
 import { Button } from '@/components/ui/button';
-import { Loader2 } from 'lucide-react';
+import { Loader2, PawPrintIcon } from 'lucide-react';
 import {
   Card,
   CardContent,
@@ -65,9 +65,10 @@ export default function PetsPage() {
       </div>
 
       {pets.length === 0 ? (
-        <div className="text-center">
-          <p>まだペットが登録されていません。新しいペットを登録しましょう！</p>
-          <p>最初のペットを追加しましょう！</p>
+        <div className="flex flex-col items-center justify-center py-12 text-gray-500">
+          <PawPrintIcon className="h-16 w-16 mb-4 text-gray-400" />
+          <p className="text-lg font-semibold mb-2">まだペットが登録されていません。</p>
+          <p className="text-md">新しいペットを登録して、ケアを始めましょう！</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

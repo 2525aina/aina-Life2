@@ -6,7 +6,7 @@ import { useLogs, Log, useLogActions } from "@/hooks/useLogs";
 import { Button } from "@/components/ui/button";
 import { format, addDays, subDays } from "date-fns";
 import { ja } from "date-fns/locale";
-import { CalendarIcon } from "lucide-react";
+import { CalendarIcon, ClipboardListIcon } from "lucide-react";
 import {
   Popover,
   PopoverContent,
@@ -24,6 +24,9 @@ export function LogTimeline() {
   const [isLogFormOpen, setIsLogFormOpen] = useState(false);
   const [logToEdit, setLogToEdit] = useState<Log | null>(null);
 
+  // Define empty message text locally
+  const emptyMessageText = "この日の記録はありません。";
+
   const handleAddLog = () => {
     setLogToEdit(null);
     setIsLogFormOpen(true);
@@ -38,8 +41,14 @@ export function LogTimeline() {
     return <p>③ログを表示するには、①と②を完了してください。</p>;
   }
 
-  if (loading) {
-    return <p>ログをロード中...</p>;
+  if (logs.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center py-12 text-gray-500">
+        <ClipboardListIcon className="h-16 w-16 mb-4 text-gray-400" />
+        <p className="text-lg font-semibold mb-2">{emptyMessageText}</p>
+        <p className="text-md">手動でログを追加するか、タスクを実行して記録しましょう！</p>
+      </div>
+    );
   }
 
   return (
