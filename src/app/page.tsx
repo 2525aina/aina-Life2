@@ -29,7 +29,7 @@ export default function Home() {
   return (
     <main className="flex min-h-screen flex-col items-center px-4 md:px-8 pt-16">
       {user ? (
-        <div className="w-full max-w-4xl space-y-8">
+        <div className="w-full max-w-4xl space-y-4"> {/* Changed space-y-8 to space-y-4 */}
           <div className="flex justify-between items-center">
           </div>
 
