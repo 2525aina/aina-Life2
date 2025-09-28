@@ -18,6 +18,7 @@ import {
 import { db } from '@/lib/firebase';
 import { useAuth } from '@/contexts/AuthContext';
 import { usePetSelection } from '@/contexts/PetSelectionContext';
+import { toast } from 'sonner';
 
 // タスクデータ型定義
 export interface Task {
@@ -66,7 +67,10 @@ export const useTasks = () => {
 
   // タスクを追加
   const addTask = async (taskData: Omit<Task, 'id'>) => {
-    if (!user || !selectedPet) throw new Error('ユーザーまたはペットが選択されていません。');
+    if (!user || !selectedPet) {
+      toast.error('ユーザーまたはペットが選択されていません。');
+      throw new Error('ユーザーまたはペットが選択されていません。');
+    }
     const tasksCollection = collection(db, 'dogs', selectedPet.id, 'tasks');
     await addDoc(tasksCollection, {
       ...taskData,
@@ -80,7 +84,10 @@ export const useTasks = () => {
 
   // タスクを更新
   const updateTask = async (taskId: string, updatedData: Partial<Omit<Task, 'id'>>) => {
-    if (!user || !selectedPet) throw new Error('ユーザーまたはペットが選択されていません。');
+    if (!user || !selectedPet) {
+      toast.error('ユーザーまたはペットが選択されていません。');
+      throw new Error('ユーザーまたはペットが選択されていません。');
+    }
 
     const batch = writeBatch(db);
     const taskRef = doc(db, 'dogs', selectedPet.id, 'tasks', taskId);
@@ -114,7 +121,10 @@ export const useTasks = () => {
 
   // タスクを削除
   const deleteTask = async (taskId: string) => {
-    if (!user || !selectedPet) throw new Error('ユーザーまたはペットが選択されていません。');
+    if (!user || !selectedPet) {
+      toast.error('ユーザーまたはペットが選択されていません。');
+      return;
+    }
     if (!confirm('本当にこのタスクを削除しますか？関連するログも非表示になります。')) return;
 
     const batch = writeBatch(db);
@@ -149,7 +159,10 @@ export const useTasks = () => {
 
   // タスクの並び順を更新する関数
   const reorderTasks = async (reorderedTasks: Task[]) => {
-    if (!user || !selectedPet) throw new Error('ユーザーまたはペットが選択されていません。');
+    if (!user || !selectedPet) {
+      toast.error('ユーザーまたはペットが選択されていません。');
+      throw new Error('ユーザーまたはペットが選択されていません。');
+    }
     try {
       for (const task of reorderedTasks) {
         const taskRef = doc(db, 'dogs', selectedPet.id, 'tasks', task.id);
@@ -162,7 +175,7 @@ export const useTasks = () => {
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : "不明なエラー";
       console.error('タスクの並び順の更新に失敗しました:', errorMessage);
-      alert('タスクの並び順の更新に失敗しました。');
+      toast.error('タスクの並び順の更新に失敗しました。');
     }
   };
 
