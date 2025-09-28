@@ -10,7 +10,6 @@ import {
   orderBy,
   doc,
   updateDoc,
-  deleteDoc,
   writeBatch,
   getDocs,
   where,
