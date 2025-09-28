@@ -22,13 +22,13 @@ export default function RootLayout({
         <AuthProvider>
           <PetSelectionProvider>
             <Header />
-            <div className="flex-grow pb-16"> {/* Add padding-bottom equal to footer height */}
+            <main className="flex-grow pb-16"> {/* Add padding-bottom equal to footer height */}
               {children}
-            </div>
+            </main>
+            <FooterNav />
           </PetSelectionProvider>
         </AuthProvider>
         <Toaster />
-        <FooterNav />
       </body>
     </html>
   );

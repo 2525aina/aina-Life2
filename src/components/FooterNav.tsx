@@ -10,7 +10,7 @@ import { signOut } from 'firebase/auth';
 
 export function FooterNav() {
   const pathname = usePathname();
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
 
   const handleLogout = async () => {
     try {
@@ -29,6 +29,7 @@ export function FooterNav() {
     { name: 'ログアウト', href: '#', icon: LogOutIcon, action: handleLogout },
   ];
 
+  if (loading) return null;
   if (!user) return null;
 
   return (
