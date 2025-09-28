@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useLogActions, Log } from '@/hooks/useLogs';
 import { toast } from 'sonner';
+import { Timestamp } from 'firebase/firestore';
 
 import { useTasks } from '@/hooks/useTasks';
 
@@ -79,7 +80,7 @@ export function LogFormModal({ isOpen, onClose, logToEdit, initialDate }: LogFor
       if (task) {
         if (logToEdit) {
           // Update existing log
-          await updateLog(logToEdit.id, { taskId: task.id, taskName: task.name, timestamp: selectedDate, note });
+          await updateLog(logToEdit.id, { taskId: task.id, taskName: task.name, timestamp: Timestamp.fromDate(selectedDate), note });
           toast.success(`ログを更新しました: ${task.name} (${format(selectedDate, 'yyyy/MM/dd')})`);
         } else {
           // Add new log

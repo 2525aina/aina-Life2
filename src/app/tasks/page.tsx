@@ -21,6 +21,7 @@ import {
   PointerSensor,
   useSensor,
   useSensors,
+  DragEndEvent,
 } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy, useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
@@ -97,10 +98,10 @@ export default function TasksPage() {
     await deleteTask(taskId);
   };
 
-  const handleDragEnd = async (event: any) => {
+  const handleDragEnd = async (event: DragEndEvent) => {
     const { active, over } = event;
 
-    if (active.id !== over.id) {
+    if (over && active.id !== over.id) {
       const oldIndex = orderedTasks.findIndex((task) => task.id === active.id);
       const newIndex = orderedTasks.findIndex((task) => task.id === over.id);
       const newOrderedTasks = arrayMove(orderedTasks, oldIndex, newIndex);

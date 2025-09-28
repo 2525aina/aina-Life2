@@ -14,6 +14,8 @@ import {
   getDoc,
   setDoc,
   Timestamp,
+  writeBatch,
+  FieldValue,
 } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { useAuth } from '@/contexts/AuthContext';
@@ -326,7 +328,11 @@ export const usePets = () => {
     }
     try {
       const memberDocRef = doc(db, 'dogs', petId, 'members', memberId);
-      const dataToUpdate: { [key: string]: any } = { 
+      const dataToUpdate: { 
+        status: 'active' | 'declined' | 'removed';
+        updatedAt: FieldValue;
+        uid?: string;
+      } = { 
         status: newStatus,
         updatedAt: serverTimestamp(),
       };

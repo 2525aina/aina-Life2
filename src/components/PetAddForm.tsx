@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { usePets, Pet } from "@/hooks/usePets";
+import { usePets, Pet, VetInfo } from "@/hooks/usePets";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -287,7 +287,7 @@ export function PetAddForm({
 
           <div className="col-span-4 space-y-2 my-4">
             <Label>かかりつけ医情報 (最大5件)</Label>
-            {formData.vetInfo.map((vet, index) => (
+            {formData.vetInfo && formData.vetInfo.map((vet, index) => (
               <div key={vet.id} className="space-y-2 border p-2 rounded">
                 <div>
                   <Label htmlFor={`vetName-${index}`}>名前</Label>
@@ -295,7 +295,7 @@ export function PetAddForm({
                     id={`vetName-${index}`}
                     name="name"
                     value={vet.name || ''}
-                    onChange={(e) => handleVetInfoChange(index, e.target.name, e.target.value)}
+                    onChange={(e) => handleVetInfoChange(index, 'name', e.target.value)}
                     className="w-full"
                     placeholder="病院名または医師名"
                   />
@@ -306,7 +306,7 @@ export function PetAddForm({
                     id={`vetPhone-${index}`}
                     name="phone"
                     value={vet.phone || ''}
-                    onChange={(e) => handleVetInfoChange(index, e.target.name, e.target.value)}
+                    onChange={(e) => handleVetInfoChange(index, 'phone', e.target.value)}
                     className="w-full"
                     placeholder="電話番号"
                   />
@@ -321,7 +321,7 @@ export function PetAddForm({
                 </Button>
               </div>
             ))}
-            {formData.vetInfo.length < 5 && (
+            {formData.vetInfo && formData.vetInfo.length < 5 && (
               <Button type="button" variant="outline" onClick={handleAddVetInfo} className="w-full">
                 かかりつけ医を追加
               </Button>
