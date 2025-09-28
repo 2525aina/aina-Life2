@@ -2,33 +2,18 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { HomeIcon, PawPrintIcon, ClipboardListIcon, LogOutIcon, UserIcon } from 'lucide-react';
+import { HomeIcon, PawPrintIcon, ClipboardListIcon, UserIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
-import { auth } from '@/lib/firebase';
-import { signOut } from 'firebase/auth';
-import { toast } from 'sonner';
 
 export function FooterNav() {
   const pathname = usePathname();
   const { user, loading } = useAuth();
-
-  const handleLogout = async () => {
-    try {
-      await signOut(auth);
-      toast.success('ログアウトしました');
-    } catch (error) {
-      console.error('ログアウトに失敗しました', error);
-      toast.error('ログアウトに失敗しました');
-    }
-  };
-
   const navItems = [
     { name: 'ホーム', href: '/', icon: HomeIcon, action: null },
     { name: 'ペット', href: '/pets', icon: PawPrintIcon, action: null },
     { name: 'タスク', href: '/tasks', icon: ClipboardListIcon, action: null },
     { name: 'プロフィール', href: '/profile', icon: UserIcon, action: null },
-    { name: 'ログアウト', href: '#', icon: LogOutIcon, action: handleLogout },
   ];
 
   if (loading) return null;

@@ -15,8 +15,10 @@ import {
 } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { Loader2 } from "lucide-react";
+import { Loader2, LogOutIcon } from "lucide-react";
 import { useUser, UserProfile } from "@/hooks/useUser";
+import { auth } from "@/lib/firebase";
+import { signOut } from "firebase/auth";
 import { usePets } from "@/hooks/usePets";
 import {
   Select,
@@ -137,6 +139,17 @@ export default function ProfilePage() {
       toast.error("プロフィールの更新に失敗しました。");
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      router.push("/login"); // Redirect to login page after logout
+      toast.success("ログアウトしました");
+    } catch (error) {
+      console.error("ログアウトに失敗しました", error);
+      toast.error("ログアウトに失敗しました");
     }
   };
 
@@ -384,6 +397,14 @@ export default function ProfilePage() {
             ) : (
               "プロフィールを更新"
             )}
+          </Button>
+          <Button
+            className="w-full mt-2"
+            variant="outline"
+            onClick={handleLogout}
+          >
+            <LogOutIcon className="mr-2 h-4 w-4" />
+            ログアウト
           </Button>
         </CardFooter>
       </Card>
