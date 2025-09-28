@@ -139,11 +139,13 @@ export function LogTimeline() {
                   {format(log.timestamp.toDate(), "HH:mm:ss")}
                 </span>
               </div>
-              <span className="ml-4 font-medium text-gray-800 text-base">
+              <span className="ml-4 font-medium text-base" style={{ color: log.taskTextColor }}>
                 {log.taskName}
               </span>
               {log.note && (
-                <span className="ml-2 text-sm text-gray-500">({log.note})</span>
+                <span className="ml-2 text-sm" style={{ color: log.taskTextColor }}>
+                  ({log.note})
+                </span>
               )}
               <div className="ml-auto flex space-x-2">
                 <Button
