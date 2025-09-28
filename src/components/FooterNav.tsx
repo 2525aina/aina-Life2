@@ -7,6 +7,7 @@ import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 import { auth } from '@/lib/firebase';
 import { signOut } from 'firebase/auth';
+import { toast } from 'sonner';
 
 export function FooterNav() {
   const pathname = usePathname();
@@ -15,10 +16,10 @@ export function FooterNav() {
   const handleLogout = async () => {
     try {
       await signOut(auth);
-      alert('ログアウトしました');
+      toast.success('ログアウトしました');
     } catch (error) {
       console.error('ログアウトに失敗しました', error);
-      alert('ログアウトに失敗しました');
+      toast.error('ログアウトに失敗しました');
     }
   };
 
