@@ -4,7 +4,6 @@ import { useState } from "react";
 import { usePetSelection } from "@/contexts/PetSelectionContext";
 import { useLogs, Log, useLogActions } from "@/hooks/useLogs";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { format, addDays, subDays } from "date-fns";
 import { ja } from "date-fns/locale";
 import { CalendarIcon } from "lucide-react";
@@ -93,70 +92,63 @@ export function LogTimeline() {
       {logs.length === 0 ? (
         <p>この日の記録はありません。</p>
       ) : (
-        <div className="space-y-4">
+        <ul className="space-y-2">
           {logs.map((log) => (
-            <Card
+            <li
               key={log.id}
               className={cn(
-                log.isTaskDeleted && "bg-gray-200 text-gray-500 opacity-60",
+                "flex items-center p-3 rounded-lg shadow-sm border transition-colors",
+                log.isTaskDeleted
+                  ? "bg-gray-200 text-gray-500 opacity-60 border-gray-300"
+                  : "bg-white border-gray-100 hover:bg-gray-50"
               )}
               style={{
                 backgroundColor: log.isTaskDeleted ? undefined : log.taskColor,
                 color: log.isTaskDeleted ? undefined : log.taskTextColor,
               }}
             >
-              <CardHeader>
-                <div className="grid grid-cols-[auto_1fr_1fr_auto_auto] items-center gap-x-2 gap-y-1 w-full"> {/* 5 columns: A, B, C, D, E */}
-                  {/* Row 1 */}
-                  <div className="col-start-1 col-end-2 row-start-1 row-end-2"> {/* A1: Display Name */}
-                    {log.createdByName && (
-                      <p className="text-xs text-muted-foreground">
-                        {log.createdByName}
-                        {log.updatedByName && log.createdByName !== log.updatedByName && (
-                          <span> (更新者: {log.updatedByName})</span>
-                        )}
-                      </p>
+              <div className="flex flex-col items-center mr-4">
+                {/* 作成者/更新者名 */}
+                {log.createdByName && (
+                  <span className="text-base text-gray-500 mb-1 bg-gray-100 px-2 py-1 rounded">
+                    {log.createdByName}
+                    {log.updatedByName && log.createdByName !== log.updatedByName && (
+                      <span> (更新者: {log.updatedByName})</span>
                     )}
-                  </div>
-                  <div className="col-start-2 col-end-4 row-start-1 row-end-2"> {/* B1-C1: Task Name */}
-                    <CardTitle className="text-base font-semibold leading-tight"> {/* leading-tight for better line spacing */}
-                      {log.taskName}
-                    </CardTitle>
-                  </div>
-                  <div className="col-start-4 col-end-5 row-start-1 row-end-3 flex flex-col gap-2 justify-center"> {/* D1-D2: Edit Button */}
-                    <Button
-                      variant="secondary"
-                      size="sm"
-                      onClick={() => handleEditLog(log)}
-                    >
-                      編集
-                    </Button>
-                  </div>
-                  <div className="col-start-5 col-end-6 row-start-1 row-end-3 flex flex-col gap-2 justify-center"> {/* E1-E2: Delete Button */}
-                    <Button
-                      variant="destructive"
-                      size="sm"
-                      onClick={() => deleteLog(log.id)}
-                    >
-                      削除
-                    </Button>
-                  </div>
-
-                  {/* Row 2 */}
-                  <div className="col-start-1 col-end-2 row-start-2 row-end-3"> {/* A2: Time */}
-                    <p className="text-sm font-medium">{format(log.timestamp.toDate(), "HH:mm:ss")}</p>
-                  </div>
-                  <div className="col-start-2 col-end-4 row-start-2 row-end-3"> {/* B2-C2: Note */} 
-                    {log.note && <p className="text-sm text-muted-foreground leading-tight">({log.note})</p>}
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent>
-                {/* CardContent is now empty */}
-              </CardContent>
-            </Card>
+                  </span>
+                )}
+                {/* 時刻表示 */}
+                <span className="font-mono text-base text-gray-700 bg-gray-100 px-2 py-1 rounded">
+                  {format(log.timestamp.toDate(), "HH:mm:ss")}
+                </span>
+              </div>
+              <span className="ml-4 font-medium text-gray-800 text-base">
+                {log.taskName}
+              </span>
+              {log.note && (
+                <span className="ml-2 text-sm text-gray-500">
+                  ({log.note})
+                </span>
+              )}
+              <div className="ml-auto flex space-x-2">
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => handleEditLog(log)}
+                >
+                  編集
+                </Button>
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  onClick={() => deleteLog(log.id)}
+                >
+                  削除
+                </Button>
+              </div>
+            </li>
           ))}
-        </div>
+        </ul>
       )}
 
       {isLogFormOpen && (
