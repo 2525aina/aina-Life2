@@ -44,7 +44,7 @@ export function LogTimeline() {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex flex-wrap items-center justify-center gap-2 mb-4"> {/* Added flex-wrap, changed justify-between to justify-center, added gap-2 */}
         <Button
           variant="outline"
           onClick={() => setCurrentDate(subDays(currentDate, 1))}
@@ -56,7 +56,7 @@ export function LogTimeline() {
             <Button
               variant={"outline"}
               className={cn(
-                "w-full sm:w-[240px] justify-start text-left font-normal",
+                "flex-1 sm:w-[240px] justify-start text-left font-normal", // Changed w-full to flex-1
                 !currentDate && "text-muted-foreground"
               )}
             >
