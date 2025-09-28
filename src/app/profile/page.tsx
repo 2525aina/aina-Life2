@@ -398,8 +398,10 @@ export default function ProfilePage() {
               "プロフィールを更新"
             )}
           </Button>
+        </CardFooter>
+        <CardFooter className="mt-4"> {/* Added mt-4 for extra spacing */}
           <Button
-            className="w-full mt-2"
+            className="w-full" // Removed mt-2 as CardFooter itself provides spacing
             variant="destructive"
             onClick={handleLogout}
           >
