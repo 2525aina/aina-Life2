@@ -29,7 +29,7 @@ export function FooterNav() {
     { name: 'ログアウト', href: '#', icon: LogOutIcon, action: handleLogout },
   ];
 
-  // if (!user) return null; // Temporarily removed for debugging
+  if (!user) return null;
 
   return (
     <footer className="fixed bottom-0 left-0 right-0 bg-background border-t shadow-lg z-50">
