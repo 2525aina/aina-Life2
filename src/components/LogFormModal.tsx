@@ -45,10 +45,16 @@ export function LogFormModal({ isOpen, onClose, logToEdit, initialDate }: LogFor
         setSelectedTime(format(logToEdit.timestamp.toDate(), 'HH:mm:ss'));
       } else {
         // Reset form for new log entry
-        setSelectedDate(initialDate || new Date());
+        const now = new Date();
+        const dateWithCurrentTime = initialDate ? new Date(initialDate) : now;
+        dateWithCurrentTime.setHours(now.getHours());
+        dateWithCurrentTime.setMinutes(now.getMinutes());
+        dateWithCurrentTime.setSeconds(now.getSeconds());
+
+        setSelectedDate(dateWithCurrentTime);
         setSelectedTaskId(undefined);
         setNote('');
-        setSelectedTime(format(initialDate || new Date(), 'HH:mm:ss'));
+        setSelectedTime(format(now, 'HH:mm:ss')); // This is for the input display
       }
     }
   }, [isOpen, logToEdit, initialDate]);
