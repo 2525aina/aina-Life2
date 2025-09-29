@@ -52,7 +52,7 @@ const TableRow = React.forwardRef<HTMLTableRowElement, React.HTMLAttributes<HTML
         className
       )}
       {...props}
-    />
+    >{props.children}</tr>
   )
 )
 TableRow.displayName = "TableRow"
