@@ -40,7 +40,7 @@ function SortableItem({
 }) {
   return (
     <TableRow>
-      <TableCell className="w-8">
+      <TableCell className="w-8 py-1"> {/* This is the arrow button column */}
         <div className="flex flex-col items-center space-y-1">
           <Button variant="ghost" size="icon" onClick={() => handleMoveUp(task.id)} disabled={isFirst}>
             <ArrowUp className="h-4 w-4" />
@@ -50,15 +50,15 @@ function SortableItem({
           </Button>
         </div>
       </TableCell>
-      <TableCell style={{ backgroundColor: task.color, color: task.textColor || '#FFFFFF' }}>{task.name}</TableCell>
-      <TableCell>
+      <TableCell className="py-1" style={{ backgroundColor: task.color, color: task.textColor || '#FFFFFF' }}>{task.name}</TableCell> {/* Task name column */}
+      <TableCell className="py-1"> {/* Color display column */}
         <div className="flex flex-col gap-1">
           <div className="w-4 h-4 rounded-full border" style={{ backgroundColor: task.color }}></div>
           <div className="w-4 h-4 rounded-full border" style={{ backgroundColor: task.textColor || '#FFFFFF' }}></div>
         </div>
       </TableCell>
-      <TableCell className="text-right">
-        <div className="flex items-center justify-end space-x-2">
+      <TableCell className="text-right py-1"> {/* Action buttons column */}
+        <div className="flex flex-col items-end space-y-1">
           <Dialog open={isEditFormOpen && taskToEdit?.id === task.id} onOpenChange={setIsEditFormOpen}>
             <DialogTrigger asChild>
               <Button variant="ghost" size="icon" onClick={() => handleEdit(task)}>
