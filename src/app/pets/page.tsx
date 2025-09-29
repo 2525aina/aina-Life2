@@ -31,6 +31,8 @@ import { WeightForm } from '@/components/WeightForm'; // WeightFormをインポ�
 import { WeightChart } from '@/components/WeightChart'; // WeightChartをインポート
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'; // Dialogコンポーネントをインポート
 import { WeightHistory } from '@/components/WeightHistory'; // WeightHistoryをインポート
+import { TaskForm } from '@/components/TaskForm'; // TaskFormをインポート
+import { TaskHistory } from '@/components/TaskHistory'; // TaskHistoryをインポート
 
 export default function PetsPage() {
   const { user, loading: authLoading } = useAuth();
@@ -180,95 +182,111 @@ export default function PetsPage() {
                 <CollapsibleContent>
                   <CardContent className="p-4">
                     {/* 新しいタブセクション */} 
-                    <Tabs defaultValue="details" className="mt-4">
-                      <TabsList className="grid w-full grid-cols-2"> {/* 必要に応じてタブ数を調整 */}
-                        <TabsTrigger value="details">詳細</TabsTrigger>
-                        <TabsTrigger value="weights">体重記録</TabsTrigger>
-                      </TabsList>
-                      <TabsContent value="details" className="mt-4">
-                        {/* 既存のペット詳細情報をここに移動または表示 */}
-                        {/* 現在のCardContentの内容をここに配置 */}
-                        <div className="space-y-2 text-gray-700 mb-4">
-                          {pet.gender && (
-                            <p className="flex items-center text-sm">
-                              <User className="mr-2 h-4 w-4 text-gray-500" />
-                              <span className="font-semibold">性別:</span> {pet.gender === 'male' ? '男の子' : pet.gender === 'female' ? '女の子' : 'その他'}
-                            </p>
-                          )}
-                          {pet.birthday && (
-                            <p className="flex items-center text-sm">
-                              <CakeIcon className="mr-2 h-4 w-4 text-gray-500" />
-                              <span className="font-semibold">誕生日:</span> {pet.birthday}
-                            </p>
-                          )}
-                          {pet.adoptionDate && (
-                            <p className="flex items-center text-sm">
-                              <CalendarIcon className="mr-2 h-4 w-4 text-gray-500" />
-                              <span className="font-semibold">お迎え日:</span> {pet.adoptionDate}
-                            </p>
-                          )}
-                          {pet.microchipId && (
-                            <p className="flex items-center text-sm">
-                              <MicrochipIcon className="mr-2 h-4 w-4 text-gray-500" />
-                              <span className="font-semibold">マイクロチップ:</span> {pet.microchipId}
-                            </p>
-                          )}
-                        </div>
-
-                        {(pet.medicalNotes || (pet.vetInfo && pet.vetInfo.length > 0)) && (
-                          <div className="mt-4">
-                            {pet.medicalNotes && (
-                              <div className="mb-4">
-                                <p className="font-semibold text-sm mb-1 flex items-center"><NotebookText className="mr-2 h-4 w-4 text-gray-500" />メモ:</p>
-                                <p className="text-sm text-gray-600 whitespace-pre-wrap pl-6">{pet.medicalNotes}</p>
-                              </div>
-                            )}
-                            {pet.vetInfo && pet.vetInfo.length > 0 && (
-                              <div>
-                                <p className="font-semibold text-sm mb-2 flex items-center"><StethoscopeIcon className="mr-2 h-4 w-4 text-gray-500" />かかりつけ医情報:</p>
-                                <div className="pl-6 space-y-2">
-                                  {pet.vetInfo.map((vet, index) => (
-                                    <div key={index} className="text-sm text-gray-600 border-t pt-2 first:border-t-0 first:pt-0">
-                                      <p><strong>病院名:</strong> {vet.name}</p>
-                                      <p><strong>電話番号:</strong> {vet.phone}</p>
-                                    </div>
-                                  ))}
-                                </div>
-                              </div>
-                            )}
-                          </div>
-                        )}
-                      </TabsContent>
-                      <TabsContent value="weights" className="mt-4">
-                        <div className="flex justify-end mb-4">
-                          <Dialog open={isWeightFormOpen} onOpenChange={setIsWeightFormOpen}>
-                            <DialogTrigger asChild>
-                              <Button>体重を追加</Button>
-                            </DialogTrigger>
-                            <DialogContent>
-                              <DialogHeader>
-                                <DialogTitle>体重記録の追加</DialogTitle>
-                              </DialogHeader>
-                              <WeightForm dogId={pet.id} onSuccess={() => setIsWeightFormOpen(false)} />
-                            </DialogContent>
-                          </Dialog>
-                        </div>
-                        {/* 体重記録サブタブ */} 
-                        <Tabs defaultValue="chart">
-                          <TabsList className="grid w-full grid-cols-2">
-                            <TabsTrigger value="chart">体重の推移</TabsTrigger>
-                            <TabsTrigger value="history">体重の履歴</TabsTrigger>
-                          </TabsList>
-                          <TabsContent value="chart" className="mt-4">
-                            <WeightChart dogId={pet.id} />
-                          </TabsContent>
-                          <TabsContent value="history" className="mt-4">
-                            <WeightHistory dogId={pet.id} />
-                          </TabsContent>
-                        </Tabs>
-                      </TabsContent>
-                    </Tabs>
-                  </CardContent>
+                                        <Tabs defaultValue="details" className="mt-4">
+                                          <TabsList className="grid w-full grid-cols-3"> {/* タブ数を3に調整 */}
+                                            <TabsTrigger value="details">詳細</TabsTrigger>
+                                            <TabsTrigger value="weights">体重記録</TabsTrigger>
+                                            <TabsTrigger value="tasks">タスク</TabsTrigger>
+                                          </TabsList>
+                                          <TabsContent value="details" className="mt-4">
+                                            {/* 既存のペット詳細情報をここに移動または表示 */}
+                                            {/* 現在のCardContentの内容をここに配置 */}
+                                            <div className="space-y-2 text-gray-700 mb-4">
+                                              {pet.gender && (
+                                                <p className="flex items-center text-sm">
+                                                  <User className="mr-2 h-4 w-4 text-gray-500" />
+                                                  <span className="font-semibold">性別:</span> {pet.gender === 'male' ? '男の子' : pet.gender === 'female' ? '女の子' : 'その他'}
+                                                </p>
+                                              )}
+                                              {pet.birthday && (
+                                                <p className="flex items-center text-sm">
+                                                  <CakeIcon className="mr-2 h-4 w-4 text-gray-500" />
+                                                  <span className="font-semibold">誕生日:</span> {pet.birthday}
+                                                </p>
+                                              )}
+                                              {pet.adoptionDate && (
+                                                <p className="flex items-center text-sm">
+                                                  <CalendarIcon className="mr-2 h-4 w-4 text-gray-500" />
+                                                  <span className="font-semibold">お迎え日:</span> {pet.adoptionDate}
+                                                </p>
+                                              )}
+                                              {pet.microchipId && (
+                                                <p className="flex items-center text-sm">
+                                                  <MicrochipIcon className="mr-2 h-4 w-4 text-gray-500" />
+                                                  <span className="font-semibold">マイクロチップ:</span> {pet.microchipId}
+                                                </p>
+                                              )}
+                                            </div>
+                    
+                                            {(pet.medicalNotes || (pet.vetInfo && pet.vetInfo.length > 0)) && (
+                                              <div className="mt-4">
+                                                {pet.medicalNotes && (
+                                                  <div className="mb-4">
+                                                    <p className="font-semibold text-sm mb-1 flex items-center"><NotebookText className="mr-2 h-4 w-4 text-gray-500" />メモ:</p>
+                                                    <p className="text-sm text-gray-600 whitespace-pre-wrap pl-6">{pet.medicalNotes}</p>
+                                                  </div>
+                                                )}
+                                                {pet.vetInfo && pet.vetInfo.length > 0 && (
+                                                  <div>
+                                                    <p className="font-semibold text-sm mb-2 flex items-center"><StethoscopeIcon className="mr-2 h-4 w-4 text-gray-500" />かかりつけ医情報:</p>
+                                                    <div className="pl-6 space-y-2">
+                                                      {pet.vetInfo.map((vet, index) => (
+                                                        <div key={index} className="text-sm text-gray-600 border-t pt-2 first:border-t-0 first:pt-0">
+                                                          <p><strong>病院名:</strong> {vet.name}</p>
+                                                          <p><strong>電話番号:</strong> {vet.phone}</p>
+                                                        </div>
+                                                      ))}
+                                                    </div>
+                                                  </div>
+                                                )}
+                                              </div>
+                                            )}
+                                          </TabsContent>
+                                          <TabsContent value="weights" className="mt-4">
+                                            <div className="flex justify-end mb-4">
+                                              <Dialog open={isWeightFormOpen} onOpenChange={setIsWeightFormOpen}>
+                                                <DialogTrigger asChild>
+                                                  <Button>体重を追加</Button>
+                                                </DialogTrigger>
+                                                <DialogContent>
+                                                  <DialogHeader>
+                                                    <DialogTitle>体重記録の追加</DialogTitle>
+                                                  </DialogHeader>
+                                                  <WeightForm dogId={pet.id} onSuccess={() => setIsWeightFormOpen(false)} />
+                                                </DialogContent>
+                                              </Dialog>
+                                            </div>
+                                            {/* 体重記録サブタブ */}
+                                            <Tabs defaultValue="chart">
+                                              <TabsList className="grid w-full grid-cols-2">
+                                                <TabsTrigger value="chart">体重の推移</TabsTrigger>
+                                                <TabsTrigger value="history">体重の履歴</TabsTrigger>
+                                              </TabsList>
+                                              <TabsContent value="chart" className="mt-4">
+                                                <WeightChart dogId={pet.id} />
+                                              </TabsContent>
+                                              <TabsContent value="history" className="mt-4">
+                                                <WeightHistory dogId={pet.id} />
+                                              </TabsContent>
+                                            </Tabs>
+                                          </TabsContent>
+                                          <TabsContent value="tasks" className="mt-4">
+                                            <div className="flex justify-end mb-4">
+                                              <Dialog>
+                                                <DialogTrigger asChild>
+                                                  <Button>タスクを追加</Button>
+                                                </DialogTrigger>
+                                                <DialogContent>
+                                                  <DialogHeader>
+                                                    <DialogTitle>新しいタスクを追加</DialogTitle>
+                                                  </DialogHeader>
+                                                  <TaskForm isOpen={true} onClose={() => {}} />
+                                                </DialogContent>
+                                              </Dialog>
+                                            </div>
+                                            <TaskHistory dogId={pet.id} />
+                                          </TabsContent>
+                                        </Tabs>                  </CardContent>
                 </CollapsibleContent>
               </Card>
             </Collapsible>
