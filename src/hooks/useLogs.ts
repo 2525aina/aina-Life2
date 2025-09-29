@@ -46,6 +46,8 @@ export interface Log {
   timeTextColor?: string;
 }
 
+import { toast } from 'sonner';
+
 // ログの追加、更新、削除アクションを提供するフック
 export const useLogActions = () => {
   const { user } = useAuth();
@@ -87,8 +89,14 @@ export const useLogActions = () => {
   // ログを削除
   const deleteLog = useCallback(async (logId: string) => {
     if (!user || !selectedPet) throw new Error('ユーザーまたはペットが選択されていません。');
-    const logRef = doc(db, 'dogs', selectedPet.id, 'logs', logId);
-    await deleteDoc(logRef);
+    try {
+      const logRef = doc(db, 'dogs', selectedPet.id, 'logs', logId);
+      await deleteDoc(logRef);
+      toast.success('ログを削除しました。');
+    } catch (error) {
+      console.error('ログの削除に失敗しました:', error);
+      toast.error('ログの削除に失敗しました。');
+    }
   }, [user, selectedPet]);
 
   return { addLog, updateLog, deleteLog };
