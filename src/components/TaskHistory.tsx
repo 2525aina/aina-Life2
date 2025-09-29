@@ -58,7 +58,7 @@ function SortableItem({
         </div>
       </TableCell>
       <TableCell className="text-right py-1"> {/* Action buttons column */}
-        <div className="flex flex-col items-end space-y-1">
+        <div className="flex flex-col items-end space-y-0">
           <Dialog open={isEditFormOpen && taskToEdit?.id === task.id} onOpenChange={setIsEditFormOpen}>
             <DialogTrigger asChild>
               <Button variant="ghost" size="icon" onClick={() => handleEdit(task)}>
