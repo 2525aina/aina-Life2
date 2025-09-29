@@ -1,18 +1,13 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import Link from 'next/link';
-import { useAuth } from '@/contexts/AuthContext';
-import { useTasks, Task } from '@/hooks/useTasks';
-import { usePetSelection } from '@/contexts/PetSelectionContext';
-import { TaskForm } from '@/components/TaskForm';
-import { Button } from '@/components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+import { useState, useEffect } from "react";
+import Link from "next/link";
+import { useAuth } from "@/contexts/AuthContext";
+import { useTasks, Task } from "@/hooks/useTasks";
+import { usePetSelection } from "@/contexts/PetSelectionContext";
+import { TaskForm } from "@/components/TaskForm";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 import {
   DndContext,
@@ -22,12 +17,23 @@ import {
   useSensor,
   useSensors,
   DragEndEvent,
-} from '@dnd-kit/core';
-import { SortableContext, verticalListSortingStrategy, useSortable } from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
-import { MenuIcon, PlusIcon, Loader2, ClipboardListIcon, PawPrintIcon } from 'lucide-react';
-import { arrayMove } from '@dnd-kit/sortable';
-import { Checkbox } from '@/components/ui/checkbox';
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  verticalListSortingStrategy,
+  useSortable,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+import {
+  MenuIcon,
+  PlusIcon,
+  Loader2,
+  ClipboardListIcon,
+  PawPrintIcon,
+} from "lucide-react";
+import { arrayMove } from "@dnd-kit/sortable";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
 
 // Sortableなタスクアイテムコンポーネント
 function SortableTaskItem({
@@ -41,16 +47,22 @@ function SortableTaskItem({
   isSelected: boolean;
   onToggleSelection: (taskId: string) => void;
 }) {
-  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: task.id });
+  const { attributes, listeners, setNodeRef, transform, transition } =
+    useSortable({ id: task.id });
 
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
-    touchAction: 'none', // モバイルでのスクロールとドラッグの競合を防ぐ
+    touchAction: "none", // モバイルでのスクロールとドラッグの競合を防ぐ
   };
 
   return (
-    <Card ref={setNodeRef} style={{ ...style, backgroundColor: task.color, color: task.textColor }} {...attributes} className="cursor-pointer">
+    <Card
+      ref={setNodeRef}
+      style={{ ...style, backgroundColor: task.color, color: task.textColor }}
+      {...attributes}
+      className="cursor-pointer"
+    >
       <CardHeader className="flex flex-wrap justify-between items-center">
         <div className="flex items-center gap-2 w-full">
           <Checkbox
@@ -58,7 +70,9 @@ function SortableTaskItem({
             onCheckedChange={() => onToggleSelection(task.id)}
             className="mr-2"
           />
-          <div className="cursor-grab" {...listeners}> {/* Drag handle */} 
+          <div className="cursor-grab" {...listeners}>
+            {" "}
+            {/* Drag handle */}
             <MenuIcon className="h-5 w-5 text-gray-500" />
           </div>
           <CardTitle className="flex-grow" onClick={() => onEdit(task)}>
@@ -67,9 +81,7 @@ function SortableTaskItem({
         </div>
         {/* Removed Edit and Delete buttons */}
       </CardHeader>
-      <CardContent>
-        {/* Additional task details if any */}
-      </CardContent>
+      <CardContent>{/* Additional task details if any */}</CardContent>
     </Card>
   );
 }
@@ -77,11 +89,18 @@ function SortableTaskItem({
 export default function TasksPage() {
   const { user, loading: authLoading } = useAuth();
   const { selectedPet } = usePetSelection();
-  const { tasks, loading: tasksLoading, reorderTasks, bulkDeleteTasks } = useTasks();
+  const {
+    tasks,
+    loading: tasksLoading,
+    reorderTasks,
+    bulkDeleteTasks,
+  } = useTasks();
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [taskToEdit, setTaskToEdit] = useState<Task | null>(null);
   const [orderedTasks, setOrderedTasks] = useState<Task[]>([]);
-  const [selectedTaskIds, setSelectedTaskIds] = useState<Set<string>>(new Set());
+  const [selectedTaskIds, setSelectedTaskIds] = useState<Set<string>>(
+    new Set()
+  );
 
   // tasksが更新されたらorderedTasksを初期化
   useEffect(() => {
@@ -98,7 +117,7 @@ export default function TasksPage() {
   );
 
   const toggleSelection = (taskId: string) => {
-    setSelectedTaskIds(prev => {
+    setSelectedTaskIds((prev) => {
       const newSelection = new Set(prev);
       if (newSelection.has(taskId)) {
         newSelection.delete(taskId);
@@ -174,21 +193,38 @@ export default function TasksPage() {
 
   return (
     <div className="container mx-auto px-4 pt-0">
-      <header className="flex justify-between items-center mb-8">
-      </header>
+      <header className="flex justify-between items-center mb-8"></header>
 
       {selectedPet ? (
         <div>
-          <div className="flex justify-end mb-4 space-x-2">
-            {selectedTaskIds.size > 0 && (
-              <Button variant="destructive" onClick={handleBulkDelete}>
-                選択したタスクを一括削除 ({selectedTaskIds.size})
-              </Button>
+          <div className="flex justify-between items-center mb-4">
+            {orderedTasks.length > 0 && (
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  checked={orderedTasks.length > 0 && selectedTaskIds.size === orderedTasks.length}
+                  indeterminate={selectedTaskIds.size > 0 && selectedTaskIds.size < orderedTasks.length}
+                  onCheckedChange={(checkedState) => {
+                    if (checkedState === true) {
+                      setSelectedTaskIds(new Set(orderedTasks.map(task => task.id)));
+                    } else {
+                      clearSelection();
+                    }
+                  }}
+                />
+                <Label htmlFor="select-all-tasks">すべて選択</Label>
+              </div>
             )}
-            <Button onClick={handleAddTask}>
-              <PlusIcon className="mr-2 h-5 w-5" />
-              新しいタスクを追加
-            </Button>
+            <div className="flex justify-end space-x-2">
+              {selectedTaskIds.size > 0 && (
+                <Button variant="destructive" onClick={handleBulkDelete}>
+                  削除 ({selectedTaskIds.size})
+                </Button>
+              )}
+              <Button onClick={handleAddTask}>
+                <PlusIcon className="mr-2 h-5 w-5" />
+                タスクを追加
+              </Button>
+            </div>
           </div>
           {tasksLoading ? (
             <div className="flex items-center justify-center py-8">
@@ -198,14 +234,25 @@ export default function TasksPage() {
           ) : orderedTasks.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 text-gray-500">
               <ClipboardListIcon className="h-16 w-16 mb-4 text-gray-400" />
-              <p className="text-lg font-semibold mb-2">このペットにはタスクがありません。</p>
-              <p className="text-md">最初のタスクを追加して、管理を始めましょう！</p>
+              <p className="text-lg font-semibold mb-2">
+                このペットにはタスクがありません。
+              </p>
+              <p className="text-md">
+                最初のタスクを追加して、管理を始めましょう！
+              </p>
             </div>
           ) : (
-            <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-              <SortableContext items={orderedTasks.map(task => task.id)} strategy={verticalListSortingStrategy}>
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragEnd={handleDragEnd}
+            >
+              <SortableContext
+                items={orderedTasks.map((task) => task.id)}
+                strategy={verticalListSortingStrategy}
+              >
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {orderedTasks.map(task => (
+                  {orderedTasks.map((task) => (
                     <SortableTaskItem
                       key={task.id}
                       task={task}
@@ -219,11 +266,16 @@ export default function TasksPage() {
             </DndContext>
           )}
         </div>
-      ) : ( // This is the "no selected pet" display
+      ) : (
+        // This is the "no selected pet" display
         <div className="flex flex-col items-center justify-center py-12 text-gray-500">
           <PawPrintIcon className="h-16 w-16 mb-4 text-gray-400" />
-          <p className="text-lg font-semibold mb-2">タスクを表示するには、まずペットを選択してください。</p>
-          <p className="text-md">ペットが登録されていない場合は、ペット管理画面から追加してください。</p>
+          <p className="text-lg font-semibold mb-2">
+            タスクを表示するには、まずペットを選択してください。
+          </p>
+          <p className="text-md">
+            ペットが登録されていない場合は、ペット管理画面から追加してください。
+          </p>
         </div>
       )}
 
