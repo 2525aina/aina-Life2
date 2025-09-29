@@ -1,0 +1,7 @@
+feat: タスク履歴とUIコンポーネントのエラーを修正
+
+- `src/components/TaskHistory.tsx`:
+  - `<tr>` 内の不要なコメントを削除し、ハイドレーションエラーを解決。
+  - `SortableItem` コンポーネントのコードフォーマットを改善し、可読性を向上。
+- `src/components/ui/button.tsx`:
+  - `Button` コンポーネントを `React.forwardRef` でラップし、`DialogTrigger` のランタイムエラーを解決。

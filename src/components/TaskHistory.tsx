@@ -11,10 +11,9 @@ import { ConfirmationModal } from '@/components/ConfirmationModal';
 import { toast } from 'sonner';
 
 interface TaskHistoryProps {
-  dogId: string; // useTasksはselectedPetを使うが、明示的にdogIdを受け取る
+  dogId: string;
 }
 
-// SortableItemコンポーネント
 function SortableItem({
   task,
   handleEdit,
@@ -40,7 +39,55 @@ function SortableItem({
   isLast: boolean;
   dogId: string;
 }) {
-  return (<TableRow><TableCell className="w-8 py-0 px-1"> {/* This is the arrow button column */} <div className="flex flex-col items-center space-y-1"> <Button variant="ghost" size="icon" onClick={() => handleMoveUp(task.id)} disabled={isFirst}> <ArrowUp className="h-4 w-4" /> </Button> <Button variant="ghost" size="icon" onClick={() => handleMoveDown(task.id)} disabled={isLast}> <ArrowDown className="h-4 w-4" /> </Button> </div> </TableCell><TableCell className="py-0 px-1" style={{ backgroundColor: task.color, color: task.textColor || '#FFFFFF' }}>{task.name}</TableCell><TableCell className="py-0 px-1"> {/* Color display column */} <div className="flex flex-col gap-1"> <div className="flex items-center gap-2"> <div className="w-4 h-4 rounded-full border" style={{ backgroundColor: task.color }}></div> <span>{task.color}</span> </div> <div className="flex items-center gap-2"> <div className="w-4 h-4 rounded-full border" style={{ backgroundColor: task.textColor || '#FFFFFF' }}></div> <span>{task.textColor || '#FFFFFF'}</span> </div> </div> </TableCell><TableCell className="text-right py-0 px-1"> {/* Action buttons column */} <div className="flex flex-col items-end space-y-0"> <Dialog open={isEditFormOpen && taskToEdit?.id === task.id} onOpenChange={setIsEditFormOpen}> <DialogTrigger asChild> <Button variant="ghost" size="icon" onClick={() => handleEdit(task)}> <Pencil className="h-4 w-4" /> </Button> </DialogTrigger> <DialogContent> <DialogHeader> <DialogTitle>タスクの編集</DialogTitle> </DialogHeader> <TaskForm petId={dogId} isOpen={true} onClose={() => setIsEditFormOpen(false)} taskToEdit={taskToEdit || undefined} /> </DialogContent> </Dialog> <Button variant="ghost" size="icon" onClick={() => handleDelete(task.id)}> <Trash2 className="h-4 w-4 text-red-500" /> </Button> </div> </TableCell></TableRow>);
+  return (
+    <TableRow>
+      <TableCell className="w-8 py-0 px-1">
+        <div className="flex flex-col items-center space-y-1">
+          <Button variant="ghost" size="icon" onClick={() => handleMoveUp(task.id)} disabled={isFirst}>
+            <ArrowUp className="h-4 w-4" />
+          </Button>
+          <Button variant="ghost" size="icon" onClick={() => handleMoveDown(task.id)} disabled={isLast}>
+            <ArrowDown className="h-4 w-4" />
+          </Button>
+        </div>
+      </TableCell>
+      <TableCell className="py-0 px-1" style={{ backgroundColor: task.color, color: task.textColor || '#FFFFFF' }}>
+        {task.name}
+      </TableCell>
+      <TableCell className="py-0 px-1">
+        <div className="flex flex-col gap-1">
+          <div className="flex items-center gap-2">
+            <div className="w-4 h-4 rounded-full border" style={{ backgroundColor: task.color }}></div>
+            <span>{task.color}</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-4 h-4 rounded-full border" style={{ backgroundColor: task.textColor || '#FFFFFF' }}></div>
+            <span>{task.textColor || '#FFFFFF'}</span>
+          </div>
+        </div>
+      </TableCell>
+      <TableCell className="text-right py-0 px-1">
+        <div className="flex flex-col items-end space-y-0">
+          <Dialog open={isEditFormOpen && taskToEdit?.id === task.id} onOpenChange={setIsEditFormOpen}>
+            <DialogTrigger asChild>
+              <Button variant="ghost" size="icon" onClick={() => handleEdit(task)}>
+                <Pencil className="h-4 w-4" />
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>タスクの編集</DialogTitle>
+              </DialogHeader>
+              <TaskForm petId={dogId} isOpen={true} onClose={() => setIsEditFormOpen(false)} taskToEdit={taskToEdit || undefined} />
+            </DialogContent>
+          </Dialog>
+          <Button variant="ghost" size="icon" onClick={() => handleDelete(task.id)}>
+            <Trash2 className="h-4 w-4 text-red-500" />
+          </Button>
+        </div>
+      </TableCell>
+    </TableRow>
+  );
 }
 
 export function TaskHistory({ dogId }: TaskHistoryProps) {
@@ -82,12 +129,11 @@ export function TaskHistory({ dogId }: TaskHistoryProps) {
       newIndex = Math.min(currentTasks.length - 1, index + 1);
     }
 
-    if (newIndex === index) return; // No change in position
+    if (newIndex === index) return;
 
     const [movedTask] = currentTasks.splice(index, 1);
     currentTasks.splice(newIndex, 0, movedTask);
 
-    // Update the order property for all tasks in the new array
     const updatedTasksWithOrder = currentTasks.map((task, idx) => ({
       ...task,
       order: idx,
@@ -114,7 +160,7 @@ export function TaskHistory({ dogId }: TaskHistoryProps) {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead className="w-10"></TableHead> {/* 矢印ボタン用の列 */}
+            <TableHead className="w-10"></TableHead>
             <TableHead>タスク名</TableHead>
             <TableHead>色</TableHead>
             <TableHead className="text-right">操作</TableHead>
