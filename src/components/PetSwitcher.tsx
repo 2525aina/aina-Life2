@@ -9,22 +9,24 @@ import { Loader2 } from 'lucide-react';
 
 export function PetSwitcher() {
   const { pets, loading: petsLoading } = usePets();
-  const { selectedPet, setSelectedPet } = usePetSelection();
+  const { selectedPetId, setSelectedPetId, selectedPet } = usePetSelection();
 
   // Set a default pet if one isn't set
   useEffect(() => {
-    if (!selectedPet && pets.length > 0) {
-      setSelectedPet(pets[0]);
+    // selectedPetIdがnullで、かつペットが存在する場合のみ処理
+    if (selectedPetId === null && pets.length > 0) {
+      // PetSelectionContextで既にprimaryPetIdや最初のペットが設定されているはずなので、ここでは何もしない
+      // もしselectedPetIdがまだnullであれば、PetSelectionContextのロジックがまだ実行されていないか、
+      // またはprimaryPetIdも最初のペットも設定できなかったケースなので、ここでは何もしない
     }
     // If the currently selected pet is no longer in the list, clear it
-    if (selectedPet && !pets.find((p) => p.id === selectedPet.id)) {
-      setSelectedPet(null);
+    if (selectedPetId && !pets.find((p) => p.id === selectedPetId)) {
+      setSelectedPetId(null);
     }
-  }, [pets, selectedPet, setSelectedPet]);
+  }, [pets, selectedPetId, setSelectedPetId]);
 
   const handleValueChange = (petId: string) => {
-    const pet = pets.find((p) => p.id === petId) || null;
-    setSelectedPet(pet);
+    setSelectedPetId(petId);
   };
 
   if (petsLoading) {
@@ -46,7 +48,7 @@ export function PetSwitcher() {
 
   return (
     <div className="w-full max-w-xs">
-      <Select onValueChange={handleValueChange} value={selectedPet?.id || ""}>
+      <Select onValueChange={handleValueChange} value={selectedPetId || ""}>
         <SelectTrigger id="pet-switcher">
           <SelectValue placeholder="ペットを選択..." />
         </SelectTrigger>

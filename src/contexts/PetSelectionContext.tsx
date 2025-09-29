@@ -1,36 +1,50 @@
-'use client';
+"use client";
 
-import { createContext, useContext, useState, ReactNode, useMemo } from 'react';
-import { Pet } from '@/hooks/usePets';
+import { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import { usePets, Pet } from "@/hooks/usePets"; // Pet型をインポート
+import { useUser } from "@/hooks/useUser";
 
-// Contextの型定義
 interface PetSelectionContextType {
-  selectedPet: Pet | null;
-  setSelectedPet: (pet: Pet | null) => void;
+  selectedPetId: string | null;
+  setSelectedPetId: (id: string | null) => void;
+  selectedPet: Pet | null; // selectedPetも提供
 }
 
-// Contextの作成
 const PetSelectionContext = createContext<PetSelectionContextType | undefined>(undefined);
 
-// PetSelectionProviderコンポーネントの定義
-export function PetSelectionProvider({ children }: { children: ReactNode }) {
-  const [selectedPet, setSelectedPet] = useState<Pet | null>(null);
+export const PetSelectionProvider = ({ children }: { children: ReactNode }) => {
+  const { pets, loading: loadingPets } = usePets();
+  const { userProfile, loading: loadingUser } = useUser();
+  const [selectedPetId, setSelectedPetId] = useState<string | null>(null);
 
-  // useMemoでcontextの値をメモ化し、不要な再レンダリングを防ぐ
-  const value = useMemo(() => ({ selectedPet, setSelectedPet }), [selectedPet]);
+  useEffect(() => {
+    if (loadingPets || loadingUser) return;
+
+    if (selectedPetId === null && pets.length > 0) {
+      if (userProfile?.primaryPetId) {
+        const primaryPet = pets.find(pet => pet.id === userProfile.primaryPetId);
+        if (primaryPet) {
+          setSelectedPetId(primaryPet.id);
+          return;
+        }
+      }
+      setSelectedPetId(pets[0].id);
+    }
+  }, [pets, selectedPetId, loadingPets, userProfile, loadingUser]);
+
+  const selectedPet = selectedPetId ? pets.find((pet) => pet.id === selectedPetId) || null : null;
 
   return (
-    <PetSelectionContext.Provider value={value}>
+    <PetSelectionContext.Provider value={{ selectedPetId, setSelectedPetId, selectedPet }}>
       {children}
     </PetSelectionContext.Provider>
   );
-}
+};
 
-// Contextを使用するためのカスタムフック
 export const usePetSelection = () => {
   const context = useContext(PetSelectionContext);
   if (context === undefined) {
-    throw new Error('usePetSelection must be used within a PetSelectionProvider');
+    throw new Error("usePetSelection must be used within a PetSelectionProvider");
   }
   return context;
 };
