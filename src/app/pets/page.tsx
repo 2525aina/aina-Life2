@@ -7,14 +7,19 @@ import { usePets, Pet } from '@/hooks/usePets';
 import { PetAddForm } from '@/components/PetAddForm';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { CalendarIcon, User, PawPrintIcon, TagIcon, MicrochipIcon, StethoscopeIcon, CakeIcon, Loader2, ChevronDown } from 'lucide-react';
+import { CalendarIcon, User, PawPrintIcon, MicrochipIcon, StethoscopeIcon, CakeIcon, Loader2, ChevronDown, MoreHorizontal, Pencil, Trash2, NotebookText } from 'lucide-react';
 import {
   Card,
   CardContent,
   CardDescription,
-  CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
@@ -104,82 +109,102 @@ export default function PetsPage() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredPets.map(pet => (
-            <Card key={pet.id} className="relative overflow-hidden group hover:shadow-lg transition-shadow duration-300 flex flex-col">
-              <div className="relative w-full h-48 bg-gray-100 flex items-center justify-center overflow-hidden">
-                {pet.profileImageUrl ? (
-                  <img src={pet.profileImageUrl} alt={pet.name} className="object-cover w-full h-full" />
-                ) : (
-                  <PawPrintIcon className="h-24 w-24 text-gray-300" />
-                )}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
-                <div className="absolute bottom-0 left-0 p-4 text-white z-10">
-                  <CardTitle className="text-2xl font-bold drop-shadow">{pet.name}</CardTitle>
-                  <CardDescription className="text-gray-200 drop-shadow">{pet.breed || '種類未設定'}</CardDescription>
+            <Collapsible key={pet.id} asChild>
+              <Card className="overflow-hidden hover:shadow-lg transition-shadow duration-300">
+                <div className="relative">
+                  <CollapsibleTrigger className="w-full text-left group">
+                    <div className="relative w-full h-48 bg-gray-100 flex items-center justify-center overflow-hidden cursor-pointer">
+                      {pet.profileImageUrl ? (
+                        <img src={pet.profileImageUrl} alt={pet.name} className="object-cover w-full h-full" />
+                      ) : (
+                        <PawPrintIcon className="h-24 w-24 text-gray-300" />
+                      )}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+                      <div className="absolute bottom-0 left-0 p-4 text-white z-10">
+                        <CardTitle className="text-2xl font-bold drop-shadow">{pet.name}</CardTitle>
+                        <CardDescription className="text-gray-200 drop-shadow">{pet.breed || '種類未設定'}</CardDescription>
+                      </div>
+                      <div className="absolute bottom-4 right-4 z-10 text-white/70 transform transition-transform duration-200 group-data-[state=open]:rotate-180">
+                        <ChevronDown className="h-5 w-5" />
+                      </div>
+                    </div>
+                  </CollapsibleTrigger>
+                  <div className="absolute top-2 right-2 z-20">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full bg-black/20 hover:bg-black/50 text-white">
+                          <MoreHorizontal className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem onClick={() => handleEditPet(pet)}>
+                          <Pencil className="mr-2 h-4 w-4" />
+                          <span>編集</span>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleDeletePet(pet.id)} className="text-red-500 focus:text-red-500 focus:bg-red-50">
+                          <Trash2 className="mr-2 h-4 w-4" />
+                          <span>削除</span>
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
                 </div>
-              </div>
-              <CardContent className="p-4 flex-grow flex flex-col justify-between">
-                <div className="space-y-2 text-gray-700 mb-4">
-                  {pet.gender && (
-                    <p className="flex items-center text-sm">
-                      <User className="mr-2 h-4 w-4 text-gray-500" />
-                      <span className="font-semibold">性別:</span> {pet.gender === 'male' ? '男の子' : pet.gender === 'female' ? '女の子' : 'その他'}
-                    </p>
-                  )}
-                  {pet.birthday && (
-                    <p className="flex items-center text-sm">
-                      <CakeIcon className="mr-2 h-4 w-4 text-gray-500" />
-                      <span className="font-semibold">誕生日:</span> {pet.birthday}
-                    </p>
-                  )}
-                  {pet.adoptionDate && (
-                    <p className="flex items-center text-sm">
-                      <CalendarIcon className="mr-2 h-4 w-4 text-gray-500" />
-                      <span className="font-semibold">お迎え日:</span> {pet.adoptionDate}
-                    </p>
-                  )}
-                  {pet.microchipId && (
-                    <p className="flex items-center text-sm">
-                      <MicrochipIcon className="mr-2 h-4 w-4 text-gray-500" />
-                      <span className="font-semibold">マイクロチップ:</span> {pet.microchipId}
-                    </p>
-                  )}
-                </div>
-                <div className="flex justify-end gap-2 mt-auto">
-                  <Button variant="secondary" size="sm" onClick={() => handleEditPet(pet)}>編集</Button>
-                  <Button variant="destructive" size="sm" onClick={() => handleDeletePet(pet.id)}>削除</Button>
-                </div>
+                <CollapsibleContent>
+                  <CardContent className="p-4">
+                    <div className="space-y-2 text-gray-700 mb-4">
+                      {pet.gender && (
+                        <p className="flex items-center text-sm">
+                          <User className="mr-2 h-4 w-4 text-gray-500" />
+                          <span className="font-semibold">性別:</span> {pet.gender === 'male' ? '男の子' : pet.gender === 'female' ? '女の子' : 'その他'}
+                        </p>
+                      )}
+                      {pet.birthday && (
+                        <p className="flex items-center text-sm">
+                          <CakeIcon className="mr-2 h-4 w-4 text-gray-500" />
+                          <span className="font-semibold">誕生日:</span> {pet.birthday}
+                        </p>
+                      )}
+                      {pet.adoptionDate && (
+                        <p className="flex items-center text-sm">
+                          <CalendarIcon className="mr-2 h-4 w-4 text-gray-500" />
+                          <span className="font-semibold">お迎え日:</span> {pet.adoptionDate}
+                        </p>
+                      )}
+                      {pet.microchipId && (
+                        <p className="flex items-center text-sm">
+                          <MicrochipIcon className="mr-2 h-4 w-4 text-gray-500" />
+                          <span className="font-semibold">マイクロチップ:</span> {pet.microchipId}
+                        </p>
+                      )}
+                    </div>
 
-                {(pet.medicalNotes || (pet.vetInfo && pet.vetInfo.length > 0)) && (
-                  <Collapsible className="w-full mt-4">
-                    <CollapsibleTrigger asChild>
-                      <Button variant="ghost" size="sm" className="w-full justify-between">
-                        <span>詳細情報</span>
-                        <ChevronDown className="h-4 w-4" />
-                      </Button>
-                    </CollapsibleTrigger>
-                    <CollapsibleContent className="space-y-2 pt-2">
-                      {pet.medicalNotes && (
-                        <div>
-                          <p className="font-semibold text-sm mb-1">メモ:</p>
-                          <p className="text-xs text-gray-600 whitespace-pre-wrap">{pet.medicalNotes}</p>
-                        </div>
-                      )}
-                      {pet.vetInfo && pet.vetInfo.length > 0 && (
-                        <div>
-                          <p className="font-semibold text-sm mb-1">かかりつけ医情報:</p>
-                          {pet.vetInfo.map((vet, index) => (
-                            <div key={index} className="text-xs text-gray-600 border-t pt-2 mt-2 first:border-t-0 first:pt-0 first:mt-0">
-                              <p><strong>名前:</strong> {vet.name}</p>
-                              <p><strong>電話:</strong> {vet.phone}</p>
+                    {(pet.medicalNotes || (pet.vetInfo && pet.vetInfo.length > 0)) && (
+                      <div className="mt-4">
+                        {pet.medicalNotes && (
+                          <div className="mb-4">
+                            <p className="font-semibold text-sm mb-1 flex items-center"><NotebookText className="mr-2 h-4 w-4 text-gray-500" />メモ:</p>
+                            <p className="text-sm text-gray-600 whitespace-pre-wrap pl-6">{pet.medicalNotes}</p>
+                          </div>
+                        )}
+                        {pet.vetInfo && pet.vetInfo.length > 0 && (
+                          <div>
+                            <p className="font-semibold text-sm mb-2 flex items-center"><StethoscopeIcon className="mr-2 h-4 w-4 text-gray-500" />かかりつけ医情報:</p>
+                            <div className="pl-6 space-y-2">
+                              {pet.vetInfo.map((vet, index) => (
+                                <div key={index} className="text-sm text-gray-600 border-t pt-2 first:border-t-0 first:pt-0">
+                                  <p><strong>病院名:</strong> {vet.name}</p>
+                                  <p><strong>電話番号:</strong> {vet.phone}</p>
+                                </div>
+                              ))}
                             </div>
-                          ))}
-                        </div>
-                      )}
-                    </CollapsibleContent>
-                  </Collapsible>
-                )}
-              </CardContent>
-            </Card>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </CardContent>
+                </CollapsibleContent>
+              </Card>
+            </Collapsible>
           ))}
         </div>
       )}
