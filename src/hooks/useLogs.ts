@@ -194,16 +194,16 @@ export const useLogs = (targetDate: Date) => {
             timeTextColor = task?.textColor || '#000000';
           }
         } else {
-          // Fallback for unknown users or if createdBy is missing
+          //不明なユーザーのためのフォールバック、またはcreatedbyが欠落している場合
           creatorNameBgColor = '#e5e7eb'; // Default gray-100
           creatorNameTextColor = '#6b7280'; // Default gray-500
           timeBgColor = '#e5e7eb'; // Default gray-100
           timeTextColor = '#4b5563'; // Default gray-700
         }
 
-        // Determine colors for deleted tasks based on user settings or defaults
-        let deletedBgColor = '#e5e7eb'; // Default gray-200
-        let deletedTextColor = '#9ca3af'; // Default gray-400
+        //ユーザー設定またはデフォルトに基づいて削除されたタスクの色を決定する
+        let deletedBgColor = '#6b7280'; // Default gray-100
+        let deletedTextColor = '#ff0000'; // Default red
 
         if (logData.createdBy && userProfilesCache[logData.createdBy]) {
           const userProfileData = userProfilesCache[logData.createdBy];
@@ -222,7 +222,7 @@ export const useLogs = (targetDate: Date) => {
               deletedTextColor = userProfileData.settings.logDisplayColors.deletedTaskText;
             }
           } else {
-            // If custom colors are disabled, use task colors
+            //カスタム色が無効になっている場合は、タスクカラーを使用します
             creatorNameBgColor = task?.color || '#cccccc';
             creatorNameTextColor = task?.textColor || '#000000';
             timeBgColor = task?.color || '#cccccc';

@@ -61,6 +61,8 @@ export default function ProfilePage() {
             creatorNameText: userProfile.settings?.logDisplayColors?.creatorNameText || "#6b7280",
             timeBg: userProfile.settings?.logDisplayColors?.timeBg || "#e5e7eb",
             timeText: userProfile.settings?.logDisplayColors?.timeText || "#4b5563",
+            deletedTaskBg: userProfile.settings?.logDisplayColors?.deletedTaskBg || "#e5e7eb", // New field
+            deletedTaskText: userProfile.settings?.logDisplayColors?.deletedTaskText || "#9ca3af", // New field
             enabled: userProfile.settings?.logDisplayColors?.enabled ?? true, // Default to true
           },
         },
@@ -80,7 +82,7 @@ export default function ProfilePage() {
   };
 
   const handleChangeColor = (
-    category: 'creatorName' | 'time',
+    category: 'creatorName' | 'time' | 'deletedTask',
     type: 'Bg' | 'Text',
     value: string
   ) => {
@@ -375,6 +377,49 @@ export default function ProfilePage() {
                   type="text"
                   value={formData.settings?.logDisplayColors?.timeText || "#4b5563"}
                   onChange={(e) => handleChangeColor("time", "Text", e.target.value)}
+                  placeholder="#RRGGBB"
+                  className="w-1/2"
+                  disabled={!formData.settings?.logDisplayColors?.enabled}
+                />
+              </div>
+            </div>
+            {/* New fields for Deleted Task Log Colors */}
+            <div className="grid gap-2">
+              <Label htmlFor="deletedTaskBg">削除済みタスク 背景色</Label>
+              <div className="flex gap-2">
+                <Input
+                  id="deletedTaskBg"
+                  type="color"
+                  value={formData.settings?.logDisplayColors?.deletedTaskBg || "#e5e7eb"}
+                  onChange={(e) => handleChangeColor("deletedTask", "Bg", e.target.value)}
+                  className="w-1/2"
+                  disabled={!formData.settings?.logDisplayColors?.enabled}
+                />
+                <Input
+                  type="text"
+                  value={formData.settings?.logDisplayColors?.deletedTaskBg || "#e5e7eb"}
+                  onChange={(e) => handleChangeColor("deletedTask", "Bg", e.target.value)}
+                  placeholder="#RRGGBB"
+                  className="w-1/2"
+                  disabled={!formData.settings?.logDisplayColors?.enabled}
+                />
+              </div>
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="deletedTaskText">削除済みタスク 文字色</Label>
+              <div className="flex gap-2">
+                <Input
+                  id="deletedTaskText"
+                  type="color"
+                  value={formData.settings?.logDisplayColors?.deletedTaskText || "#9ca3af"}
+                  onChange={(e) => handleChangeColor("deletedTask", "Text", e.target.value)}
+                  className="w-1/2"
+                  disabled={!formData.settings?.logDisplayColors?.enabled}
+                />
+                <Input
+                  type="text"
+                  value={formData.settings?.logDisplayColors?.deletedTaskText || "#9ca3af"}
+                  onChange={(e) => handleChangeColor("deletedTask", "Text", e.target.value)}
                   placeholder="#RRGGBB"
                   className="w-1/2"
                   disabled={!formData.settings?.logDisplayColors?.enabled}
