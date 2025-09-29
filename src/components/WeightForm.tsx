@@ -5,7 +5,6 @@ import { useWeights, Weight } from "@/hooks/useWeights";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { Timestamp } from "firebase/firestore";
 import { format, parseISO } from 'date-fns';
@@ -23,7 +22,6 @@ export function WeightForm({ dogId, initialWeight, onSuccess, onCancel }: Weight
   const [unit, setUnit] = useState<string>(initialWeight?.unit || "kg");
   const [date, setDate] = useState<string>(initialWeight?.date ? format(initialWeight.date.toDate(), 'yyyy-MM-dd') : format(new Date(), 'yyyy-MM-dd'));
   const [time, setTime] = useState<string>(initialWeight?.date ? format(initialWeight.date.toDate(), 'HH:mm') : format(new Date(), 'HH:mm'));
-  const [notes, setNotes] = useState<string>(""); // 体重記録にはnotesフィールドがないため、一旦空で定義
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
@@ -67,7 +65,7 @@ export function WeightForm({ dogId, initialWeight, onSuccess, onCancel }: Weight
         toast.success("体重記録を追加しました。");
       }
       onSuccess?.();
-    } catch (err) {
+    } catch (_err) {
       toast.error(error || "体重記録の保存中にエラーが発生しました。");
     } finally {
       setIsSubmitting(false);
@@ -122,15 +120,6 @@ export function WeightForm({ dogId, initialWeight, onSuccess, onCancel }: Weight
         </div>
       </div>
       {/* 体重記録にはnotesフィールドがないため、一旦コメントアウト */}
-      {/* <div className="space-y-2">
-        <Label htmlFor="weight-notes">メモ (任意)</Label>
-        <Textarea
-          id="weight-notes"
-          value={notes}
-          onChange={(e) => setNotes(e.target.value)}
-          placeholder="メモを入力..."
-        />
-      </div> */}
       <div className="flex justify-end space-x-2">
         {onCancel && <Button type="button" variant="outline" onClick={onCancel}>キャンセル</Button>}
         <Button type="submit" disabled={isSubmitting || loading}>

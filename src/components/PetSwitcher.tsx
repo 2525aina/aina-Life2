@@ -9,7 +9,7 @@ import { Loader2 } from 'lucide-react';
 
 export function PetSwitcher() {
   const { pets, loading: petsLoading } = usePets();
-  const { selectedPetId, setSelectedPetId, selectedPet } = usePetSelection();
+  const { selectedPetId, setSelectedPetId } = usePetSelection();
 
   // Set a default pet if one isn't set
   useEffect(() => {

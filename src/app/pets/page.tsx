@@ -286,7 +286,7 @@ export default function PetsPage() {
                                                 </DialogContent>
                                               </Dialog>
                                             </div>
-                                            <TaskHistory dogId={pet.id} />
+                                            <TaskHistory />
                                           </TabsContent>
                                         </Tabs>                  </CardContent>
                 </CollapsibleContent>

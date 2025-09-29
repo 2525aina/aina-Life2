@@ -10,10 +10,6 @@ import { TaskForm } from '@/components/TaskForm';
 import { ConfirmationModal } from '@/components/ConfirmationModal';
 import { toast } from 'sonner';
 
-interface TaskHistoryProps {
-  dogId: string; // useTasksはselectedPetを使うが、明示的にdogIdを受け取る
-}
-
 // SortableItemコンポーネント
 function SortableItem({
   task,
@@ -84,7 +80,7 @@ function SortableItem({
   );
 }
 
-export function TaskHistory({ dogId }: TaskHistoryProps) {
+export function TaskHistory() {
   const { tasks, loading, deleteTask, reorderTasks } = useTasks();
   const [isEditFormOpen, setIsEditFormOpen] = useState(false);
   const [taskToEdit, setTaskToEdit] = useState<Task | null>(null);
