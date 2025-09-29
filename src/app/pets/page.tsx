@@ -37,6 +37,7 @@ import { TaskHistory } from '@/components/TaskHistory'; // TaskHistoryをイン�
 export default function PetsPage() {
   const { user, loading: authLoading } = useAuth();
   const { pets, loading: petsLoading, deletePet } = usePets();
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { selectedPetId } = usePetSelection(); // selectedPetIdを取得
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [petToEdit, setPetToEdit] = useState<Pet | null>(null);

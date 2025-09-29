@@ -17,7 +17,7 @@ interface WeightFormProps {
 }
 
 export function WeightForm({ dogId, initialWeight, onSuccess, onCancel }: WeightFormProps) {
-  const { addWeight, updateWeight, loading, error } = useWeights(dogId);
+  const { addWeight, updateWeight, loading } = useWeights(dogId);
   const [value, setValue] = useState<number | string>(initialWeight?.value || "");
   const [unit, setUnit] = useState<string>(initialWeight?.unit || "kg");
   const [date, setDate] = useState<string>(initialWeight?.date ? format(initialWeight.date.toDate(), 'yyyy-MM-dd') : format(new Date(), 'yyyy-MM-dd'));
@@ -65,8 +65,8 @@ export function WeightForm({ dogId, initialWeight, onSuccess, onCancel }: Weight
         toast.success("体重記録を追加しました。");
       }
       onSuccess?.();
-    } catch (_err) {
-      toast.error(error || "体重記録の保存中にエラーが発生しました。");
+    } catch (error: unknown) {
+      toast.error(error instanceof Error ? error.message : "体重記録の保存中にエラーが発生しました。");
     } finally {
       setIsSubmitting(false);
     }
