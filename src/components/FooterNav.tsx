@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { HomeIcon, PawPrintIcon, ClipboardListIcon, UserIcon } from 'lucide-react';
+import { HomeIcon, PawPrintIcon, UserIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -12,7 +12,6 @@ export function FooterNav() {
   const navItems = [
     { name: 'ホーム', href: '/', icon: HomeIcon, action: null },
     { name: 'ペット', href: '/pets', icon: PawPrintIcon, action: null },
-    { name: 'タスク', href: '/tasks', icon: ClipboardListIcon, action: null },
     { name: 'プロフィール', href: '/profile', icon: UserIcon, action: null },
   ];
 
