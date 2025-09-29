@@ -6,6 +6,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { usePets, Pet } from '@/hooks/usePets';
 import { PetAddForm } from '@/components/PetAddForm';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Loader2, PawPrintIcon } from 'lucide-react';
 import {
   Card,
@@ -20,8 +21,14 @@ export default function PetsPage() {
   const { pets, loading: petsLoading, deletePet } = usePets();
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [petToEdit, setPetToEdit] = useState<Pet | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
 
   const isLoading = authLoading || petsLoading;
+
+  const filteredPets = pets.filter(pet =>
+    pet.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (pet.breed && pet.breed.toLowerCase().includes(searchTerm.toLowerCase()))
+  );
 
   const handleEditPet = (pet: Pet) => {
     setPetToEdit(pet);
@@ -61,7 +68,16 @@ export default function PetsPage() {
       </header>
 
       <div className="flex justify-end mb-4"> {/* New div for PetAddForm */}
-        <PetAddForm />
+        <div className="flex items-center space-x-2">
+          <Input
+            type="text"
+            placeholder="ペットを検索..."
+            className="max-w-sm"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+          <PetAddForm />
+        </div>
       </div>
 
       {pets.length === 0 ? (
@@ -72,7 +88,7 @@ export default function PetsPage() {
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {pets.map(pet => (
+          {filteredPets.map(pet => (
             <Card key={pet.id} className="relative overflow-hidden group hover:shadow-lg transition-shadow duration-300">
               {pet.profileImageUrl ? (
                 <div className="w-full h-48 bg-gray-100 flex items-center justify-center overflow-hidden">
