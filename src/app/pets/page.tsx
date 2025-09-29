@@ -8,6 +8,7 @@ import { PetAddForm } from '@/components/PetAddForm';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { CalendarIcon, User, PawPrintIcon, MicrochipIcon, StethoscopeIcon, CakeIcon, Loader2, ChevronDown, MoreHorizontal, Pencil, Trash2, NotebookText, Mars, Venus } from 'lucide-react';
+import Image from 'next/image';
 import {
   Card,
   CardContent,
@@ -115,7 +116,7 @@ export default function PetsPage() {
                   <CollapsibleTrigger className="w-full text-left group">
                     <div className="relative w-full h-48 bg-gray-100 flex items-center justify-center overflow-hidden cursor-pointer">
                       {pet.profileImageUrl ? (
-                        <img src={pet.profileImageUrl} alt={pet.name} className="object-cover w-full h-full" />
+                        <Image src={pet.profileImageUrl} alt={pet.name} fill style={{ objectFit: 'cover' }} />
                       ) : (
                         <PawPrintIcon className="h-24 w-24 text-gray-300" />
                       )}

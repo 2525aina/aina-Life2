@@ -24,6 +24,7 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { PlusIcon, Loader2, UploadCloudIcon, CalendarIcon } from 'lucide-react';
+import Image from 'next/image';
 import { toast } from 'sonner';
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
@@ -313,7 +314,7 @@ export function PetAddForm({
                 <div className="mt-2 flex items-center gap-4">
                   <div className="w-24 h-24 rounded-full bg-gray-100 flex items-center justify-center overflow-hidden">
                     {imagePreview ? (
-                      <img src={imagePreview} alt="プレビュー" className="w-full h-full object-cover" />
+                      <Image src={imagePreview} alt="プレビュー" width={96} height={96} style={{ objectFit: 'cover' }} />
                     ) : (
                       <UploadCloudIcon className="w-10 h-10 text-gray-400" />
                     )}
