@@ -7,7 +7,7 @@ import { usePets, Pet } from '@/hooks/usePets';
 import { PetAddForm } from '@/components/PetAddForm';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { CalendarIcon, User, PawPrintIcon, MicrochipIcon, StethoscopeIcon, CakeIcon, Loader2, ChevronDown, MoreHorizontal, Pencil, Trash2, NotebookText } from 'lucide-react';
+import { CalendarIcon, User, PawPrintIcon, MicrochipIcon, StethoscopeIcon, CakeIcon, Loader2, ChevronDown, MoreHorizontal, Pencil, Trash2, NotebookText, Mars, Venus } from 'lucide-react';
 import {
   Card,
   CardContent,
@@ -121,7 +121,11 @@ export default function PetsPage() {
                       )}
                       <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
                       <div className="absolute bottom-0 left-0 p-4 text-white z-10">
-                        <CardTitle className="text-2xl font-bold drop-shadow">{pet.name}</CardTitle>
+                        <div className="flex items-center gap-2">
+                          {pet.gender === 'male' && <Mars className="h-6 w-6 text-blue-300 drop-shadow" />}
+                          {pet.gender === 'female' && <Venus className="h-6 w-6 text-pink-300 drop-shadow" />}
+                          <CardTitle className="text-2xl font-bold drop-shadow">{pet.name}</CardTitle>
+                        </div>
                         <CardDescription className="text-gray-200 drop-shadow">{pet.breed || '種類未設定'}</CardDescription>
                       </div>
                       <div className="absolute bottom-4 right-4 z-10 text-white/70 transform transition-transform duration-200 group-data-[state=open]:rotate-180">
