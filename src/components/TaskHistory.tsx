@@ -44,8 +44,8 @@ function SortableItem({ task, dogId, handleEdit, handleDelete, isEditFormOpen, t
   };
 
   return (
-    <TableRow ref={setNodeRef} style={style}>
-      <TableCell><Button variant="ghost" size="icon" className="cursor-grab" {...listeners} {...attributes}><GripVertical className="h-4 w-4" /></Button></TableCell>
+    <TableRow ref={setNodeRef} style={style} {...attributes} {...listeners} className="cursor-grab">
+      <TableCell><GripVertical className="h-4 w-4 text-gray-500" /></TableCell>
       <TableCell style={{ backgroundColor: task.color, color: task.textColor || '#FFFFFF' }}>{task.name}</TableCell>
       <TableCell>
         <div className="flex flex-col gap-1">
