@@ -40,7 +40,7 @@ function SortableItem({
 }) {
   return (
     <TableRow>
-      <TableCell className="w-10">
+      <TableCell className="w-8">
         <div className="flex flex-col items-center space-y-1">
           <Button variant="ghost" size="icon" onClick={() => handleMoveUp(task.id)} disabled={isFirst}>
             <ArrowUp className="h-4 w-4" />
