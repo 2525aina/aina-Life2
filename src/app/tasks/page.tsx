@@ -34,6 +34,7 @@ import {
 import { arrayMove } from "@dnd-kit/sortable";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
+import { ConfirmationModal } from '@/components/ConfirmationModal';
 
 // Sortableなタスクアイテムコンポーネント
 function SortableTaskItem({
@@ -101,6 +102,7 @@ export default function TasksPage() {
   const [selectedTaskIds, setSelectedTaskIds] = useState<Set<string>>(
     new Set()
   );
+  const [isBulkDeleteConfirmOpen, setIsBulkDeleteConfirmOpen] = useState(false);
 
   // tasksが更新されたらorderedTasksを初期化
   useEffect(() => {
@@ -144,11 +146,15 @@ export default function TasksPage() {
     console.log("Editing task:", task);
   };
 
-  const handleBulkDelete = async () => {
+  const handleBulkDelete = () => {
     if (selectedTaskIds.size === 0) return;
+    setIsBulkDeleteConfirmOpen(true);
+  };
 
+  const handleConfirmBulkDelete = async () => {
     await bulkDeleteTasks(Array.from(selectedTaskIds));
     clearSelection(); // Clear selection after bulk delete
+    setIsBulkDeleteConfirmOpen(false);
   };
 
   const handleDragEnd = async (event: DragEndEvent) => {
@@ -286,6 +292,17 @@ export default function TasksPage() {
           taskToEdit={taskToEdit}
         />
       )}
+
+      <ConfirmationModal
+        isOpen={isBulkDeleteConfirmOpen}
+        onClose={() => setIsBulkDeleteConfirmOpen(false)}
+        title="タスクの一括削除確認"
+        message={`選択された${selectedTaskIds.size}件のタスクを本当に削除しますか？この操作は元に戻せません。関連するログも非表示になります。`}
+        onConfirm={handleConfirmBulkDelete}
+        confirmButtonText="削除する"
+        cancelButtonText="キャンセル"
+        isDestructive={true}
+      />
     </div>
   );
 }

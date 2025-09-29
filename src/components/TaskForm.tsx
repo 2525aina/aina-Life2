@@ -15,6 +15,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import { Loader2 } from 'lucide-react';
+import { ConfirmationModal } from '@/components/ConfirmationModal';
 
 interface TaskFormProps {
   isOpen: boolean;
@@ -26,6 +27,7 @@ export function TaskForm({ isOpen, onClose, taskToEdit }: TaskFormProps) {
   const { addTask, updateTask, deleteTask } = useTasks();
   const [formData, setFormData] = useState({ name: '', color: '#000000', textColor: '#FFFFFF' });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
@@ -102,13 +104,7 @@ export function TaskForm({ isOpen, onClose, taskToEdit }: TaskFormProps) {
           {taskToEdit && (
             <Button
               variant="destructive"
-              onClick={async () => {
-                if (taskToEdit && confirm('本当にこのタスクを削除しますか？')) {
-                  await deleteTask(taskToEdit.id);
-                  onClose();
-                  toast.success('タスクを削除しました。');
-                }
-              }}
+              onClick={() => setIsDeleteConfirmOpen(true)} // Open modal
               disabled={isSubmitting}
             >
               削除
@@ -127,6 +123,26 @@ export function TaskForm({ isOpen, onClose, taskToEdit }: TaskFormProps) {
           </Button>
         </DialogFooter>
       </DialogContent>
+
+      {taskToEdit && (
+        <ConfirmationModal
+          isOpen={isDeleteConfirmOpen}
+          onClose={() => setIsDeleteConfirmOpen(false)}
+          title="タスクの削除確認"
+          message="本当にこのタスクを削除しますか？この操作は元に戻せません。関連するログも非表示になります。"
+          onConfirm={async () => {
+            if (taskToEdit) {
+              await deleteTask(taskToEdit.id);
+              toast.success('タスクを削除しました。');
+              onClose(); // Close TaskForm modal after deletion
+            }
+            setIsDeleteConfirmOpen(false);
+          }}
+          confirmButtonText="削除する"
+          cancelButtonText="キャンセル"
+          isDestructive={true}
+        />
+      )}
     </Dialog>
   );
 }

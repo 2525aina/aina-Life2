@@ -87,7 +87,6 @@ export const useLogActions = () => {
   // ログを削除
   const deleteLog = useCallback(async (logId: string) => {
     if (!user || !selectedPet) throw new Error('ユーザーまたはペットが選択されていません。');
-    if (!confirm('本当にこのログを削除しますか？')) return;
     const logRef = doc(db, 'dogs', selectedPet.id, 'logs', logId);
     await deleteDoc(logRef);
   }, [user, selectedPet]);

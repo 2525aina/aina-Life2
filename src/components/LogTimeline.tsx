@@ -21,6 +21,7 @@ import {
 import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
 import { LogFormModal } from "@/components/LogFormModal";
+import { ConfirmationModal } from '@/components/ConfirmationModal';
 
 export function LogTimeline() {
   const { selectedPet } = usePetSelection();
@@ -29,6 +30,8 @@ export function LogTimeline() {
   const { deleteLog } = useLogActions();
   const [isLogFormOpen, setIsLogFormOpen] = useState(false);
   const [logToEdit, setLogToEdit] = useState<Log | null>(null);
+  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
+  const [logToDeleteId, setLogToDeleteId] = useState<string | null>(null);
 
   // Define empty message text locally
   const emptyMessageText = "この日の記録はありません。";
@@ -192,7 +195,10 @@ export function LogTimeline() {
                 <Button
                   variant="destructive"
                   size="icon"
-                  onClick={() => deleteLog(log.id)}
+                  onClick={() => {
+                    setLogToDeleteId(log.id);
+                    setIsDeleteConfirmOpen(true);
+                  }}
                 >
                   <Trash2Icon className="h-4 w-4" />
                 </Button>
@@ -210,6 +216,23 @@ export function LogTimeline() {
           initialDate={currentDate}
         />
       )}
+
+      <ConfirmationModal
+        isOpen={isDeleteConfirmOpen}
+        onClose={() => setIsDeleteConfirmOpen(false)}
+        title="ログの削除確認"
+        message="本当にこのログを削除しますか？この操作は元に戻せません。"
+        onConfirm={async () => {
+          if (logToDeleteId) {
+            await deleteLog(logToDeleteId);
+            setLogToDeleteId(null);
+            setIsDeleteConfirmOpen(false);
+          }
+        }}
+        confirmButtonText="削除する"
+        cancelButtonText="キャンセル"
+        isDestructive={true}
+      />
     </div>
   );
 }

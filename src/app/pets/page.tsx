@@ -24,6 +24,8 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { ConfirmationModal } from '@/components/ConfirmationModal';
+import { toast } from 'sonner';
 
 export default function PetsPage() {
   const { user, loading: authLoading } = useAuth();
@@ -32,6 +34,8 @@ export default function PetsPage() {
   const [petToEdit, setPetToEdit] = useState<Pet | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedTab, setSelectedTab] = useState('all'); // 'all', 'male', 'female', 'other'
+  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
+  const [petToDeleteId, setPetToDeleteId] = useState<string | null>(null);
 
   const isLoading = authLoading || petsLoading;
 
@@ -48,9 +52,17 @@ export default function PetsPage() {
     setIsFormOpen(true);
   };
 
-  const handleDeletePet = async (petId: string) => {
-    if (confirm('本当にこのペットを削除しますか？')) {
-      await deletePet(petId);
+  const handleDeletePet = (petId: string) => {
+    setPetToDeleteId(petId);
+    setIsDeleteConfirmOpen(true);
+  };
+
+  const handleConfirmDeletePet = async () => {
+    if (petToDeleteId) {
+      await deletePet(petToDeleteId);
+      toast.success('ペットを削除しました！');
+      setPetToDeleteId(null);
+      setIsDeleteConfirmOpen(false);
     }
   };
 
@@ -225,6 +237,17 @@ export default function PetsPage() {
           petToEdit={petToEdit}
         />
       )}
+
+      <ConfirmationModal
+        isOpen={isDeleteConfirmOpen}
+        onClose={() => setIsDeleteConfirmOpen(false)}
+        title="ペットの削除確認"
+        message="本当にこのペットを削除しますか？この操作は元に戻せません。関連するタスクやログも全て論理削除されます。"
+        onConfirm={handleConfirmDeletePet}
+        confirmButtonText="削除する"
+        cancelButtonText="キャンセル"
+        isDestructive={true}
+      />
     </div>
   );
 }
