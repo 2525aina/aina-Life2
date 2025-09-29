@@ -9,9 +9,6 @@ import {
   GoogleAuthProvider,
   signInWithPopup,
   signInAnonymously,
-  linkWithPopup,
-  linkWithCredential,
-  EmailAuthProvider,
 } from "firebase/auth";
 import { auth } from "@/lib/firebase";
 import { Button } from "@/components/ui/button";
@@ -44,25 +41,14 @@ export default function LoginPage() {
 
         if (emailFromStorage) {
           try {
-            // Check if a user is already logged in anonymously
-            if (auth.currentUser && auth.currentUser.isAnonymous) {
-              const credential = EmailAuthProvider.credentialWithLink(emailFromStorage, window.location.href);
-              await linkWithCredential(auth.currentUser, credential);
-              toast.success("アカウントを連携しました！");
-            } else {
-              await signInWithEmailLink(auth, emailFromStorage, window.location.href);
-              toast.success('ログインしました！');
-            }
+            await signInWithEmailLink(auth, emailFromStorage, window.location.href);
             window.localStorage.removeItem('emailForSignIn');
+            toast.success('ログインしました！');
             router.push('/');
           } catch (err: unknown) {
             const errorMessage = err instanceof Error ? err.message : "不明なエラー";
             setError(errorMessage);
-            if (typeof err === 'object' && err !== null && 'code' in err && (err as { code: string }).code === 'auth/credential-already-in-use') {
-                toast.error('このメールアドレスは既に使用されています。');
-            } else {
-                toast.error(`ログインに失敗しました: ${errorMessage}`);
-            }
+            toast.error(`ログインに失敗しました: ${errorMessage}`);
             setLoading(false);
           }
         } else {
@@ -104,25 +90,15 @@ export default function LoginPage() {
     setLoading(true);
     const provider = new GoogleAuthProvider();
     try {
-      // Check if a user is already logged in anonymously
-      if (auth.currentUser && auth.currentUser.isAnonymous) {
-        await linkWithPopup(auth.currentUser, provider);
-        console.log("Anonymous account successfully linked with Google!");
-        toast.success("アカウントを連携しました！");
-      } else {
-        await signInWithPopup(auth, provider);
-        console.log("Logged in with Google successfully!");
-      }
+      await signInWithPopup(auth, provider);
+      console.log("Logged in with Google successfully!");
+      toast.success("Googleでログインしました！");
       router.push('/');
     } catch (err: unknown) {
       const errorMessage = err instanceof Error ? err.message : "不明なエラー";
       setError(errorMessage);
       console.error(err);
-      if (typeof err === 'object' && err !== null && 'code' in err && (err as { code: string }).code === 'auth/credential-already-in-use') {
-        toast.error('このGoogleアカウントは既に使用されています。');
-      } else {
-        toast.error(`Googleでの処理に失敗しました: ${errorMessage}`);
-      }
+      toast.error(`Googleでのログインに失敗しました: ${errorMessage}`);
     } finally {
         setLoading(false);
     }
