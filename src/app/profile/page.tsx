@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
@@ -29,6 +29,7 @@ import {
 } from "@/components/ui/select";
 import { toast } from "sonner";
 import { Textarea } from "@/components/ui/textarea";
+import { AccountLinker } from "@/components/ui/AccountLinker";
 
 export default function ProfilePage() {
   const { user, loading: authLoading } = useAuth();
@@ -190,7 +191,8 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 py-8">
+      {user && user.isAnonymous && <AccountLinker />}
       <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle className="text-2xl">プロフィール</CardTitle>
@@ -475,7 +477,7 @@ export default function ProfilePage() {
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 更新中...
-              </>
+              </> 
             ) : (
               "プロフィールを更新"
             )}
