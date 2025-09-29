@@ -32,7 +32,7 @@ export function TaskSelector() {
       <div className="flex flex-col items-center justify-center py-12 text-gray-500">
         <ClipboardListIcon className="h-16 w-16 mb-4 text-gray-400" />
         <p className="text-lg font-semibold mb-2">記録するタスクがありません。</p>
-        <Link href="/tasks">
+        <Link href="/pets">
           <Button>タスクを作成する</Button>
         </Link>
       </div>
