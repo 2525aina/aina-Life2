@@ -41,15 +41,21 @@ export function LogTimeline() {
     return (
       <div className="flex flex-col items-center justify-center py-12 text-gray-500">
         <PawPrintIcon className="h-16 w-16 mb-4 text-gray-400" />
-        <p className="text-lg font-semibold mb-2">ログを表示するには、まずペットを選択してください。</p>
-        <p className="text-md">ペットが登録されていない場合は、ペット管理画面から追加してください。</p>
+        <p className="text-lg font-semibold mb-2">
+          ログを表示するには、まずペットを選択してください。
+        </p>
+        <p className="text-md">
+          ペットが登録されていない場合は、ペット管理画面から追加してください。
+        </p>
       </div>
     );
   }
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-wrap items-center justify-center gap-2 mb-4"> {/* Added flex-wrap, changed justify-between to justify-center, added gap-2 */}
+      <div className="flex flex-wrap items-center justify-center gap-2 mb-4">
+        {" "}
+        {/* Added flex-wrap, changed justify-between to justify-center, added gap-2 */}
         <Button
           variant="outline"
           onClick={() => setCurrentDate(subDays(currentDate, 1))}
@@ -98,7 +104,9 @@ export function LogTimeline() {
         <div className="flex flex-col items-center justify-center py-12 text-gray-500">
           <ClipboardListIcon className="h-16 w-16 mb-4 text-gray-400" />
           <p className="text-lg font-semibold mb-2">{emptyMessageText}</p>
-          <p className="text-md">手動でログを追加するか、タスクを実行して記録しましょう！</p>
+          <p className="text-md">
+            手動でログを追加するか、タスクを実行して記録しましょう！
+          </p>
         </div>
       ) : (
         <ul className="space-y-2">
@@ -116,7 +124,7 @@ export function LogTimeline() {
                 color: log.isTaskDeleted ? undefined : log.taskTextColor,
               }}
             >
-              <div className="flex flex-col items-center mr-4">
+              <div className="flex flex-col items-center">
                 {/* 作成者/更新者名 */}
                 {(() => {
                   const primaryName = log.createdByName || "unknown";
@@ -148,11 +156,17 @@ export function LogTimeline() {
                   {format(log.timestamp.toDate(), "HH:mm:ss")}
                 </span>
               </div>
-              <span className="ml-4 font-medium text-base" style={{ color: log.taskTextColor }}>
+              <span
+                className="font-medium text-base"
+                style={{ color: log.taskTextColor }}
+              >
                 {log.taskName}
               </span>
               {log.note && (
-                <span className="ml-2 text-sm" style={{ color: log.taskTextColor }}>
+                <span
+                  className="ml-2 text-sm"
+                  style={{ color: log.taskTextColor }}
+                >
                   ({log.note})
                 </span>
               )}
