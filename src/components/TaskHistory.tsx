@@ -67,11 +67,17 @@ export function TaskHistory({ dogId }: TaskHistoryProps) {
         <TableBody>
           {tasks.map((task) => (
             <TableRow key={task.id}>
-              <TableCell>{task.name}</TableCell>
+              <TableCell style={{ color: task.textColor || '#FFFFFF' }}>{task.name}</TableCell>
               <TableCell>
-                <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 rounded-full" style={{ backgroundColor: task.color }}></div>
-                  <span>{task.color}</span>
+                <div className="flex flex-col gap-1">
+                  <div className="flex items-center gap-1">
+                    <div className="w-4 h-4 rounded-full border" style={{ backgroundColor: task.color }}></div>
+                    <span className="text-xs">背景: {task.color}</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <div className="w-4 h-4 rounded-full border" style={{ backgroundColor: task.textColor || '#FFFFFF' }}></div>
+                    <span className="text-xs">文字: {task.textColor || '#FFFFFF'}</span>
+                  </div>
                 </div>
               </TableCell>
               <TableCell className="text-right">
