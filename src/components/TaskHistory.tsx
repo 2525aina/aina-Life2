@@ -40,8 +40,7 @@ function SortableItem({
   isLast: boolean;
   dogId: string;
 }) {
-  return (
-    <TableRow><TableCell className="w-8 py-0 px-1"> {/* This is the arrow button column */}
+  return (<TableRow><TableCell className="w-8 py-0 px-1"> {/* This is the arrow button column */}
         <div className="flex flex-col items-center space-y-1">
           <Button variant="ghost" size="icon" onClick={() => handleMoveUp(task.id)} disabled={isFirst}>
             <ArrowUp className="h-4 w-4" />
@@ -80,8 +79,7 @@ function SortableItem({
             <Trash2 className="h-4 w-4 text-red-500" />
           </Button>
         </div>
-      </TableCell></TableRow>
-  );
+      </TableCell></TableRow>);
 }
 
 export function TaskHistory({ dogId }: TaskHistoryProps) {
