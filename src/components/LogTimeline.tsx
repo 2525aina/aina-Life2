@@ -6,7 +6,13 @@ import { useLogs, Log, useLogActions } from "@/hooks/useLogs";
 import { Button } from "@/components/ui/button";
 import { format, addDays, subDays } from "date-fns";
 import { ja } from "date-fns/locale";
-import { CalendarIcon, ClipboardListIcon, PawPrintIcon } from "lucide-react";
+import {
+  CalendarIcon,
+  ClipboardListIcon,
+  PawPrintIcon,
+  PencilIcon,
+  Trash2Icon,
+} from "lucide-react";
 import {
   Popover,
   PopoverContent,
@@ -157,14 +163,14 @@ export function LogTimeline() {
                 </span>
               </div>
               <span
-                className="font-medium text-base"
+                className="font-medium text-base break-all"
                 style={{ color: log.taskTextColor }}
               >
                 {log.taskName}
               </span>
               {log.note && (
                 <span
-                  className="ml-2 text-sm"
+                  className="ml-2 text-sm break-all"
                   style={{ color: log.taskTextColor }}
                 >
                   ({log.note})
@@ -173,17 +179,17 @@ export function LogTimeline() {
               <div className="ml-auto flex space-x-2">
                 <Button
                   variant="secondary"
-                  size="sm"
+                  size="icon"
                   onClick={() => handleEditLog(log)}
                 >
-                  編集
+                  <PencilIcon className="h-4 w-4" />
                 </Button>
                 <Button
                   variant="destructive"
-                  size="sm"
+                  size="icon"
                   onClick={() => deleteLog(log.id)}
                 >
-                  削除
+                  <Trash2Icon className="h-4 w-4" />
                 </Button>
               </div>
             </li>
