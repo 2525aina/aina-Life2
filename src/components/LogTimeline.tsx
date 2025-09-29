@@ -91,6 +91,7 @@ export function LogTimeline() {
               selected={currentDate}
               onSelect={(date) => date && setCurrentDate(date)}
               initialFocus
+              locale={ja}
             />
           </PopoverContent>
         </Popover>
@@ -152,16 +153,15 @@ export function LogTimeline() {
                   );
                 })()}
                 {/* 時刻表示 */}
-                <span
-                  className="font-mono text-sm px-2 py-1 rounded"
-                  style={{
-                    backgroundColor: log.timeBgColor,
-                    color: log.timeTextColor,
-                  }}
-                >
-                  {format(log.timestamp.toDate(), "HH:mm:ss")}
-                </span>
-              </div>
+                                  <span
+                                    className="font-mono text-sm px-2 py-1 rounded"
+                                    style={{
+                                      backgroundColor: log.timeBgColor,
+                                      color: log.timeTextColor,
+                                    }}
+                                  >
+                                    {format(log.timestamp.toDate(), "HH:mm:ss", { locale: ja })}
+                                  </span>              </div>
               <span
                 className="ml-1 font-medium text-base break-all block overflow-y-auto"
                 style={{

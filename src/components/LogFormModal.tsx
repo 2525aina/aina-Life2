@@ -15,6 +15,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { CalendarIcon } from 'lucide-react';
 import { format } from 'date-fns';
+import { ja } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
 import { usePetSelection } from '../contexts/PetSelectionContext';
 
@@ -132,7 +133,7 @@ export function LogFormModal({ isOpen, onClose, logToEdit, initialDate }: LogFor
                   )}
                 >
                   <CalendarIcon className="mr-2 h-4 w-4" />
-                  {selectedDate ? format(selectedDate, "yyyy/MM/dd") : <span>日付を選択</span>}
+                  {selectedDate ? format(selectedDate, "yyyy/MM/dd", { locale: ja }) : <span>日付を選択</span>}
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0">
@@ -150,6 +151,7 @@ export function LogFormModal({ isOpen, onClose, logToEdit, initialDate }: LogFor
                     }
                   }}
                   initialFocus
+                  locale={ja}
                 />
               </PopoverContent>
             </Popover>
