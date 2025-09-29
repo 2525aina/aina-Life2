@@ -40,6 +40,16 @@ function SortableItem({
 }) {
   return (
     <TableRow>
+      <TableCell className="w-10">
+        <div className="flex flex-col items-center space-y-1">
+          <Button variant="ghost" size="icon" onClick={() => handleMoveUp(task.id)} disabled={isFirst}>
+            <ArrowUp className="h-4 w-4" />
+          </Button>
+          <Button variant="ghost" size="icon" onClick={() => handleMoveDown(task.id)} disabled={isLast}>
+            <ArrowDown className="h-4 w-4" />
+          </Button>
+        </div>
+      </TableCell>
       <TableCell style={{ backgroundColor: task.color, color: task.textColor || '#FFFFFF' }}>{task.name}</TableCell>
       <TableCell>
         <div className="flex flex-col gap-1">
@@ -148,6 +158,7 @@ export function TaskHistory({ dogId }: TaskHistoryProps) {
       <Table>
         <TableHeader>
           <TableRow>
+            <TableHead className="w-10"></TableHead> {/* 矢印ボタン用の列 */}
             <TableHead>タスク名</TableHead>
             <TableHead>色</TableHead>
             <TableHead className="text-right">操作</TableHead>
