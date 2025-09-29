@@ -59,12 +59,6 @@ function SortableItem({
       </TableCell>
       <TableCell className="text-right">
         <div className="flex items-center justify-end space-x-2">
-          <Button variant="ghost" size="icon" onClick={() => handleMoveUp(task.id)} disabled={isFirst}>
-            <ArrowUp className="h-4 w-4" />
-          </Button>
-          <Button variant="ghost" size="icon" onClick={() => handleMoveDown(task.id)} disabled={isLast}>
-            <ArrowDown className="h-4 w-4" />
-          </Button>
           <Dialog open={isEditFormOpen && taskToEdit?.id === task.id} onOpenChange={setIsEditFormOpen}>
             <DialogTrigger asChild>
               <Button variant="ghost" size="icon" onClick={() => handleEdit(task)}>
