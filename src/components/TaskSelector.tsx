@@ -6,9 +6,11 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import Link from "next/link";
 import { ClipboardListIcon } from 'lucide-react';
+import { usePetSelection } from "@/contexts/PetSelectionContext";
 
 export function TaskSelector() {
-  const { tasks, loading: tasksLoading } = useTasks();
+  const { selectedPet } = usePetSelection();
+  const { tasks, loading: tasksLoading } = useTasks(selectedPet?.id || '');
   const { addLog } = useLogActions(); // Use useLogActions
 
   const handleTaskClick = async (task: (typeof tasks)[0]) => {

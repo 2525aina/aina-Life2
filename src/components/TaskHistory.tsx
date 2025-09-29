@@ -10,6 +10,10 @@ import { TaskForm } from '@/components/TaskForm';
 import { ConfirmationModal } from '@/components/ConfirmationModal';
 import { toast } from 'sonner';
 
+interface TaskHistoryProps {
+  dogId: string; // useTasksはselectedPetを使うが、明示的にdogIdを受け取る
+}
+
 // SortableItemコンポーネント
 function SortableItem({
   task,
@@ -22,6 +26,7 @@ function SortableItem({
   setIsEditFormOpen,
   isFirst,
   isLast,
+  dogId,
 }: {
   task: Task;
   handleEdit: (task: Task) => void;
@@ -33,6 +38,7 @@ function SortableItem({
   setIsEditFormOpen: (isOpen: boolean) => void;
   isFirst: boolean;
   isLast: boolean;
+  dogId: string;
 }) {
   return (
     <TableRow><TableCell className="w-8 py-0 px-1"> {/* This is the arrow button column */}
@@ -67,7 +73,7 @@ function SortableItem({
               <DialogHeader>
                 <DialogTitle>タスクの編集</DialogTitle>
               </DialogHeader>
-              <TaskForm isOpen={true} onClose={() => setIsEditFormOpen(false)} taskToEdit={taskToEdit || undefined} />
+              <TaskForm petId={dogId} isOpen={true} onClose={() => setIsEditFormOpen(false)} taskToEdit={taskToEdit || undefined} />
             </DialogContent>
           </Dialog>
           <Button variant="ghost" size="icon" onClick={() => handleDelete(task.id)}>
@@ -78,8 +84,8 @@ function SortableItem({
   );
 }
 
-export function TaskHistory() {
-  const { tasks, loading, deleteTask, reorderTasks } = useTasks();
+export function TaskHistory({ dogId }: TaskHistoryProps) {
+  const { tasks, loading, deleteTask, reorderTasks } = useTasks(dogId);
   const [isEditFormOpen, setIsEditFormOpen] = useState(false);
   const [taskToEdit, setTaskToEdit] = useState<Task | null>(null);
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
@@ -169,6 +175,7 @@ export function TaskHistory() {
               setIsEditFormOpen={setIsEditFormOpen}
               isFirst={index === 0}
               isLast={index === tasks.length - 1}
+              dogId={dogId}
             />
           ))}
         </TableBody>

@@ -21,10 +21,11 @@ interface TaskFormProps {
   isOpen: boolean;
   onClose: () => void;
   taskToEdit?: Task | null;
+  petId: string; // Add petId prop
 }
 
-export function TaskForm({ isOpen, onClose, taskToEdit }: TaskFormProps) {
-  const { addTask, updateTask, deleteTask } = useTasks();
+export function TaskForm({ isOpen, onClose, taskToEdit, petId }: TaskFormProps) {
+  const { addTask, updateTask, deleteTask } = useTasks(petId);
   const [formData, setFormData] = useState({ name: '', color: '#000000', textColor: '#FFFFFF' });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);

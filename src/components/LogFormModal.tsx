@@ -28,7 +28,7 @@ interface LogFormModalProps {
 
 export function LogFormModal({ isOpen, onClose, logToEdit, initialDate }: LogFormModalProps) {
   const { selectedPet } = usePetSelection();
-  const { tasks } = useTasks();
+  const { tasks } = useTasks(selectedPet?.id || '');
   const { addLog, updateLog } = useLogActions(); // Get updateLog here
 
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(initialDate || new Date());

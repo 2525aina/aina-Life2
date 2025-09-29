@@ -282,11 +282,11 @@ export default function PetsPage() {
                                                   <DialogHeader>
                                                     <DialogTitle>新しいタスクを追加</DialogTitle>
                                                   </DialogHeader>
-                                                  <TaskForm isOpen={isAddTaskFormOpen} onClose={() => setIsAddTaskFormOpen(false)} />
+                                                  <TaskForm petId={pet.id} isOpen={isAddTaskFormOpen} onClose={() => setIsAddTaskFormOpen(false)} />
                                                 </DialogContent>
                                               </Dialog>
                                             </div>
-                                            <TaskHistory />
+                                            <TaskHistory dogId={pet.id} />
                                           </TabsContent>
                                         </Tabs>                  </CardContent>
                 </CollapsibleContent>

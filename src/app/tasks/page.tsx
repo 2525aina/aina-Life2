@@ -95,7 +95,7 @@ export default function TasksPage() {
     loading: tasksLoading,
     reorderTasks,
     bulkDeleteTasks,
-  } = useTasks();
+  } = useTasks(selectedPet?.id || ""); // selectedPetがnullの場合に備えて空文字列を渡す
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [taskToEdit, setTaskToEdit] = useState<Task | null>(null);
   const [orderedTasks, setOrderedTasks] = useState<Task[]>([]);
@@ -290,6 +290,7 @@ export default function TasksPage() {
           isOpen={isFormOpen}
           onClose={() => setIsFormOpen(false)}
           taskToEdit={taskToEdit}
+          petId={selectedPet?.id || ""}
         />
       )}
 
