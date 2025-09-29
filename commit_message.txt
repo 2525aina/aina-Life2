@@ -1,7 +1,6 @@
-feat: タスク履歴とUIコンポーネントのエラーを修正
+fix: 体重追加フォームが別のペットの履歴に追加される問題を修正
 
-- `src/components/TaskHistory.tsx`:
-  - `<tr>` 内の不要なコメントを削除し、ハイドレーションエラーを解決。
-  - `SortableItem` コンポーネントのコードフォーマットを改善し、可読性を向上。
-- `src/components/ui/button.tsx`:
-  - `Button` コンポーネントを `React.forwardRef` でラップし、`DialogTrigger` のランタイムエラーを解決。
+- `src/app/pets/page.tsx`:
+  - `isWeightFormOpen` を `openWeightFormForPetId` に変更し、各ペットの体重フォームの開閉を個別に管理するように修正。
+  - `WeightForm` を含む `Dialog` の開閉ロジックを `openWeightFormForPetId` の状態に基づいて修正。
+  - 未使用の変数 `editingWeight` と `setEditingWeight` の宣言を削除。

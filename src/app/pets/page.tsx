@@ -44,8 +44,8 @@ export default function PetsPage() {
   const [selectedTab, setSelectedTab] = useState('all'); // 'all', 'male', 'female', 'other'
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
   const [petToDeleteId, setPetToDeleteId] = useState<string | null>(null);
-  const [isWeightFormOpen, setIsWeightFormOpen] = useState(false);
-  const [editingWeight, setEditingWeight] = useState(null);
+  const [openWeightFormForPetId, setOpenWeightFormForPetId] = useState<string | null>(null);
+
   const [isAddTaskFormOpen, setIsAddTaskFormOpen] = useState(false);
 
   const isLoading = authLoading || petsLoading;
@@ -246,15 +246,19 @@ export default function PetsPage() {
                                           </TabsContent>
                                           <TabsContent value="weights" className="mt-4">
                                             <div className="flex justify-end mb-4">
-                                              <Dialog open={isWeightFormOpen} onOpenChange={setIsWeightFormOpen}>
+                                              <Dialog open={openWeightFormForPetId === pet.id} onOpenChange={(isOpen) => {
+                                                if (!isOpen) {
+                                                  setOpenWeightFormForPetId(null);
+                                                }
+                                              }}>
                                                 <DialogTrigger asChild>
-                                                  <Button>体重を追加</Button>
+                                                  <Button onClick={() => setOpenWeightFormForPetId(pet.id)}>体重を追加</Button>
                                                 </DialogTrigger>
                                                 <DialogContent>
                                                   <DialogHeader>
                                                     <DialogTitle>体重記録の追加</DialogTitle>
                                                   </DialogHeader>
-                                                  <WeightForm dogId={pet.id} onSuccess={() => setIsWeightFormOpen(false)} />
+                                                  <WeightForm dogId={pet.id} onSuccess={() => setOpenWeightFormForPetId(null)} />
                                                 </DialogContent>
                                               </Dialog>
                                             </div>
