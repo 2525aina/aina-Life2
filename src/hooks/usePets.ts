@@ -202,9 +202,6 @@ export const usePets = () => {
       toast.error('ログインが必要です。');
       return;
     }
-    if (!confirm('⚠️本当にこのペットを削除しますか？この操作は元に戻せません。\n関連するタスクやログも全て論理削除されます。')) {
-      return;
-    }
     try {
       const batch = writeBatch(db);
       const petRef = doc(db, 'dogs', petId);

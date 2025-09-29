@@ -125,7 +125,6 @@ export const useTasks = () => {
       toast.error('ユーザーまたはペットが選択されていません。');
       return;
     }
-    if (!confirm('本当にこのタスクを削除しますか？関連するログも非表示になります。')) return;
 
     const batch = writeBatch(db);
     const taskRef = doc(db, 'dogs', selectedPet.id, 'tasks', taskId);
@@ -185,7 +184,6 @@ export const useTasks = () => {
       toast.error('ユーザーまたはペットが選択されていません。');
       return;
     }
-    if (!confirm(`選択された${taskIds.length}件のタスクを本当に削除しますか？関連するログも非表示になります。`)) return;
 
     const batch = writeBatch(db);
     const petId = selectedPet.id;
