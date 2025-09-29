@@ -1,9 +1,11 @@
 'use client';
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from 'next/navigation';
 import {
-  signInWithEmailAndPassword,
+  sendSignInLinkToEmail,
+  isSignInWithEmailLink,
+  signInWithEmailLink,
   GoogleAuthProvider,
   signInWithPopup,
 } from "firebase/auth";
@@ -23,21 +25,62 @@ import { toast } from 'sonner';
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
 
-  const handleLogin = async () => {
+  useEffect(() => {
+    const processSignIn = async () => {
+      if (isSignInWithEmailLink(auth, window.location.href)) {
+        setLoading(true);
+        let emailFromStorage = window.localStorage.getItem('emailForSignIn');
+        if (!emailFromStorage) {
+          emailFromStorage = window.prompt('確認のため、メールアドレスを再度入力してください。');
+        }
+
+        if (emailFromStorage) {
+          try {
+            await signInWithEmailLink(auth, emailFromStorage, window.location.href);
+            window.localStorage.removeItem('emailForSignIn');
+            toast.success('ログインしました！');
+            router.push('/');
+          } catch (err) {
+            const errorMessage = err instanceof Error ? err.message : "不明なエラー";
+            setError(errorMessage);
+            toast.error(`ログインに失敗しました: ${errorMessage}`);
+            setLoading(false);
+          }
+        } else {
+            toast.error('メールアドレスが確認できませんでした。');
+            setLoading(false);
+        }
+      }
+    };
+    processSignIn();
+  }, [router]);
+
+
+  const handleEmailLogin = async () => {
     setError(null);
+    setLoading(true);
+
+    const actionCodeSettings = {
+      url: `${window.location.origin}/login`,
+      handleCodeInApp: true,
+    };
+
     try {
-      await signInWithEmailAndPassword(auth, email, password);
-      console.log("Logged in successfully!");
-      router.push('/');
+      await sendSignInLinkToEmail(auth, email, actionCodeSettings);
+      window.localStorage.setItem('emailForSignIn', email);
+      toast.success(`${email} にログインリンクを送信しました。メールを確認してください。`);
+      setEmail("");
     } catch (err: unknown) {
       const errorMessage = err instanceof Error ? err.message : "不明なエラー";
       setError(errorMessage);
       console.error(err);
-      toast.error(`ログインに失敗しました: ${errorMessage}`);
+      toast.error(`ログインリンクの送信に失敗しました: ${errorMessage}`);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -62,7 +105,7 @@ export default function LoginPage() {
         <CardHeader>
           <CardTitle className="text-2xl">ログイン</CardTitle>
           <CardDescription>
-            メールアドレスとパスワードを入力してログインしてください。
+            メールアドレスを入力してログインリンクを受け取ってください。
           </CardDescription>
         </CardHeader>
         <CardContent className="grid gap-4">
@@ -75,25 +118,16 @@ export default function LoginPage() {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-            />
-          </div>
-          <div className="grid gap-2">
-            <Label htmlFor="password">パスワード</Label>
-            <Input
-              id="password"
-              type="password"
-              required
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              disabled={loading}
             />
           </div>
           {error && <p className="text-red-500 text-sm">{error}</p>}
         </CardContent>
         <CardFooter className="flex flex-col gap-4">
-          <Button className="w-full" onClick={handleLogin}>
-            ログイン
+          <Button className="w-full" onClick={handleEmailLogin} disabled={loading}>
+            {loading ? '送信中...' : 'ログインリンクを送信'}
           </Button>
-          <Button variant="outline" className="w-full" onClick={handleGoogleLogin}>
+          <Button variant="outline" className="w-full" onClick={handleGoogleLogin} disabled={loading}>
             Googleでログイン
           </Button>
         </CardFooter>
