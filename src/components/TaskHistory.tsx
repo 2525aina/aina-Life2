@@ -49,9 +49,7 @@ function SortableItem({
             <ArrowDown className="h-4 w-4" />
           </Button>
         </div>
-      </TableCell>
-      <TableCell className="py-0 px-1" style={{ backgroundColor: task.color, color: task.textColor || '#FFFFFF' }}>{task.name}</TableCell> {/* Task name column */}
-      <TableCell className="py-0 px-1"> {/* Color display column */}
+      </TableCell><TableCell className="py-0 px-1" style={{ backgroundColor: task.color, color: task.textColor || '#FFFFFF' }}>{task.name}</TableCell><TableCell className="py-0 px-1"> {/* Color display column */}
         <div className="flex flex-col gap-1">
           <div className="flex items-center gap-2">
             <div className="w-4 h-4 rounded-full border" style={{ backgroundColor: task.color }}></div>
@@ -62,8 +60,7 @@ function SortableItem({
             <span>{task.textColor || '#FFFFFF'}</span>
           </div>
         </div>
-      </TableCell>
-      <TableCell className="text-right py-0 px-1"> {/* Action buttons column */}
+      </TableCell><TableCell className="text-right py-0 px-1"> {/* Action buttons column */}
         <div className="flex flex-col items-end space-y-0">
           <Dialog open={isEditFormOpen && taskToEdit?.id === task.id} onOpenChange={setIsEditFormOpen}>
             <DialogTrigger asChild>
