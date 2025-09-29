@@ -1,10 +1,11 @@
 // src/lib/firebase.ts
 // Firebaseの初期化および各サービスインスタンスの取得。
-// 依存: 環境変数(NEXT_PUBLIC_FIREBASE_*)、firebase/app, firebase/auth, firebase/firestore
+// 依存: 環境変数(NEXT_PUBLIC_FIREBASE_*)、firebase/app, firebase/auth, firebase/firestore, firebase/storage
 
 import { initializeApp, getApps, getApp } from 'firebase/app'; // Firebaseアプリ初期化
 import { getAuth, connectAuthEmulator } from 'firebase/auth'; // 認証サービス
 import { getFirestore, connectFirestoreEmulator } from 'firebase/firestore'; // Firestoreデータベース
+import { getStorage, connectStorageEmulator } from 'firebase/storage'; // Storageサービス
 
 // Firebaseの設定は環境変数から読み込む
 const firebaseConfig = {
@@ -30,13 +31,17 @@ const auth = getAuth(app);
 // Firestoreデータベースのインスタンスを取得
 const db = getFirestore(app);
 
+// Firebase Storageのインスタンスを取得
+const storage = getStorage(app);
+
 // ローカルエミュレータを使用する場合の接続設定
 if (process.env.NODE_ENV === 'development') {
   if (process.env.NEXT_PUBLIC_USE_FIREBASE_EMULATOR === 'true') {
     connectAuthEmulator(auth, 'http://localhost:9099');
     connectFirestoreEmulator(db, 'localhost', 8080);
+    connectStorageEmulator(storage, 'localhost', 9199);
   }
 }
 
 // 他モジュールで利用できるようエクスポート
-export { app, auth, db };
+export { app, auth, db, storage };
