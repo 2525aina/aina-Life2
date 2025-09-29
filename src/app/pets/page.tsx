@@ -7,7 +7,7 @@ import { usePets, Pet } from '@/hooks/usePets';
 import { PetAddForm } from '@/components/PetAddForm';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { CalendarIcon, User, PawPrintIcon, TagIcon, MicrochipIcon, StethoscopeIcon, CakeIcon, Loader2 } from 'lucide-react';
+import { CalendarIcon, User, PawPrintIcon, TagIcon, MicrochipIcon, StethoscopeIcon, CakeIcon, Loader2, ChevronDown } from 'lucide-react';
 import {
   Card,
   CardContent,
@@ -16,6 +16,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
 export default function PetsPage() {
   const { user, loading: authLoading } = useAuth();
@@ -147,6 +148,36 @@ export default function PetsPage() {
                   <Button variant="secondary" size="sm" onClick={() => handleEditPet(pet)}>編集</Button>
                   <Button variant="destructive" size="sm" onClick={() => handleDeletePet(pet.id)}>削除</Button>
                 </div>
+
+                {(pet.medicalNotes || (pet.vetInfo && pet.vetInfo.length > 0)) && (
+                  <Collapsible className="w-full mt-4">
+                    <CollapsibleTrigger asChild>
+                      <Button variant="ghost" size="sm" className="w-full justify-between">
+                        <span>詳細情報</span>
+                        <ChevronDown className="h-4 w-4" />
+                      </Button>
+                    </CollapsibleTrigger>
+                    <CollapsibleContent className="space-y-2 pt-2">
+                      {pet.medicalNotes && (
+                        <div>
+                          <p className="font-semibold text-sm mb-1">メモ:</p>
+                          <p className="text-xs text-gray-600 whitespace-pre-wrap">{pet.medicalNotes}</p>
+                        </div>
+                      )}
+                      {pet.vetInfo && pet.vetInfo.length > 0 && (
+                        <div>
+                          <p className="font-semibold text-sm mb-1">かかりつけ医情報:</p>
+                          {pet.vetInfo.map((vet, index) => (
+                            <div key={index} className="text-xs text-gray-600 border-t pt-2 mt-2 first:border-t-0 first:pt-0 first:mt-0">
+                              <p><strong>名前:</strong> {vet.name}</p>
+                              <p><strong>電話:</strong> {vet.phone}</p>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </CollapsibleContent>
+                  </Collapsible>
+                )}
               </CardContent>
             </Card>
           ))}
