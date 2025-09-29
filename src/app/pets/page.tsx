@@ -15,6 +15,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export default function PetsPage() {
   const { user, loading: authLoading } = useAuth();
@@ -22,13 +23,17 @@ export default function PetsPage() {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [petToEdit, setPetToEdit] = useState<Pet | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedTab, setSelectedTab] = useState('all'); // 'all', 'male', 'female', 'other'
 
   const isLoading = authLoading || petsLoading;
 
-  const filteredPets = pets.filter(pet =>
-    pet.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (pet.breed && pet.breed.toLowerCase().includes(searchTerm.toLowerCase()))
-  );
+  const filteredPets = pets.filter(pet => {
+    const matchesTab = selectedTab === 'all' || pet.gender === selectedTab;
+    const matchesSearch = 
+      pet.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (pet.breed && pet.breed.toLowerCase().includes(searchTerm.toLowerCase()));
+    return matchesTab && matchesSearch;
+  });
 
   const handleEditPet = (pet: Pet) => {
     setPetToEdit(pet);
@@ -79,6 +84,15 @@ export default function PetsPage() {
           <PetAddForm />
         </div>
       </div>
+
+      <Tabs value={selectedTab} onValueChange={setSelectedTab} className="w-full mb-4">
+        <TabsList className="grid w-full grid-cols-4">
+          <TabsTrigger value="all">すべて</TabsTrigger>
+          <TabsTrigger value="male">男の子</TabsTrigger>
+          <TabsTrigger value="female">女の子</TabsTrigger>
+          <TabsTrigger value="other">その他</TabsTrigger>
+        </TabsList>
+      </Tabs>
 
       {pets.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-12 text-gray-500">
