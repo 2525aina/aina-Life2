@@ -4,6 +4,7 @@ import { PetSelectionProvider } from "@/contexts/PetSelectionContext";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { Header } from "@/components/Header";
 import { FooterNav } from "@/components/FooterNav";
+import { ToastProvider } from "@/components/ToastProvider";
 
 export const metadata: Metadata = {
   title: "aina-Life",
@@ -25,6 +26,7 @@ export default function RootLayout({
               {children}
             </main>
             <FooterNav />
+            <ToastProvider />
           </PetSelectionProvider>
         </AuthProvider>
       </body>
