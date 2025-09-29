@@ -163,14 +163,18 @@ export function LogTimeline() {
                 </span>
               </div>
               <span
-                className="font-medium text-base break-all block overflow-y-auto"
-                style={{ color: log.taskTextColor, maxHeight: "3rem" }}
+                className="ml-1 font-medium text-base break-all block overflow-y-auto"
+                style={{
+                  color: log.taskTextColor,
+                  maxHeight: "3rem",
+                  minWidth: "12px",
+                }}
               >
                 {log.taskName}
               </span>
               {log.note && (
                 <span
-                  className="ml-2 text-sm break-all block overflow-y-auto"
+                  className="ml-1 text-sm break-all block overflow-y-auto"
                   style={{ color: log.taskTextColor, maxHeight: "3rem" }}
                 >
                   ({log.note})
