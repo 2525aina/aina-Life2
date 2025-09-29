@@ -20,7 +20,7 @@ export function Header() {
         </Link>
         {user && <PetSwitcher />}
       </div>
-      <Toaster position={toastPosition} /> {/* Render Toaster with configurable position */}
+      <Toaster position={toastPosition} richColors offset="64px" /> {/* Render Toaster with configurable position and offset */}
     </header>
   );
 }
