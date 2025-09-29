@@ -47,52 +47,54 @@ export function LogTimeline() {
     );
   }
 
-  return (
     <div className="space-y-4">
-      <div className="flex flex-wrap items-center justify-center gap-2 mb-4"> {/* Added flex-wrap, changed justify-between to justify-center, added gap-2 */}
-        <Button
-          variant="outline"
-          onClick={() => setCurrentDate(subDays(currentDate, 1))}
-        >
-          前日
-        </Button>
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button
-              variant={"outline"}
-              className={cn(
-                "flex-1 sm:w-[240px] justify-start text-left font-normal", // Changed w-full to flex-1
-                !currentDate && "text-muted-foreground"
-              )}
-            >
-              <CalendarIcon className="mr-2 h-4 w-4" />
-              {currentDate ? (
-                format(currentDate, "yyyy年MM月dd日 (eee)", { locale: ja })
-              ) : (
-                <span>日付を選択</span>
-              )}
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-auto p-0" align="start">
-            <Calendar
-              mode="single"
-              selected={currentDate}
-              onSelect={(date) => date && setCurrentDate(date)}
-              initialFocus
-            />
-          </PopoverContent>
-        </Popover>
-        <Button
-          variant="outline"
-          onClick={() => setCurrentDate(addDays(currentDate, 1))}
-        >
-          翌日
-        </Button>
-      </div>
+      <div className="sticky top-0 z-10 bg-background pb-4"> {/* Sticky container with background and padding */}
+        <div className="flex flex-wrap items-center justify-center gap-2 mb-4">
+          {/* Date navigation buttons */}
+          <Button
+            variant="outline"
+            onClick={() => setCurrentDate(subDays(currentDate, 1))}
+          >
+            前日
+          </Button>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant={"outline"}
+                className={cn(
+                  "flex-1 sm:w-[240px] justify-start text-left font-normal", // Changed w-full to flex-1
+                  !currentDate && "text-muted-foreground"
+                )}
+              >
+                <CalendarIcon className="mr-2 h-4 w-4" />
+                {currentDate ? (
+                  format(currentDate, "yyyy年MM月dd日 (eee)", { locale: ja })
+                ) : (
+                  <span>日付を選択</span>
+                )}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="start">
+              <Calendar
+                mode="single"
+                selected={currentDate}
+                onSelect={(date) => date && setCurrentDate(date)}
+                initialFocus
+              />
+            </PopoverContent>
+          </Popover>
+          <Button
+            variant="outline"
+            onClick={() => setCurrentDate(addDays(currentDate, 1))}
+          >
+            翌日
+          </Button>
+        </div>
 
-      <div className="flex justify-end mb-4">
-        <Button onClick={handleAddLog}>手動でログを追加</Button>
-      </div>
+        <div className="flex justify-end mb-4">
+          <Button onClick={handleAddLog}>手動でログを追加</Button>
+        </div>
+      </div> {/* End of sticky container */}
 
       {logs.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-12 text-gray-500">
@@ -186,5 +188,4 @@ export function LogTimeline() {
         />
       )}
     </div>
-  );
 }
