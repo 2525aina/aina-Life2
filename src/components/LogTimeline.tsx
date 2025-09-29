@@ -123,7 +123,7 @@ export function LogTimeline() {
               className={cn(
                 "flex items-center p-3 rounded-lg shadow-sm border transition-colors",
                 log.isTaskDeleted
-                  ? "bg-gray-200 text-gray-500 opacity-60 border-gray-300"
+                  ? "bg-gray-200 opacity-60 border-gray-300"
                   : "bg-white border-gray-100 hover:bg-gray-50"
               )}
               style={{
@@ -153,15 +153,16 @@ export function LogTimeline() {
                   );
                 })()}
                 {/* 時刻表示 */}
-                                  <span
-                                    className="font-mono text-sm px-2 py-1 rounded"
-                                    style={{
-                                      backgroundColor: log.timeBgColor,
-                                      color: log.timeTextColor,
-                                    }}
-                                  >
-                                    {format(log.timestamp.toDate(), "HH:mm:ss", { locale: ja })}
-                                  </span>              </div>
+                <span
+                  className="font-mono text-sm px-2 py-1 rounded"
+                  style={{
+                    backgroundColor: log.timeBgColor,
+                    color: log.timeTextColor,
+                  }}
+                >
+                  {format(log.timestamp.toDate(), "HH:mm:ss", { locale: ja })}
+                </span>{" "}
+              </div>
               <span
                 className="ml-1 font-medium text-base break-all block overflow-y-auto"
                 style={{

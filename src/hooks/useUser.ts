@@ -29,6 +29,8 @@ export interface UserProfile {
           creatorNameText?: string;
           timeBg?: string;
           timeText?: string;
+          deletedTaskBg?: string; // New field for deleted task background color
+          deletedTaskText?: string; // New field for deleted task text color
         };
       };}
 

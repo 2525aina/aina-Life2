@@ -201,17 +201,52 @@ export const useLogs = (targetDate: Date) => {
           timeTextColor = '#4b5563'; // Default gray-700
         }
 
+        // Determine colors for deleted tasks based on user settings or defaults
+        let deletedBgColor = '#e5e7eb'; // Default gray-200
+        let deletedTextColor = '#9ca3af'; // Default gray-400
+
+        if (logData.createdBy && userProfilesCache[logData.createdBy]) {
+          const userProfileData = userProfilesCache[logData.createdBy];
+          const customColorsEnabled = userProfileData.settings?.logDisplayColors?.enabled ?? true;
+
+          if (customColorsEnabled) {
+            creatorNameBgColor = userProfileData.settings?.logDisplayColors?.creatorNameBg || '#e5e7eb'; // Default gray-100
+            creatorNameTextColor = userProfileData.settings?.logDisplayColors?.creatorNameText || '#6b7280'; // Default gray-500
+            timeBgColor = userProfileData.settings?.logDisplayColors?.timeBg || '#e5e7eb'; // Default gray-100
+            timeTextColor = userProfileData.settings?.logDisplayColors?.timeText || '#4b5563'; // Default gray-700
+
+            if (userProfileData.settings?.logDisplayColors?.deletedTaskBg) {
+              deletedBgColor = userProfileData.settings.logDisplayColors.deletedTaskBg;
+            }
+            if (userProfileData.settings?.logDisplayColors?.deletedTaskText) {
+              deletedTextColor = userProfileData.settings.logDisplayColors.deletedTaskText;
+            }
+          } else {
+            // If custom colors are disabled, use task colors
+            creatorNameBgColor = task?.color || '#cccccc';
+            creatorNameTextColor = task?.textColor || '#000000';
+            timeBgColor = task?.color || '#cccccc';
+            timeTextColor = task?.textColor || '#000000';
+          }
+        } else {
+          // Fallback for unknown users or if createdBy is missing
+          creatorNameBgColor = '#e5e7eb'; // Default gray-100
+          creatorNameTextColor = '#6b7280'; // Default gray-500
+          timeBgColor = '#e5e7eb'; // Default gray-100
+          timeTextColor = '#4b5563'; // Default gray-700
+        }
+
         return {
           ...logData,
           taskColor: task?.color || '#cccccc',
-          taskTextColor: task?.textColor || '#000000',
+          taskTextColor: isTaskDeleted ? deletedTextColor : (task?.textColor || '#000000'), // Use deletedTextColor if task is deleted
           isTaskDeleted: isTaskDeleted,
           createdByName: createdByName,
           updatedByName: updatedByName,
-          creatorNameBgColor: creatorNameBgColor,
-          creatorNameTextColor: creatorNameTextColor,
-          timeBgColor: timeBgColor,
-          timeTextColor: timeTextColor,
+          creatorNameBgColor: isTaskDeleted ? deletedBgColor : creatorNameBgColor, // Use deletedBgColor if task is deleted
+          creatorNameTextColor: isTaskDeleted ? deletedTextColor : creatorNameTextColor, // Use deletedTextColor if task is deleted
+          timeBgColor: isTaskDeleted ? deletedBgColor : timeBgColor, // Use deletedBgColor if task is deleted
+          timeTextColor: isTaskDeleted ? deletedTextColor : timeTextColor, // Use deletedTextColor if task is deleted
         };
       });
 
