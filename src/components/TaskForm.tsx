@@ -23,7 +23,7 @@ interface TaskFormProps {
 }
 
 export function TaskForm({ isOpen, onClose, taskToEdit }: TaskFormProps) {
-  const { addTask, updateTask } = useTasks();
+  const { addTask, updateTask, deleteTask } = useTasks();
   const [formData, setFormData] = useState({ name: '', color: '#000000', textColor: '#FFFFFF' });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -99,6 +99,21 @@ export function TaskForm({ isOpen, onClose, taskToEdit }: TaskFormProps) {
           </div>
         </div>
         <DialogFooter>
+          {taskToEdit && (
+            <Button
+              variant="destructive"
+              onClick={async () => {
+                if (taskToEdit && confirm('本当にこのタスクを削除しますか？')) {
+                  await deleteTask(taskToEdit.id);
+                  onClose();
+                  toast.success('タスクを削除しました。');
+                }
+              }}
+              disabled={isSubmitting}
+            >
+              削除
+            </Button>
+          )}
           <Button onClick={onClose} variant="outline">キャンセル</Button>
           <Button onClick={handleSubmit} disabled={isSubmitting}>
             {isSubmitting ? (

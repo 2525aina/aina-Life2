@@ -27,9 +27,20 @@ import { SortableContext, verticalListSortingStrategy, useSortable } from '@dnd-
 import { CSS } from '@dnd-kit/utilities';
 import { MenuIcon, PlusIcon, Loader2, ClipboardListIcon, PawPrintIcon } from 'lucide-react';
 import { arrayMove } from '@dnd-kit/sortable';
+import { Checkbox } from '@/components/ui/checkbox';
 
 // Sortableなタスクアイテムコンポーネント
-function SortableTaskItem({ task, onEdit, onDelete }: { task: Task; onEdit: (task: Task) => void; onDelete: (taskId: string) => void; }) {
+function SortableTaskItem({
+  task,
+  onEdit,
+  isSelected,
+  onToggleSelection,
+}: {
+  task: Task;
+  onEdit: (task: Task) => void;
+  isSelected: boolean;
+  onToggleSelection: (taskId: string) => void;
+}) {
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: task.id });
 
   const style = {
@@ -39,20 +50,22 @@ function SortableTaskItem({ task, onEdit, onDelete }: { task: Task; onEdit: (tas
   };
 
   return (
-    <Card ref={setNodeRef} style={{ ...style, backgroundColor: task.color, color: task.textColor }} {...attributes}>
+    <Card ref={setNodeRef} style={{ ...style, backgroundColor: task.color, color: task.textColor }} {...attributes} className="cursor-pointer">
       <CardHeader className="flex flex-wrap justify-between items-center">
         <div className="flex items-center gap-2 w-full">
+          <Checkbox
+            checked={isSelected}
+            onCheckedChange={() => onToggleSelection(task.id)}
+            className="mr-2"
+          />
           <div className="cursor-grab" {...listeners}> {/* Drag handle */} 
             <MenuIcon className="h-5 w-5 text-gray-500" />
           </div>
-          <CardTitle className="flex-grow">
+          <CardTitle className="flex-grow" onClick={() => onEdit(task)}>
             <span>{task.name}</span>
           </CardTitle>
         </div>
-        <div className="flex gap-2 mt-2 sm:mt-0 w-full sm:w-auto justify-end">
-          <Button variant="secondary" size="sm" onClick={() => onEdit(task)}>編集</Button>
-          <Button variant="destructive" size="sm" onClick={() => onDelete(task.id)}>削除</Button>
-        </div>
+        {/* Removed Edit and Delete buttons */}
       </CardHeader>
       <CardContent>
         {/* Additional task details if any */}
@@ -64,15 +77,18 @@ function SortableTaskItem({ task, onEdit, onDelete }: { task: Task; onEdit: (tas
 export default function TasksPage() {
   const { user, loading: authLoading } = useAuth();
   const { selectedPet } = usePetSelection();
-  const { tasks, loading: tasksLoading, deleteTask, reorderTasks } = useTasks();
+  const { tasks, loading: tasksLoading, reorderTasks, bulkDeleteTasks } = useTasks();
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [taskToEdit, setTaskToEdit] = useState<Task | null>(null);
   const [orderedTasks, setOrderedTasks] = useState<Task[]>([]);
+  const [selectedTaskIds, setSelectedTaskIds] = useState<Set<string>>(new Set());
 
   // tasksが更新されたらorderedTasksを初期化
   useEffect(() => {
     if (tasks) {
       setOrderedTasks(tasks);
+      // タスクが更新されたら選択状態をクリア
+      setSelectedTaskIds(new Set());
     }
   }, [tasks]);
 
@@ -80,6 +96,22 @@ export default function TasksPage() {
     useSensor(PointerSensor),
     useSensor(KeyboardSensor)
   );
+
+  const toggleSelection = (taskId: string) => {
+    setSelectedTaskIds(prev => {
+      const newSelection = new Set(prev);
+      if (newSelection.has(taskId)) {
+        newSelection.delete(taskId);
+      } else {
+        newSelection.add(taskId);
+      }
+      return newSelection;
+    });
+  };
+
+  const clearSelection = () => {
+    setSelectedTaskIds(new Set());
+  };
 
   const handleAddTask = () => {
     setTaskToEdit(null);
@@ -91,6 +123,13 @@ export default function TasksPage() {
     setTaskToEdit(task);
     setIsFormOpen(true);
     console.log("Editing task:", task);
+  };
+
+  const handleBulkDelete = async () => {
+    if (selectedTaskIds.size === 0) return;
+
+    await bulkDeleteTasks(Array.from(selectedTaskIds));
+    clearSelection(); // Clear selection after bulk delete
   };
 
   const handleDragEnd = async (event: DragEndEvent) => {
@@ -140,7 +179,12 @@ export default function TasksPage() {
 
       {selectedPet ? (
         <div>
-          <div className="flex justify-end mb-4">
+          <div className="flex justify-end mb-4 space-x-2">
+            {selectedTaskIds.size > 0 && (
+              <Button variant="destructive" onClick={handleBulkDelete}>
+                選択したタスクを一括削除 ({selectedTaskIds.size})
+              </Button>
+            )}
             <Button onClick={handleAddTask}>
               <PlusIcon className="mr-2 h-5 w-5" />
               新しいタスクを追加
@@ -162,7 +206,13 @@ export default function TasksPage() {
               <SortableContext items={orderedTasks.map(task => task.id)} strategy={verticalListSortingStrategy}>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {orderedTasks.map(task => (
-                    <SortableTaskItem key={task.id} task={task} onEdit={handleEditTask} onDelete={deleteTask} />
+                    <SortableTaskItem
+                      key={task.id}
+                      task={task}
+                      onEdit={handleEditTask}
+                      isSelected={selectedTaskIds.has(task.id)}
+                      onToggleSelection={toggleSelection}
+                    />
                   ))}
                 </div>
               </SortableContext>

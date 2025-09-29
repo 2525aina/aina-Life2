@@ -179,5 +179,47 @@ export const useTasks = () => {
     }
   };
 
-  return { tasks, loading, addTask, updateTask, deleteTask, reorderTasks };
+  // 複数のタスクを一括削除
+  const bulkDeleteTasks = async (taskIds: string[]) => {
+    if (!user || !selectedPet) {
+      toast.error('ユーザーまたはペットが選択されていません。');
+      return;
+    }
+    if (!confirm(`選択された${taskIds.length}件のタスクを本当に削除しますか？関連するログも非表示になります。`)) return;
+
+    const batch = writeBatch(db);
+    const petId = selectedPet.id;
+
+    for (const taskId of taskIds) {
+      const taskRef = doc(db, 'dogs', petId, 'tasks', taskId);
+      // タスクを論理削除
+      batch.update(taskRef, {
+        deleted: true,
+        deletedAt: serverTimestamp(),
+        updatedBy: user.uid,
+        updatedAt: serverTimestamp(),
+      });
+
+      // 関連するログも論理削除
+      const logsQuery = query(
+        collection(db, 'dogs', petId, 'logs'),
+        where('taskId', '==', taskId)
+      );
+      const logsSnapshot = await getDocs(logsQuery);
+
+      logsSnapshot.forEach((logDoc) => {
+        batch.update(logDoc.ref, {
+          deleted: true,
+          deletedAt: serverTimestamp(),
+          updatedBy: user.uid,
+          updatedAt: serverTimestamp(),
+        });
+      });
+    }
+
+    await batch.commit();
+    toast.success(`${taskIds.length}件のタスクと関連データが論理削除されました。`);
+  };
+
+  return { tasks, loading, addTask, updateTask, deleteTask, reorderTasks, bulkDeleteTasks };
 };
