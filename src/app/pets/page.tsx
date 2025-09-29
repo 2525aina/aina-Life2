@@ -44,7 +44,9 @@ export default function PetsPage() {
   const [selectedTab, setSelectedTab] = useState('all'); // 'all', 'male', 'female', 'other'
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
   const [petToDeleteId, setPetToDeleteId] = useState<string | null>(null);
-  const [isWeightFormOpen, setIsWeightFormOpen] = useState(false); // 体重フォームのモーダル状態
+  const [isWeightFormOpen, setIsWeightFormOpen] = useState(false);
+  const [editingWeight, setEditingWeight] = useState(null);
+  const [isAddTaskFormOpen, setIsAddTaskFormOpen] = useState(false);
 
   const isLoading = authLoading || petsLoading;
 
@@ -272,7 +274,7 @@ export default function PetsPage() {
                                           </TabsContent>
                                           <TabsContent value="tasks" className="mt-4">
                                             <div className="flex justify-end mb-4">
-                                              <Dialog>
+                                              <Dialog open={isAddTaskFormOpen} onOpenChange={setIsAddTaskFormOpen}>
                                                 <DialogTrigger asChild>
                                                   <Button>タスクを追加</Button>
                                                 </DialogTrigger>
@@ -280,7 +282,7 @@ export default function PetsPage() {
                                                   <DialogHeader>
                                                     <DialogTitle>新しいタスクを追加</DialogTitle>
                                                   </DialogHeader>
-                                                  <TaskForm isOpen={true} onClose={() => {}} />
+                                                  <TaskForm isOpen={isAddTaskFormOpen} onClose={() => setIsAddTaskFormOpen(false)} />
                                                 </DialogContent>
                                               </Dialog>
                                             </div>
