@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { doc, getDoc, setDoc, updateDoc, serverTimestamp, Timestamp } from 'firebase/firestore';
+import { doc, getDoc, setDoc, updateDoc, serverTimestamp, Timestamp, onSnapshot } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -23,6 +23,7 @@ export interface UserProfile {
           dailySummary: boolean;
         };
         theme: 'system' | 'light' | 'dark';
+        toastPosition?: 'top-left' | 'top-center' | 'top-right' | 'bottom-left' | 'bottom-center' | 'bottom-right'; // New field for toast position
         logDisplayColors?: {
           enabled?: boolean;
           creatorNameBg?: string;
@@ -77,12 +78,12 @@ export const useUser = () => {
     fetchProfile();
 
     // Optionally, listen for real-time updates
-    // const unsubscribe = onSnapshot(userDocRef, (doc) => {
-    //   if (doc.exists()) {
-    //     setUserProfile({ uid: user.uid, ...(doc.data() as Omit<UserProfile, 'uid'>) });
-    //   }
-    // });
-    // return () => unsubscribe();
+    const unsubscribe = onSnapshot(userDocRef, (doc) => {
+      if (doc.exists()) {
+        setUserProfile({ uid: user.uid, ...(doc.data() as Omit<UserProfile, 'uid'>) });
+      }
+    });
+    return () => unsubscribe();
 
   }, [user]);
 

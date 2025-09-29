@@ -65,6 +65,7 @@ export default function ProfilePage() {
             deletedTaskText: userProfile.settings?.logDisplayColors?.deletedTaskText || "#9ca3af", // New field
             enabled: userProfile.settings?.logDisplayColors?.enabled ?? true, // Default to true
           },
+          toastPosition: userProfile.settings?.toastPosition || 'bottom-right', // Default to bottom-right
         },
       });
     }
@@ -78,7 +79,20 @@ export default function ProfilePage() {
   };
 
   const handleSelectChange = (name: string, value: string) => {
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    setFormData((prev) => {
+      if (name.includes('.')) {
+        const [parent, child] = name.split('.');
+        return {
+          ...prev,
+          [parent]: {
+            ...(prev[parent as keyof Partial<UserProfile>] as object),
+            [child]: value,
+          },
+        };
+      } else {
+        return { ...prev, [name]: value };
+      }
+    });
   };
 
   const handleChangeColor = (
@@ -425,6 +439,29 @@ export default function ProfilePage() {
                   disabled={!formData.settings?.logDisplayColors?.enabled}
                 />
               </div>
+            </div>
+          </div>
+          {/* Toast Position Setting */}
+          <div className="grid gap-4 mt-6">
+            <h3 className="text-lg font-semibold">トースト表示位置</h3>
+            <div className="grid gap-2">
+              <Label htmlFor="toastPosition">表示位置</Label>
+              <Select
+                onValueChange={(value) => handleSelectChange("settings.toastPosition", value)}
+                value={formData.settings?.toastPosition || "bottom-right"}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="位置を選択" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="top-left">左上</SelectItem>
+                  <SelectItem value="top-center">上中央</SelectItem>
+                  <SelectItem value="top-right">右上</SelectItem>
+                  <SelectItem value="bottom-left">左下</SelectItem>
+                  <SelectItem value="bottom-center">下中央</SelectItem>
+                  <SelectItem value="bottom-right">右下</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
         </CardContent>

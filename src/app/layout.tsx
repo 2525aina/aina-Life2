@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { Toaster } from "@/components/ui/sonner";
 import { PetSelectionProvider } from "@/contexts/PetSelectionContext";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { Header } from "@/components/Header";
@@ -28,7 +27,6 @@ export default function RootLayout({
             <FooterNav />
           </PetSelectionProvider>
         </AuthProvider>
-        <Toaster />
       </body>
     </html>
   );
