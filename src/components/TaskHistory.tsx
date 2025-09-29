@@ -40,7 +40,7 @@ function SortableItem({
 }) {
   return (
     <TableRow>
-      <TableCell className="w-8 py-1 px-1"> {/* This is the arrow button column */}
+      <TableCell className="w-8 py-0 px-1"> {/* This is the arrow button column */}
         <div className="flex flex-col items-center space-y-1">
           <Button variant="ghost" size="icon" onClick={() => handleMoveUp(task.id)} disabled={isFirst}>
             <ArrowUp className="h-4 w-4" />
@@ -50,8 +50,8 @@ function SortableItem({
           </Button>
         </div>
       </TableCell>
-      <TableCell className="py-1 px-1" style={{ backgroundColor: task.color, color: task.textColor || '#FFFFFF' }}>{task.name}</TableCell> {/* Task name column */}
-      <TableCell className="py-1 px-1"> {/* Color display column */}
+      <TableCell className="py-0 px-1" style={{ backgroundColor: task.color, color: task.textColor || '#FFFFFF' }}>{task.name}</TableCell> {/* Task name column */}
+      <TableCell className="py-0 px-1"> {/* Color display column */}
         <div className="flex flex-col gap-1">
           <div className="flex items-center gap-2">
             <div className="w-4 h-4 rounded-full border" style={{ backgroundColor: task.color }}></div>
@@ -63,7 +63,7 @@ function SortableItem({
           </div>
         </div>
       </TableCell>
-      <TableCell className="text-right py-1 px-1"> {/* Action buttons column */}
+      <TableCell className="text-right py-0 px-1"> {/* Action buttons column */}
         <div className="flex flex-col items-end space-y-0">
           <Dialog open={isEditFormOpen && taskToEdit?.id === task.id} onOpenChange={setIsEditFormOpen}>
             <DialogTrigger asChild>
