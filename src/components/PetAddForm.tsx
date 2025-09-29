@@ -144,6 +144,7 @@ export function PetAddForm({
     setFormData((prev) => ({ ...prev, [name]: date ? format(date, "yyyy-MM-dd") : "" }));
   };
 
+
   const handleVetInfoChange = (index: number, field: keyof VetInfo, value: string) => {
     setFormData(prev => ({
       ...prev,

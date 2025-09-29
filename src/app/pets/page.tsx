@@ -15,6 +15,7 @@ import {
   CardDescription,
   CardTitle,
 } from '@/components/ui/card';
+import { calculateAge } from '@/lib/utils';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -127,7 +128,10 @@ export default function PetsPage() {
                           {pet.gender === 'female' && <Venus className="h-6 w-6 text-pink-300 drop-shadow" />}
                           <CardTitle className="text-2xl font-bold drop-shadow">{pet.name}</CardTitle>
                         </div>
-                        <CardDescription className="text-gray-200 drop-shadow">{pet.breed || '種類未設定'}</CardDescription>
+                        <CardDescription className="text-gray-200 drop-shadow">
+                          {pet.breed || '種類未設定'}
+                          {pet.birthday && ` (${calculateAge(pet.birthday)})`}
+                        </CardDescription>
                       </div>
                       <div className="absolute bottom-4 right-4 z-10 text-white/70 transform transition-transform duration-200 group-data-[state=open]:rotate-180">
                         <ChevronDown className="h-5 w-5" />
