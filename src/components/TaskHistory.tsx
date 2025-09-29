@@ -53,8 +53,14 @@ function SortableItem({
       <TableCell className="py-1" style={{ backgroundColor: task.color, color: task.textColor || '#FFFFFF' }}>{task.name}</TableCell> {/* Task name column */}
       <TableCell className="py-1"> {/* Color display column */}
         <div className="flex flex-col gap-1">
-          <div className="w-4 h-4 rounded-full border" style={{ backgroundColor: task.color }}></div>
-          <div className="w-4 h-4 rounded-full border" style={{ backgroundColor: task.textColor || '#FFFFFF' }}></div>
+          <div className="flex items-center gap-2">
+            <div className="w-4 h-4 rounded-full border" style={{ backgroundColor: task.color }}></div>
+            <span>{task.color}</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-4 h-4 rounded-full border" style={{ backgroundColor: task.textColor || '#FFFFFF' }}></div>
+            <span>{task.textColor || '#FFFFFF'}</span>
+          </div>
         </div>
       </TableCell>
       <TableCell className="text-right py-1"> {/* Action buttons column */}
