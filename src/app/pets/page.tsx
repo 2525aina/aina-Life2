@@ -30,6 +30,7 @@ import { usePetSelection } from '@/contexts/PetSelectionContext'; // usePetSelec
 import { WeightForm } from '@/components/WeightForm'; // WeightFormをインポート
 import { WeightChart } from '@/components/WeightChart'; // WeightChartをインポート
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'; // Dialogコンポーネントをインポート
+import { WeightHistory } from '@/components/WeightHistory'; // WeightHistoryをインポート
 
 export default function PetsPage() {
   const { user, loading: authLoading } = useAuth();
@@ -252,7 +253,19 @@ export default function PetsPage() {
                             </DialogContent>
                           </Dialog>
                         </div>
-                        <WeightChart dogId={pet.id} />
+                        {/* 体重記録サブタブ */} 
+                        <Tabs defaultValue="chart">
+                          <TabsList className="grid w-full grid-cols-2">
+                            <TabsTrigger value="chart">体重の推移</TabsTrigger>
+                            <TabsTrigger value="history">体重の履歴</TabsTrigger>
+                          </TabsList>
+                          <TabsContent value="chart" className="mt-4">
+                            <WeightChart dogId={pet.id} />
+                          </TabsContent>
+                          <TabsContent value="history" className="mt-4">
+                            <WeightHistory dogId={pet.id} />
+                          </TabsContent>
+                        </Tabs>
                       </TabsContent>
                     </Tabs>
                   </CardContent>
