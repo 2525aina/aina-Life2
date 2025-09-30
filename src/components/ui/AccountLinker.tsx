@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from "react";
+import { useRouter } from 'next/navigation';
 import { auth } from "@/lib/firebase";
 import {
   GoogleAuthProvider,
@@ -26,6 +27,7 @@ import { Loader2 } from "lucide-react";
 export function AccountLinker() {
   const [isLinking, setIsLinking] = useState(false);
   const [emailForLink, setEmailForLink] = useState("");
+  const router = useRouter();
 
   // Effect to handle the email link sign-in completion
   useEffect(() => {
@@ -47,7 +49,7 @@ export function AccountLinker() {
             await linkWithCredential(auth.currentUser, credential);
             toast.success("メールアドレスを連携しました！");
             window.localStorage.removeItem("emailForSignIn");
-            // The page will re-render automatically due to auth state change
+            router.push('/profile'); // リダイレクトを追加
           } catch (err: unknown) {
             const errorMessage = err instanceof Error ? err.message : "不明なエラー";
             if (typeof err === 'object' && err !== null && 'code' in err && (err as { code: string }).code === "auth/credential-already-in-use") {
@@ -64,7 +66,7 @@ export function AccountLinker() {
       }
     };
     completeEmailLink();
-  }, []);
+  }, [router]);
 
   const handleLinkWithGoogle = async () => {
     if (!auth.currentUser) return;
@@ -73,6 +75,7 @@ export function AccountLinker() {
     try {
       await linkWithPopup(auth.currentUser, provider);
       toast.success("Googleアカウントを連携しました！");
+      router.push('/profile'); // リダイレクトを追加
     } catch (err: unknown) {
       const errorMessage = err instanceof Error ? err.message : "不明なエラー";
       if (typeof err === 'object' && err !== null && 'code' in err && (err as { code: string }).code === "auth/credential-already-in-use") {

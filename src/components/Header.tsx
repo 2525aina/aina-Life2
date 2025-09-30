@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
 import { PetSwitcher } from '@/components/PetSwitcher';
+import { Bell } from 'lucide-react';
 
 export function Header() {
   const { user } = useAuth();
@@ -13,7 +14,14 @@ export function Header() {
         <Link href="/" className="text-2xl font-bold whitespace-nowrap">
           aina-Life
         </Link>
-        {user && <PetSwitcher />}
+        {user && (
+          <div className="flex items-center space-x-4">
+            <Link href="/invitations" className="text-primary-foreground hover:text-primary-foreground/80">
+              <Bell className="h-6 w-6" />
+            </Link>
+            <PetSwitcher />
+          </div>
+        )}
       </div>
     </header>
   );

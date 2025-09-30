@@ -16,6 +16,7 @@ export interface UserProfile {
   introduction?: string;
   primaryPetId?: string;
   lastLoginAt?: Timestamp; // Timestamp of last login
+  authProvider?: string; // New field for authentication provider name
   createdAt: Timestamp;
   updatedAt: Timestamp;
       settings: {
@@ -53,13 +54,48 @@ export const useUser = () => {
     const fetchProfile = async () => {
       const docSnap = await getDoc(userDocRef);
       if (docSnap.exists()) {
-        setUserProfile({ uid: user.uid, ...(docSnap.data() as Omit<UserProfile, 'uid'>) });
+        const existingProfile = docSnap.data() as Omit<UserProfile, 'uid'>;
+        const updatedData: Partial<UserProfile> = {};
+
+        const currentAuthProvider = user.providerData[0]?.providerId;
+        const getProviderName = (providerId: string) => {
+          if (providerId === 'google.com') return 'Google';
+          if (providerId === 'password') return undefined; // メール認証の場合はプロバイダ名を表示しない
+          return providerId; // Fallback
+        };
+        const authProviderName = currentAuthProvider ? getProviderName(currentAuthProvider) : undefined;
+
+        if (user.email && existingProfile.authEmail !== user.email) {
+          updatedData.authEmail = user.email;
+        }
+        if (user.displayName && existingProfile.authName !== user.displayName) {
+          updatedData.authName = user.displayName;
+        }
+        if (authProviderName && existingProfile.authProvider !== authProviderName) {
+          updatedData.authProvider = authProviderName;
+        }
+
+        if (Object.keys(updatedData).length > 0) {
+          await updateDoc(userDocRef, { ...updatedData, updatedAt: serverTimestamp() });
+          setUserProfile({ uid: user.uid, ...existingProfile, ...updatedData, updatedAt: serverTimestamp() as Timestamp });
+        } else {
+          setUserProfile({ uid: user.uid, ...existingProfile });
+        }
       } else {
         // Create a new profile if it doesn't exist
+        const currentAuthProvider = user.providerData[0]?.providerId;
+        const getProviderName = (providerId: string) => {
+          if (providerId === 'google.com') return 'Google';
+          if (providerId === 'password') return undefined; // メール認証の場合はプロバイダ名を表示しない
+          return providerId; // Fallback
+        };
+        const authProviderName = currentAuthProvider ? getProviderName(currentAuthProvider) : undefined;
+
         const newProfile: UserProfile = {
           uid: user.uid,
           authEmail: user.email || '',
           authName: user.displayName || '',
+          authProvider: authProviderName,
           createdAt: serverTimestamp() as Timestamp,
           updatedAt: serverTimestamp() as Timestamp,
           settings: {

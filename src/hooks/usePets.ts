@@ -14,7 +14,6 @@ import {
   getDocs,
   collectionGroup,
   getDoc,
-  setDoc,
   Timestamp,
   writeBatch,
   FieldValue,
@@ -79,6 +78,30 @@ export const usePets = () => {
     }
 
     setLoading(true);
+
+    // ユーザーがログインまたはアカウント連携した際に、保留中の招待を自動的にアクティブ化
+    const activatePendingInvitations = async () => {
+      if (user && user.email) {
+        const pendingMembersQuery = query(
+          collectionGroup(db, 'members'),
+          where('inviteEmail', '==', user.email),
+          where('status', '==', 'pending')
+        );
+        const pendingMembersSnapshot = await getDocs(pendingMembersQuery);
+        const batch = writeBatch(db);
+
+        pendingMembersSnapshot.docs.forEach(memberDoc => {
+          batch.update(memberDoc.ref, {
+            uid: user.uid,
+            status: 'active',
+            inviteEmail: null, // Clear inviteEmail once activated
+            updatedAt: serverTimestamp(),
+          });
+        });
+        await batch.commit();
+      }
+    };
+    activatePendingInvitations();
 
     // 既存の個別ペットリスナーを全て解除
     petListenersRef.current.forEach(unsubscribe => unsubscribe());
