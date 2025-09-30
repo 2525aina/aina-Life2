@@ -162,8 +162,7 @@ export const usePets = () => {
       });
 
       // `members`サブコレクションに飼い主（オーナー）を追加
-      const memberDocRef = doc(db, 'dogs', newPetRef.id, 'members', user.uid);
-      await setDoc(memberDocRef, {
+      await addDoc(collection(db, 'dogs', newPetRef.id, 'members'), {
         uid: user.uid,
         inviteEmail: user.email,
         role: 'owner',
