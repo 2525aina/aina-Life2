@@ -9,58 +9,11 @@ import { usePets, Pet } from "@/hooks/usePets";
 import { PetAddForm } from "@/components/PetAddForm";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  CalendarIcon,
-  User,
-  PawPrintIcon,
-  MicrochipIcon,
-  StethoscopeIcon,
-  CakeIcon,
-  Loader2,
-  ChevronDown,
-  MoreHorizontal,
-  Pencil,
-  Trash2,
-  NotebookText,
-  Mars,
-  Venus,
-} from "lucide-react";
-import Image from "next/image";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardTitle,
-} from "@/components/ui/card";
-import { calculateAge } from "@/lib/utils";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"; // TabsContentを追加
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
+import { PawPrintIcon, Loader2 } from "lucide-react";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ConfirmationModal } from "@/components/ConfirmationModal";
 import { toast } from "sonner";
-import { usePetSelection } from "@/contexts/PetSelectionContext"; // usePetSelectionをインポート
-import { WeightForm } from "@/components/WeightForm"; // WeightFormをインポート
-import { WeightChart } from "@/components/WeightChart"; // WeightChartをインポート
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog"; // Dialogコンポーネントをインポート
-import { WeightHistory } from "@/components/WeightHistory"; // WeightHistoryをインポート
-import { TaskForm } from "@/components/TaskForm"; // TaskFormをインポート
-import { TaskHistory } from "@/components/TaskHistory"; // TaskHistoryをインポート
-
+import { usePetSelection } from "@/contexts/PetSelectionContext";
 export default function PetsPage() {
   const { user, loading: authLoading } = useAuth();
   const { pets, loading: petsLoading, deletePet } = usePets();
