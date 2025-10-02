@@ -43,8 +43,6 @@ export default function LoginPage() {
     const processSignIn = async () => {
       try {
         if (isSignInWithEmailLink(auth, window.location.href)) {
-            // Only process link if there is no user logged in.
-            // This prevents conflicts with the account linking flow.
             if (auth.currentUser) {
                 return;
             }
@@ -52,7 +50,6 @@ export default function LoginPage() {
             setLoading(true);
             let emailFromStorage = window.localStorage.getItem('emailForSignIn');
             if (!emailFromStorage) {
-              // This is a fallback. The user might have opened the link in a different browser.
               emailFromStorage = window.prompt('確認のため、メールアドレスを再度入力してください。');
             }
 
@@ -67,11 +64,14 @@ export default function LoginPage() {
                 setLoading(false);
             }
         }
-      } catch (err: any) {
-        if (err.code === 'auth/invalid-action-code') {
+      } catch (err) {
+        const isFirebaseError = typeof err === 'object' && err !== null && 'code' in err;
+        const message = err instanceof Error ? err.message : String(err);
+
+        if (isFirebaseError && (err as {code: string}).code === 'auth/invalid-action-code') {
             toast.error('このログインリンクは無効です。有効期限が切れているか、既に使用されています。');
         } else {
-            toast.error(`ログインに失敗しました: ${err.message}`);
+            toast.error(`ログインに失敗しました: ${message}`);
         }
         setLoading(false);
       }
@@ -102,8 +102,9 @@ export default function LoginPage() {
       window.localStorage.setItem('emailForSignIn', email);
       toast.success(`${email} にログインリンクを送信しました。迷惑メールフォルダもご確認ください。`);
       setEmail("");
-    } catch (err: any) {
-      toast.error(`ログインリンクの送信に失敗しました: ${err.message}`);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      toast.error(`ログインリンクの送信に失敗しました: ${message}`);
     } finally {
       setLoading(false);
     }
@@ -116,8 +117,9 @@ export default function LoginPage() {
       await signInWithPopup(auth, provider);
       toast.success("Googleでログインしました！");
       router.push('/');
-    } catch (err: any) {
-      toast.error(`Googleでのログインに失敗しました: ${err.message}`);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      toast.error(`Googleでのログインに失敗しました: ${message}`);
     } finally {
         setLoading(false);
     }
@@ -128,8 +130,9 @@ export default function LoginPage() {
     try {
       await signInAnonymously(auth);
       router.push('/');
-    } catch (err: any) {
-      toast.error(`ゲストログインに失敗しました: ${err.message}`);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      toast.error(`ゲストログインに失敗しました: ${message}`);
     } finally {
       setLoading(false);
     }

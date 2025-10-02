@@ -42,22 +42,23 @@ export function AccountLinker() {
         if (email && auth.currentUser) {
           try {
             const credential = EmailAuthProvider.credentialWithLink(email, window.location.href);
-            // Clean URL immediately before potential errors from linking
             window.history.replaceState({}, document.title, window.location.pathname);
             await linkWithCredential(auth.currentUser, credential);
             toast.success("メールアドレスを連携しました！");
             window.localStorage.removeItem("emailForSignIn");
             router.push('/profile');
-          } catch (err: any) {
-            if (err.code === "auth/credential-already-in-use" || err.code === "auth/email-already-in-use") {
+          } catch (err) {
+            const isFirebaseError = typeof err === 'object' && err !== null && 'code' in err;
+            const message = err instanceof Error ? err.message : String(err);
+            if (isFirebaseError && ((err as {code:string}).code === "auth/credential-already-in-use" || (err as {code:string}).code === "auth/email-already-in-use")) {
               toast.error("このメールアドレスアカウントが既に使用されています。登録されていないメールアドレスを使用してください。");
             } else {
-              toast.error(`連携に失敗しました: ${err.message}`);
+              toast.error(`連携に失敗しました: ${message}`);
             }
           } finally {
             setIsLinking(false);
           }
-        } else if (email) { // Case where auth.currentUser is null but we have an email
+        } else if (email) {
             toast.error("連携セッションが見つかりません。再度ゲストとしてログインしてからお試しください。");
             setIsLinking(false);
         }
@@ -74,11 +75,13 @@ export function AccountLinker() {
       await linkWithPopup(auth.currentUser, provider);
       toast.success("Googleアカウントを連携しました！");
       router.push('/profile');
-    } catch (err: any) {
-      if (err.code === "auth/credential-already-in-use") {
+    } catch (err) {
+        const isFirebaseError = typeof err === 'object' && err !== null && 'code' in err;
+        const message = err instanceof Error ? err.message : String(err);
+      if (isFirebaseError && (err as {code:string}).code === "auth/credential-already-in-use") {
         toast.error("このGoogleアカウントは既に使用されています。登録されていないGoogleアカウントを使用してください。");
       } else {
-        toast.error(`連携に失敗しました: ${err.message}`);
+        toast.error(`連携に失敗しました: ${message}`);
       }
     } finally {
       setIsLinking(false);
@@ -101,13 +104,12 @@ export function AccountLinker() {
       handleCodeInApp: true,
     };
     try {
-      // Note: sendSignInLinkToEmail does not check for existing emails.
-      // The check happens when the user clicks the link.
       await sendSignInLinkToEmail(auth, emailForLink, actionCodeSettings);
       window.localStorage.setItem("emailForSignIn", emailForLink);
       toast.success(`${emailForLink} に確認メールを送信しました。迷惑メールフォルダもご確認ください。`);
-    } catch (err: any) {
-      toast.error(`メールの送信に失敗しました: ${err.message}`);
+    } catch (err) {
+        const message = err instanceof Error ? err.message : String(err);
+        toast.error(`メールの送信に失敗しました: ${message}`);
     } finally {
       setIsLinking(false);
     }

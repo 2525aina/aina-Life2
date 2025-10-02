@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
@@ -11,10 +11,11 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-  CardFooter,
 } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { Separator } from "@/components/ui/separator";
 import { Loader2, LogOutIcon } from "lucide-react";
 import { useUser, UserProfile } from "@/hooks/useUser";
 import { auth } from "@/lib/firebase";
@@ -59,23 +60,19 @@ export default function ProfilePage() {
           ...userProfile.settings,
           logDisplayColors: {
             creatorNameBg:
-              userProfile.settings?.logDisplayColors?.creatorNameBg ||
-              "#e5e7eb",
+              userProfile.settings?.logDisplayColors?.creatorNameBg || "#e5e7eb",
             creatorNameText:
-              userProfile.settings?.logDisplayColors?.creatorNameText ||
-              "#6b7280",
+              userProfile.settings?.logDisplayColors?.creatorNameText || "#6b7280",
             timeBg: userProfile.settings?.logDisplayColors?.timeBg || "#e5e7eb",
             timeText:
               userProfile.settings?.logDisplayColors?.timeText || "#4b5563",
             deletedTaskBg:
-              userProfile.settings?.logDisplayColors?.deletedTaskBg ||
-              "#e5e7eb", // New field
+              userProfile.settings?.logDisplayColors?.deletedTaskBg || "#e5e7eb",
             deletedTaskText:
-              userProfile.settings?.logDisplayColors?.deletedTaskText ||
-              "#9ca3af", // New field
-            enabled: userProfile.settings?.logDisplayColors?.enabled ?? true, // Default to true
+              userProfile.settings?.logDisplayColors?.deletedTaskText || "#9ca3af",
+            enabled: userProfile.settings?.logDisplayColors?.enabled ?? true,
           },
-          toastPosition: userProfile.settings?.toastPosition || "bottom-right", // Default to bottom-right
+          toastPosition: userProfile.settings?.toastPosition || "bottom-right",
         },
       });
     }
@@ -111,43 +108,45 @@ export default function ProfilePage() {
     value: string
   ) => {
     setFormData((prev) => {
-      const currentSettings = prev.settings || {
-        notifications: { dailySummary: false },
-        theme: "system",
-      };
-      const currentLogDisplayColors = currentSettings.logDisplayColors || {};
-
-      return {
-        ...prev,
-        settings: {
-          ...currentSettings,
-          logDisplayColors: {
-            ...currentLogDisplayColors,
-            [`${category}${type}`]: value,
-          },
-        },
-      };
+        const currentSettings = prev.settings || {
+            notifications: { dailySummary: false },
+            theme: 'system',
+            logDisplayColors: {},
+            toastPosition: 'bottom-right',
+        };
+        const currentLogDisplayColors = currentSettings.logDisplayColors || {};
+        return {
+            ...prev,
+            settings: {
+                ...currentSettings,
+                logDisplayColors: {
+                    ...currentLogDisplayColors,
+                    [`${category}${type}`]: value,
+                },
+            },
+        };
     });
   };
 
   const handleToggleChange = (checked: boolean) => {
     setFormData((prev) => {
-      const currentSettings = prev.settings || {
-        notifications: { dailySummary: false },
-        theme: "system",
-      };
-      const currentLogDisplayColors = currentSettings.logDisplayColors || {};
-
-      return {
-        ...prev,
-        settings: {
-          ...currentSettings,
-          logDisplayColors: {
-            ...currentLogDisplayColors,
-            enabled: checked,
-          },
-        },
-      };
+        const currentSettings = prev.settings || {
+            notifications: { dailySummary: false },
+            theme: 'system',
+            logDisplayColors: {},
+            toastPosition: 'bottom-right',
+        };
+        const currentLogDisplayColors = currentSettings.logDisplayColors || {};
+        return {
+            ...prev,
+            settings: {
+                ...currentSettings,
+                logDisplayColors: {
+                    ...currentLogDisplayColors,
+                    enabled: checked,
+                },
+            },
+        };
     });
   };
 
@@ -159,10 +158,10 @@ export default function ProfilePage() {
     setIsSubmitting(true);
     try {
       await updateUserProfile(formData);
-      toast.success("プロフィールを更新しました！");
+      toast.success("設定を更新しました！");
     } catch (error) {
-      console.error("プロフィールの更新に失敗しました", error);
-      toast.error("プロフィールの更新に失敗しました。");
+      console.error("更新に失敗しました", error);
+      toast.error("更新に失敗しました。");
     } finally {
       setIsSubmitting(false);
     }
@@ -171,7 +170,7 @@ export default function ProfilePage() {
   const handleLogout = async () => {
     try {
       await signOut(auth);
-      router.push("/login"); // Redirect to login page after logout
+      router.push("/login");
       toast.success("ログアウトしました");
     } catch (error) {
       console.error("ログアウトに失敗しました", error);
@@ -200,371 +199,181 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 py-8">
-      {user && user.isAnonymous && <AccountLinker />}
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle className="text-2xl">プロフィール</CardTitle>
-          <CardDescription>ユーザー情報を管理します。</CardDescription>
-        </CardHeader>
-        <CardContent className="grid gap-4">
-          <div className="grid gap-2">
-            <Label htmlFor="email">メールアドレス</Label>
-            <Input id="email" type="email" value={userProfile?.authEmail || ""} readOnly />
-          </div>
-          <div className="grid gap-2">
-            <Label htmlFor="authName">認証名</Label>
-            <Input
-              id="authName"
-              type="text"
-              value={userProfile?.authName || ""}
-              readOnly
-            />
-          </div>
-          <div className="grid gap-2">
-            <Label htmlFor="nickname">表示名</Label>
-            <Input
-              id="nickname"
-              name="nickname"
-              type="text"
-              value={formData.nickname || ""}
-              onChange={handleChange}
-            />
-          </div>
-          <div className="grid gap-2">
-            <Label htmlFor="profileImageUrl">プロフィール画像URL</Label>
-            <Input
-              id="profileImageUrl"
-              name="profileImageUrl"
-              type="text"
-              value={formData.profileImageUrl || ""}
-              onChange={handleChange}
-            />
-          </div>
-          <div className="grid gap-2">
-            <Label htmlFor="birthday">誕生日</Label>
-            <Input
-              id="birthday"
-              name="birthday"
-              type="date"
-              value={formData.birthday || ""}
-              onChange={handleChange}
-            />
-          </div>
-          <div className="grid gap-2">
-            <Label htmlFor="gender">性別</Label>
-            <Select
-              onValueChange={(value) => handleSelectChange("gender", value)}
-              value={formData.gender || "other"}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="性別を選択" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="male">男性</SelectItem>
-                <SelectItem value="female">女性</SelectItem>
-                <SelectItem value="other">その他</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="grid gap-2">
-            <Label htmlFor="introduction">自己紹介</Label>
-            <Textarea
-              id="introduction"
-              name="introduction"
-              value={formData.introduction || ""}
-              onChange={handleChange}
-            />
-          </div>
-          <div className="grid gap-2">
-            <Label htmlFor="primaryPetId">メインペット</Label>
-            <Select
-              onValueChange={(value) =>
-                handleSelectChange("primaryPetId", value)
-              }
-              value={formData.primaryPetId || ""}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="メインペットを選択" />
-              </SelectTrigger>
-              <SelectContent>
-                {pets.length === 0 ? (
-                  <SelectItem value="no-pets" disabled>
-                    ペットがいません
-                  </SelectItem>
-                ) : (
-                  pets.map((pet) => (
-                    <SelectItem key={pet.id} value={pet.id}>
-                      {pet.name}
-                    </SelectItem>
-                  ))
-                )}
-              </SelectContent>
-            </Select>
-          </div>
-          {userProfile?.lastLoginAt && (
-            <div className="grid gap-2">
-              <Label>最終ログイン</Label>
-              <p className="text-sm text-muted-foreground">
-                {userProfile.lastLoginAt.toDate().toLocaleString()}
-              </p>
-            </div>
-          )}
+    <div className="container mx-auto max-w-2xl py-8 px-4">
+        <Tabs defaultValue="profile" className="w-full">
+            <TabsList className="grid w-full grid-cols-3">
+                <TabsTrigger value="profile">プロフィール</TabsTrigger>
+                <TabsTrigger value="account">アカウント</TabsTrigger>
+                <TabsTrigger value="settings">アプリ設定</TabsTrigger>
+            </TabsList>
 
-          {/* ログ表示色設定 */}
-          <div className="grid gap-4 mt-6">
-            <h3 className="text-lg font-semibold">ログ表示色設定</h3>
-            <div className="flex items-center justify-between space-x-2">
-              <Label htmlFor="enableCustomColors">カスタム色を有効にする</Label>
-              <input
-                id="enableCustomColors"
-                type="checkbox"
-                checked={formData.settings?.logDisplayColors?.enabled || false}
-                onChange={(e) => handleToggleChange(e.target.checked)}
-                className="h-5 w-5 text-blue-600 focus:ring-blue-500 border-gray-300 rounded" // Basic styling
-              />
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="creatorNameBg">作成者名 背景色</Label>
-              <div className="flex gap-2">
-                <Input
-                  id="creatorNameBg"
-                  type="color"
-                  value={
-                    formData.settings?.logDisplayColors?.creatorNameBg ||
-                    "#e5e7eb"
-                  }
-                  onChange={(e) =>
-                    handleChangeColor("creatorName", "Bg", e.target.value)
-                  }
-                  className="w-1/2"
-                  disabled={!formData.settings?.logDisplayColors?.enabled}
-                />
-                <Input
-                  type="text"
-                  value={
-                    formData.settings?.logDisplayColors?.creatorNameBg ||
-                    "#e5e7eb"
-                  }
-                  onChange={(e) =>
-                    handleChangeColor("creatorName", "Bg", e.target.value)
-                  }
-                  placeholder="#RRGGBB"
-                  className="w-1/2"
-                  disabled={!formData.settings?.logDisplayColors?.enabled}
-                />
-              </div>
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="creatorNameText">作成者名 文字色</Label>
-              <div className="flex gap-2">
-                <Input
-                  id="creatorNameText"
-                  type="color"
-                  value={
-                    formData.settings?.logDisplayColors?.creatorNameText ||
-                    "#6b7280"
-                  }
-                  onChange={(e) =>
-                    handleChangeColor("creatorName", "Text", e.target.value)
-                  }
-                  className="w-1/2"
-                  disabled={!formData.settings?.logDisplayColors?.enabled}
-                />
-                <Input
-                  type="text"
-                  value={
-                    formData.settings?.logDisplayColors?.creatorNameText ||
-                    "#6b7280"
-                  }
-                  onChange={(e) =>
-                    handleChangeColor("creatorName", "Text", e.target.value)
-                  }
-                  placeholder="#RRGGBB"
-                  className="w-1/2"
-                  disabled={!formData.settings?.logDisplayColors?.enabled}
-                />
-              </div>
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="timeBg">時刻 背景色</Label>
-              <div className="flex gap-2">
-                <Input
-                  id="timeBg"
-                  type="color"
-                  value={
-                    formData.settings?.logDisplayColors?.timeBg || "#e5e7eb"
-                  }
-                  onChange={(e) =>
-                    handleChangeColor("time", "Bg", e.target.value)
-                  }
-                  className="w-1/2"
-                  disabled={!formData.settings?.logDisplayColors?.enabled}
-                />
-                <Input
-                  type="text"
-                  value={
-                    formData.settings?.logDisplayColors?.timeBg || "#e5e7eb"
-                  }
-                  onChange={(e) =>
-                    handleChangeColor("time", "Bg", e.target.value)
-                  }
-                  placeholder="#RRGGBB"
-                  className="w-1/2"
-                  disabled={!formData.settings?.logDisplayColors?.enabled}
-                />
-              </div>
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="timeText">時刻 文字色</Label>
-              <div className="flex gap-2">
-                <Input
-                  id="timeText"
-                  type="color"
-                  value={
-                    formData.settings?.logDisplayColors?.timeText || "#4b5563"
-                  }
-                  onChange={(e) =>
-                    handleChangeColor("time", "Text", e.target.value)
-                  }
-                  className="w-1/2"
-                  disabled={!formData.settings?.logDisplayColors?.enabled}
-                />
-                <Input
-                  type="text"
-                  value={
-                    formData.settings?.logDisplayColors?.timeText || "#4b5563"
-                  }
-                  onChange={(e) =>
-                    handleChangeColor("time", "Text", e.target.value)
-                  }
-                  placeholder="#RRGGBB"
-                  className="w-1/2"
-                  disabled={!formData.settings?.logDisplayColors?.enabled}
-                />
-              </div>
-            </div>
-            {/* New fields for Deleted Task Log Colors */}
-            <div className="grid gap-2">
-              <Label htmlFor="deletedTaskBg">削除済みタスク 背景色</Label>
-              <div className="flex gap-2">
-                <Input
-                  id="deletedTaskBg"
-                  type="color"
-                  value={
-                    formData.settings?.logDisplayColors?.deletedTaskBg ||
-                    "#e5e7eb"
-                  }
-                  onChange={(e) =>
-                    handleChangeColor("deletedTask", "Bg", e.target.value)
-                  }
-                  className="w-1/2"
-                  disabled={!formData.settings?.logDisplayColors?.enabled}
-                />
-                <Input
-                  type="text"
-                  value={
-                    formData.settings?.logDisplayColors?.deletedTaskBg ||
-                    "#e5e7eb"
-                  }
-                  onChange={(e) =>
-                    handleChangeColor("deletedTask", "Bg", e.target.value)
-                  }
-                  placeholder="#RRGGBB"
-                  className="w-1/2"
-                  disabled={!formData.settings?.logDisplayColors?.enabled}
-                />
-              </div>
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="deletedTaskText">削除済みタスク 文字色</Label>
-              <div className="flex gap-2">
-                <Input
-                  id="deletedTaskText"
-                  type="color"
-                  value={
-                    formData.settings?.logDisplayColors?.deletedTaskText ||
-                    "#9ca3af"
-                  }
-                  onChange={(e) =>
-                    handleChangeColor("deletedTask", "Text", e.target.value)
-                  }
-                  className="w-1/2"
-                  disabled={!formData.settings?.logDisplayColors?.enabled}
-                />
-                <Input
-                  type="text"
-                  value={
-                    formData.settings?.logDisplayColors?.deletedTaskText ||
-                    "#9ca3af"
-                  }
-                  onChange={(e) =>
-                    handleChangeColor("deletedTask", "Text", e.target.value)
-                  }
-                  placeholder="#RRGGBB"
-                  className="w-1/2"
-                  disabled={!formData.settings?.logDisplayColors?.enabled}
-                />
-              </div>
-            </div>
-          </div>
-          {/* Toast Position Setting */}
-          <div className="grid gap-4 mt-6">
-            <h3 className="text-lg font-semibold">トースト表示位置</h3>
-            <div className="grid gap-2">
-              <Label htmlFor="toastPosition">表示位置</Label>
-              <Select
-                onValueChange={(value) =>
-                  handleSelectChange("settings.toastPosition", value)
-                }
-                value={formData.settings?.toastPosition || "bottom-right"}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="位置を選択" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="top-left">左上</SelectItem>
-                  <SelectItem value="top-center">上中央</SelectItem>
-                  <SelectItem value="top-right">右上</SelectItem>
-                  <SelectItem value="bottom-left">左下</SelectItem>
-                  <SelectItem value="bottom-center">下中央</SelectItem>
-                  <SelectItem value="bottom-right">右下</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-        </CardContent>
-        <CardFooter>
-          <Button
-            className="w-full"
-            onClick={handleUpdateProfile}
-            disabled={isSubmitting}
-          >
-            {isSubmitting ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                更新中...
-              </>
-            ) : (
-              "プロフィールを更新"
+            {/* Profile Tab */}
+            <TabsContent value="profile">
+                <Card>
+                    <CardHeader>
+                        <CardTitle>公開プロフィール</CardTitle>
+                        <CardDescription>他のユーザーに表示される情報を編集します。</CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                        <div className="grid gap-2">
+                            <Label htmlFor="nickname">表示名</Label>
+                            <Input id="nickname" name="nickname" value={formData.nickname || ""} onChange={handleChange} />
+                        </div>
+                        <div className="grid gap-2">
+                            <Label htmlFor="introduction">自己紹介</Label>
+                            <Textarea id="introduction" name="introduction" value={formData.introduction || ""} onChange={handleChange} />
+                        </div>
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="grid gap-2">
+                                <Label htmlFor="birthday">誕生日</Label>
+                                <Input id="birthday" name="birthday" type="date" value={formData.birthday || ""} onChange={handleChange} />
+                            </div>
+                            <div className="grid gap-2">
+                                <Label htmlFor="gender">性別</Label>
+                                <Select onValueChange={(value) => handleSelectChange("gender", value)} value={formData.gender || "other"}>
+                                    <SelectTrigger><SelectValue placeholder="性別を選択" /></SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="male">男性</SelectItem>
+                                        <SelectItem value="female">女性</SelectItem>
+                                        <SelectItem value="other">その他</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                        </div>
+                        <div className="grid gap-2">
+                            <Label htmlFor="primaryPetId">メインペット</Label>
+                            <Select onValueChange={(value) => handleSelectChange("primaryPetId", value)} value={formData.primaryPetId || ""}>
+                                <SelectTrigger><SelectValue placeholder="メインペットを選択" /></SelectTrigger>
+                                <SelectContent>
+                                    {pets.length === 0 ? (
+                                        <SelectItem value="no-pets" disabled>ペットがいません</SelectItem>
+                                    ) : (
+                                        pets.map((pet) => <SelectItem key={pet.id} value={pet.id}>{pet.name}</SelectItem>)
+                                    )}
+                                </SelectContent>
+                            </Select>
+                        </div>
+                         <div className="grid gap-2">
+                            <Label htmlFor="profileImageUrl">プロフィール画像URL</Label>
+                            <Input id="profileImageUrl" name="profileImageUrl" type="text" value={formData.profileImageUrl || ""} onChange={handleChange} />
+                        </div>
+                    </CardContent>
+                </Card>
+            </TabsContent>
+
+            {/* Account Tab */}
+            <TabsContent value="account">
+                {user.isAnonymous && <AccountLinker />}
+                <Card>
+                    <CardHeader>
+                        <CardTitle>アカウント情報</CardTitle>
+                        <CardDescription>ログインに使用するアカウント情報です。</CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                        <div className="grid gap-2">
+                            <Label htmlFor="email">メールアドレス</Label>
+                            <Input id="email" type="email" value={userProfile?.authEmail || ""} readOnly disabled />
+                        </div>
+                        <div className="grid gap-2">
+                            <Label htmlFor="authName">認証方法</Label>
+                            <Input id="authName" type="text" value={userProfile?.authProvider || ""} readOnly disabled />
+                        </div>
+                        {userProfile?.lastLoginAt && (
+                            <div className="grid gap-2">
+                                <Label>最終ログイン日時</Label>
+                                <p className="text-sm text-muted-foreground pt-2">{userProfile.lastLoginAt.toDate().toLocaleString()}</p>
+                            </div>
+                        )}
+                    </CardContent>
+                </Card>
+            </TabsContent>
+
+            {/* Settings Tab */}
+            <TabsContent value="settings">
+                <Card>
+                    <CardHeader>
+                        <CardTitle>アプリ設定</CardTitle>
+                        <CardDescription>アプリケーションの表示や動作をカスタマイズします。</CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-6">
+                        {/* Log Color Settings */}
+                        <div className="space-y-4">
+                            <h3 className="text-md font-medium">ログの配色設定</h3>
+                            <div className="flex items-center justify-between space-x-2 rounded-lg border p-4">
+                                <Label htmlFor="enableCustomColors" className="flex flex-col space-y-1">
+                                    <span>カスタムカラー</span>
+                                    <span className="font-normal leading-snug text-muted-foreground">ログの作成者や時刻の背景色・文字色をカスタマイズします。</span>
+                                </Label>
+                                <input id="enableCustomColors" type="checkbox" checked={formData.settings?.logDisplayColors?.enabled || false} onChange={(e) => handleToggleChange(e.target.checked)} className="h-5 w-5" />
+                            </div>
+                            <div className={`rounded-lg border ${!formData.settings?.logDisplayColors?.enabled && 'opacity-50 pointer-events-none'}`}>
+                                <div className="grid grid-cols-[1fr,1fr,1fr] items-center px-4 py-2 font-medium bg-muted/50 text-sm">
+                                    <Label>項目</Label>
+                                    <Label>背景色</Label>
+                                    <Label>文字色</Label>
+                                </div>
+                                <Separator />
+                                {[
+                                    { id: 'creatorName' as const, label: '作成者名', bg: formData.settings?.logDisplayColors?.creatorNameBg, text: formData.settings?.logDisplayColors?.creatorNameText, defaultBg: '#e5e7eb', defaultText: '#6b7280' },
+                                    { id: 'time' as const, label: '時刻', bg: formData.settings?.logDisplayColors?.timeBg, text: formData.settings?.logDisplayColors?.timeText, defaultBg: '#e5e7eb', defaultText: '#4b5563' },
+                                    { id: 'deletedTask' as const, label: '削除済みタスク', bg: formData.settings?.logDisplayColors?.deletedTaskBg, text: formData.settings?.logDisplayColors?.deletedTaskText, defaultBg: '#e5e7eb', defaultText: '#9ca3af' },
+                                ].map((item, index) => (
+                                    <div key={item.id}>
+                                        <div className="grid grid-cols-[1fr,1fr,1fr] items-center gap-4 px-4 py-3">
+                                            <p className="text-sm font-medium">{item.label}</p>
+                                            <div className="flex items-center gap-2">
+                                                <Input type="color" value={item.bg || item.defaultBg} onChange={(e) => handleChangeColor(item.id as ("creatorName" | "time" | "deletedTask"), "Bg", e.target.value)} className="w-10 h-8 p-1 shrink-0" />
+                                                <Input value={item.bg || item.defaultBg} onChange={(e) => handleChangeColor(item.id as ("creatorName" | "time" | "deletedTask"), "Bg", e.target.value)} className="h-8" placeholder="#RRGGBB" />
+                                            </div>
+                                            <div className="flex items-center gap-2">
+                                                <Input type="color" value={item.text || item.defaultText} onChange={(e) => handleChangeColor(item.id as ("creatorName" | "time" | "deletedTask"), "Text", e.target.value)} className="w-10 h-8 p-1 shrink-0" />
+                                                <Input value={item.text || item.defaultText} onChange={(e) => handleChangeColor(item.id as ("creatorName" | "time" | "deletedTask"), "Text", e.target.value)} className="h-8" placeholder="#RRGGBB" />
+                                            </div>
+                                        </div>
+                                        {index < 2 && <Separator />}
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
+                        <Separator />
+
+                        {/* Toast Position Settings */}
+                        <div className="space-y-2">
+                            <h3 className="text-md font-medium">通知の表示位置</h3>
+                             <Label htmlFor="toastPosition" className="text-sm font-normal text-muted-foreground">通知（トースト）が画面のどこに表示されるかを設定します。</Label>
+                            <Select onValueChange={(value) => handleSelectChange("settings.toastPosition", value)} value={formData.settings?.toastPosition || "bottom-right"}>
+                                <SelectTrigger><SelectValue placeholder="位置を選択" /></SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="top-left">左上</SelectItem>
+                                    <SelectItem value="top-center">上中央</SelectItem>
+                                    <SelectItem value="top-right">右上</SelectItem>
+                                    <SelectItem value="bottom-left">左下</SelectItem>
+                                    <SelectItem value="bottom-center">下中央</SelectItem>
+                                    <SelectItem value="bottom-right">右下</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+                    </CardContent>
+                </Card>
+            </TabsContent>
+        </Tabs>
+
+        <div className="flex justify-end mt-6 space-x-4">
+             {user && !user.isAnonymous && (
+                <Button variant="destructive" onClick={handleLogout}>
+                    <LogOutIcon className="mr-2 h-4 w-4" />
+                    ログアウト
+                </Button>
             )}
-          </Button>
-        </CardFooter>
-        {user && !user.isAnonymous && (
-        <CardFooter className="mt-4">
-          {" "}
-          {/* Added mt-4 for extra spacing */}
-          <Button
-            className="w-full" // Removed mt-2 as CardFooter itself provides spacing
-            variant="destructive"
-            onClick={handleLogout}
-          >
-            <LogOutIcon className="mr-2 h-4 w-4" />
-            ログアウト
-          </Button>
-        </CardFooter>
-        )}
-      </Card>
+            <Button onClick={handleUpdateProfile} disabled={isSubmitting}>
+                {isSubmitting ? (
+                    <><Loader2 className="mr-2 h-4 w-4 animate-spin" />更新中...</>
+                ) : (
+                    "保存する"
+                )}
+            </Button>
+        </div>
     </div>
   );
 }
