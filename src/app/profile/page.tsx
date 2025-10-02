@@ -550,6 +550,7 @@ export default function ProfilePage() {
             )}
           </Button>
         </CardFooter>
+        {user && !user.isAnonymous && (
         <CardFooter className="mt-4">
           {" "}
           {/* Added mt-4 for extra spacing */}
@@ -562,6 +563,7 @@ export default function ProfilePage() {
             ログアウト
           </Button>
         </CardFooter>
+        )}
       </Card>
     </div>
   );

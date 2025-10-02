@@ -24,45 +24,43 @@ import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 export function AccountLinker() {
   const [isLinking, setIsLinking] = useState(false);
   const [emailForLink, setEmailForLink] = useState("");
   const router = useRouter();
 
-  // Effect to handle the email link sign-in completion
   useEffect(() => {
     const completeEmailLink = async () => {
-      if (isSignInWithEmailLink(auth, window.location.href)) {
+      if (isSignInWithEmailLink(auth, window.location.href) && auth.currentUser?.isAnonymous) {
         setIsLinking(true);
         let email = window.localStorage.getItem("emailForSignIn");
         if (!email) {
-          email = window.prompt(
-            "確認のため、メールアドレスを再度入力してください。"
-          );
+          email = window.prompt("確認のため、メールアドレスを再度入力してください。");
         }
         if (email && auth.currentUser) {
           try {
-            const credential = EmailAuthProvider.credentialWithLink(
-              email,
-              window.location.href
-            );
+            const credential = EmailAuthProvider.credentialWithLink(email, window.location.href);
+            // Clean URL immediately before potential errors from linking
+            window.history.replaceState({}, document.title, window.location.pathname);
             await linkWithCredential(auth.currentUser, credential);
             toast.success("メールアドレスを連携しました！");
             window.localStorage.removeItem("emailForSignIn");
-            router.push('/profile'); // リダイレクトを追加
-          } catch (err: unknown) {
-            const errorMessage = err instanceof Error ? err.message : "不明なエラー";
-            if (typeof err === 'object' && err !== null && 'code' in err && (err as { code: string }).code === "auth/credential-already-in-use") {
-              toast.error("このメールアドレスは既に使用されています。");
+            router.push('/profile');
+          } catch (err: any) {
+            if (err.code === "auth/credential-already-in-use" || err.code === "auth/email-already-in-use") {
+              toast.error("このメールアドレスアカウントが既に使用されています。登録されていないメールアドレスを使用してください。");
             } else {
-              toast.error(`連携に失敗しました: ${errorMessage}`);
+              toast.error(`連携に失敗しました: ${err.message}`);
             }
           } finally {
-            // Clean up URL
-            window.history.replaceState({}, document.title, window.location.pathname);
+            setIsLinking(false);
           }
+        } else if (email) { // Case where auth.currentUser is null but we have an email
+            toast.error("連携セッションが見つかりません。再度ゲストとしてログインしてからお試しください。");
+            setIsLinking(false);
         }
-        setIsLinking(false);
       }
     };
     completeEmailLink();
@@ -75,13 +73,12 @@ export function AccountLinker() {
     try {
       await linkWithPopup(auth.currentUser, provider);
       toast.success("Googleアカウントを連携しました！");
-      router.push('/profile'); // リダイレクトを追加
-    } catch (err: unknown) {
-      const errorMessage = err instanceof Error ? err.message : "不明なエラー";
-      if (typeof err === 'object' && err !== null && 'code' in err && (err as { code: string }).code === "auth/credential-already-in-use") {
-        toast.error("このGoogleアカウントは既に使用されています。");
+      router.push('/profile');
+    } catch (err: any) {
+      if (err.code === "auth/credential-already-in-use") {
+        toast.error("このGoogleアカウントは既に使用されています。登録されていないGoogleアカウントを使用してください。");
       } else {
-        toast.error(`連携に失敗しました: ${errorMessage}`);
+        toast.error(`連携に失敗しました: ${err.message}`);
       }
     } finally {
       setIsLinking(false);
@@ -94,18 +91,23 @@ export function AccountLinker() {
       toast.error("メールアドレスを入力してください。");
       return;
     }
+    if (!emailRegex.test(emailForLink)) {
+      toast.error("有効なメールアドレスを入力してください。");
+      return;
+    }
     setIsLinking(true);
     const actionCodeSettings = {
-      url: window.location.href, // Link back to the current page (profile)
+      url: window.location.href,
       handleCodeInApp: true,
     };
     try {
+      // Note: sendSignInLinkToEmail does not check for existing emails.
+      // The check happens when the user clicks the link.
       await sendSignInLinkToEmail(auth, emailForLink, actionCodeSettings);
       window.localStorage.setItem("emailForSignIn", emailForLink);
-      toast.success(`${emailForLink} に確認メールを送信しました。`);
-    } catch (err: unknown) {
-      const errorMessage = err instanceof Error ? err.message : "不明なエラー";
-      toast.error(`メールの送信に失敗しました: ${errorMessage}`);
+      toast.success(`${emailForLink} に確認メールを送信しました。迷惑メールフォルダもご確認ください。`);
+    } catch (err: any) {
+      toast.error(`メールの送信に失敗しました: ${err.message}`);
     } finally {
       setIsLinking(false);
     }
@@ -157,7 +159,6 @@ export function AccountLinker() {
             {isLinking ? (
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
             ) : (
-              // You might want to add a Google icon here later
               "Googleアカウントと連携"
             )}
           </Button>

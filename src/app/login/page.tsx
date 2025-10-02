@@ -11,6 +11,7 @@ import {
   signInAnonymously,
 } from "firebase/auth";
 import { auth } from "@/lib/firebase";
+import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -24,65 +25,72 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from 'sonner';
 
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 export default function LoginPage() {
   const [email, setEmail] = useState("");
-  const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const { user, loading: authLoading } = useAuth();
+
+  useEffect(() => {
+    if (user) {
+      router.push('/');
+    }
+  }, [user, router]);
 
   useEffect(() => {
     const processSignIn = async () => {
-      console.log('LoginPage: useEffect - processSignIn started');
-      console.log('LoginPage: Current URL:', window.location.href);
+      try {
+        if (isSignInWithEmailLink(auth, window.location.href)) {
+            // Only process link if there is no user logged in.
+            // This prevents conflicts with the account linking flow.
+            if (auth.currentUser) {
+                return;
+            }
 
-      // Check if the current URL is the expected continueUrl
-      const expectedContinueUrl = `${window.location.origin}/login`;
-      if (!window.location.href.startsWith(expectedContinueUrl)) {
-        console.log('LoginPage: Current URL is not the expected continueUrl, skipping sign-in process.');
-        return;
-      }
+            setLoading(true);
+            let emailFromStorage = window.localStorage.getItem('emailForSignIn');
+            if (!emailFromStorage) {
+              // This is a fallback. The user might have opened the link in a different browser.
+              emailFromStorage = window.prompt('確認のため、メールアドレスを再度入力してください。');
+            }
 
-      if (isSignInWithEmailLink(auth, window.location.href)) {
-        console.log('LoginPage: isSignInWithEmailLink returned true');
-        setLoading(true);
-        let emailFromStorage = window.localStorage.getItem('emailForSignIn');
-        console.log('LoginPage: emailFromStorage:', emailFromStorage);
-        if (!emailFromStorage) {
-          emailFromStorage = window.prompt('確認のため、メールアドレスを再度入力してください。');
-          console.log('LoginPage: emailFromStorage from prompt:', emailFromStorage);
+            if (emailFromStorage) {
+                await signInWithEmailLink(auth, emailFromStorage, window.location.href);
+                window.localStorage.removeItem('emailForSignIn');
+                window.history.replaceState({}, document.title, window.location.pathname);
+                toast.success('ログインしました！');
+                router.push('/');
+            } else {
+                toast.error('メールアドレスが確認できませんでした。');
+                setLoading(false);
+            }
         }
-
-        if (emailFromStorage) {
-          try {
-            console.log('LoginPage: Attempting signInWithEmailLink with email:', emailFromStorage);
-            await signInWithEmailLink(auth, emailFromStorage, window.location.href);
-            window.localStorage.removeItem('emailForSignIn');
-            toast.success('ログインしました！');
-            router.push('/');
-            console.log('LoginPage: signInWithEmailLink successful');
-          } catch (err: unknown) {
-            const errorMessage = err instanceof Error ? err.message : "不明なエラー";
-            setError(errorMessage);
-            console.error('LoginPage: signInWithEmailLink failed:', errorMessage, err);
-            toast.error(`ログインに失敗しました: ${errorMessage}`);
-            setLoading(false);
-          }
+      } catch (err: any) {
+        if (err.code === 'auth/invalid-action-code') {
+            toast.error('このログインリンクは無効です。有効期限が切れているか、既に使用されています。');
         } else {
-            console.log('LoginPage: emailFromStorage is null or empty, showing error toast');
-            toast.error('メールアドレスが確認できませんでした。');
-            setLoading(false);
+            toast.error(`ログインに失敗しました: ${err.message}`);
         }
-      } else {
-        console.log('LoginPage: isSignInWithEmailLink returned false');
+        setLoading(false);
       }
     };
-    processSignIn();
-  }, []);
+
+    if (!authLoading) {
+        processSignIn();
+    }
+  }, [authLoading, router]);
 
 
   const handleEmailLogin = async () => {
-    setError(null);
     setLoading(true);
+
+    if (!emailRegex.test(email)) {
+        toast.error("有効なメールアドレスを入力してください。");
+        setLoading(false);
+        return;
+    }
 
     const actionCodeSettings = {
       url: `${window.location.origin}/login`,
@@ -92,49 +100,36 @@ export default function LoginPage() {
     try {
       await sendSignInLinkToEmail(auth, email, actionCodeSettings);
       window.localStorage.setItem('emailForSignIn', email);
-      toast.success(`${email} にログインリンクを送信しました。メールを確認してください。`);
+      toast.success(`${email} にログインリンクを送信しました。迷惑メールフォルダもご確認ください。`);
       setEmail("");
-    } catch (err: unknown) {
-      const errorMessage = err instanceof Error ? err.message : "不明なエラー";
-      setError(errorMessage);
-      console.error(err);
-      toast.error(`ログインリンクの送信に失敗しました: ${errorMessage}`);
+    } catch (err: any) {
+      toast.error(`ログインリンクの送信に失敗しました: ${err.message}`);
     } finally {
       setLoading(false);
     }
   };
 
   const handleGoogleLogin = async () => {
-    setError(null);
     setLoading(true);
     const provider = new GoogleAuthProvider();
     try {
       await signInWithPopup(auth, provider);
-      console.log("Logged in with Google successfully!");
       toast.success("Googleでログインしました！");
       router.push('/');
-    } catch (err: unknown) {
-      const errorMessage = err instanceof Error ? err.message : "不明なエラー";
-      setError(errorMessage);
-      console.error(err);
-      toast.error(`Googleでのログインに失敗しました: ${errorMessage}`);
+    } catch (err: any) {
+      toast.error(`Googleでのログインに失敗しました: ${err.message}`);
     } finally {
         setLoading(false);
     }
   };
 
   const handleAnonymousLogin = async () => {
-    setError(null);
     setLoading(true);
     try {
       await signInAnonymously(auth);
-      console.log("Logged in anonymously successfully!");
       router.push('/');
-    } catch (err: unknown) {
-      const errorMessage = err instanceof Error ? err.message : "不明なエラー";
-      setError(errorMessage);
-      console.error(err);
-      toast.error(`ゲストログインに失敗しました: ${errorMessage}`);
+    } catch (err: any) {
+      toast.error(`ゲストログインに失敗しました: ${err.message}`);
     } finally {
       setLoading(false);
     }
@@ -162,7 +157,6 @@ export default function LoginPage() {
               disabled={loading}
             />
           </div>
-          {error && <p className="text-red-500 text-sm">{error}</p>}
         </CardContent>
         <CardFooter className="flex flex-col gap-4">
           <Button className="w-full" onClick={handleEmailLogin} disabled={loading}>

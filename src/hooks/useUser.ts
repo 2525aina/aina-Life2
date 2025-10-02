@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { doc, getDoc, setDoc, updateDoc, serverTimestamp, Timestamp, onSnapshot } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { useAuth } from '@/contexts/AuthContext';
+import type { UserInfo } from "firebase/auth";
 
 export interface UserProfile {
   uid: string; // Corresponds to Firebase Auth uid, also the document ID
@@ -53,48 +54,82 @@ export const useUser = () => {
 
     const fetchProfile = async () => {
       const docSnap = await getDoc(userDocRef);
+
+      // Helper functions
+      const getProviderName = (providerId: string) => {
+        if (providerId === 'google.com') return 'Google認証';
+        if (providerId === 'password') return 'メール認証';
+        return providerId;
+      };
+
+      const getAuthNamePart = (provider: UserInfo): string | null => {
+          if (provider.providerId === 'password') return 'mailUser';
+          if (provider.providerId === 'google.com') return provider.displayName;
+          return null;
+      }
+
       if (docSnap.exists()) {
+        // UPDATE EXISTING USER
         const existingProfile = docSnap.data() as Omit<UserProfile, 'uid'>;
         const updatedData: Partial<UserProfile> = {};
 
-        const currentAuthProvider = user.providerData[0]?.providerId;
-        const getProviderName = (providerId: string) => {
-          if (providerId === 'google.com') return 'Google';
-          if (providerId === 'password') return 'メール認証'; // メール認証の場合は「メール認証」と表示
-          return providerId; // Fallback
-        };
-        const authProviderName = user.isAnonymous ? 'GestUser' : (currentAuthProvider ? getProviderName(currentAuthProvider) : null);
+        if (user.isAnonymous) {
+            if (existingProfile.authEmail !== 'アカウント未登録者') updatedData.authEmail = 'アカウント未登録者';
+            if (existingProfile.authName !== 'ゲストユーザー') updatedData.authName = 'ゲストユーザー';
+            if (existingProfile.authProvider !== '匿名認証') updatedData.authProvider = '匿名認証';
+        } else {
+            // Handle regular and linked accounts
+            const providerNames = user.providerData.map(p => getProviderName(p.providerId)).filter(p => p !== null).sort();
+            const newAuthProvider = providerNames.join('&');
 
-        if (user.email && existingProfile.authEmail !== user.email) {
-          updatedData.authEmail = user.email;
-        }
-        if (user.displayName && existingProfile.authName !== user.displayName) {
-          updatedData.authName = user.displayName;
-        }
-        if (authProviderName && existingProfile.authProvider !== authProviderName) {
-          updatedData.authProvider = authProviderName;
+            const authNameParts = user.providerData.map(p => getAuthNamePart(p)).filter(p => p !== null).sort();
+            const newAuthName = authNameParts.join('&');
+
+            if (user.email && existingProfile.authEmail !== user.email) {
+                updatedData.authEmail = user.email;
+            }
+            if (newAuthName && existingProfile.authName !== newAuthName) {
+                updatedData.authName = newAuthName;
+            }
+            if (newAuthProvider && existingProfile.authProvider !== newAuthProvider) {
+                updatedData.authProvider = newAuthProvider;
+            }
         }
 
         if (Object.keys(updatedData).length > 0) {
           await updateDoc(userDocRef, { ...updatedData, updatedAt: serverTimestamp() });
-          setUserProfile({ uid: user.uid, ...existingProfile, ...updatedData, updatedAt: serverTimestamp() as Timestamp });
-        } else {
-          setUserProfile({ uid: user.uid, ...existingProfile });
         }
+        // The onSnapshot listener will update the state
       } else {
-        // Create a new profile if it doesn't exist
-        const currentAuthProvider = user.providerData[0]?.providerId;
-        const getProviderName = (providerId: string) => {
-          if (providerId === 'google.com') return 'Google';
-          if (providerId === 'password') return 'メール認証'; // メール認証の場合は「メール認証」と表示
-          return providerId; // Fallback
-        };
-        const authProviderName = user.isAnonymous ? 'GestUser' : (currentAuthProvider ? getProviderName(currentAuthProvider) : null);
+        // CREATE NEW USER
+        let authProviderName: string | null;
+        let authName: string;
+        let authEmail: string;
+
+        if (user.isAnonymous) {
+            authEmail = 'アカウント未登録者';
+            authName = 'ゲストユーザー';
+            authProviderName = '匿名認証';
+        } else {
+            authEmail = user.email || '';
+            const providerId = user.providerData[0]?.providerId;
+            if (providerId === 'password') {
+                authName = 'mailUser';
+                authProviderName = 'メール認証';
+            } else if (providerId === 'google.com') {
+                authName = user.displayName || '';
+                authProviderName = 'Google認証';
+            } else {
+                // Fallback for other providers
+                authName = user.displayName || '';
+                authProviderName = providerId ? getProviderName(providerId) : null;
+            }
+        }
 
         const newProfile: UserProfile = {
           uid: user.uid,
-          authEmail: user.isAnonymous ? 'アカウント未登録者' : user.email || '',
-          authName: user.isAnonymous ? 'ゲストユーザー' : user.displayName || '',
+          authEmail: authEmail,
+          authName: authName,
           authProvider: authProviderName,
           createdAt: serverTimestamp() as Timestamp,
           updatedAt: serverTimestamp() as Timestamp,
@@ -106,14 +141,12 @@ export const useUser = () => {
           },
         };
         await setDoc(userDocRef, newProfile);
-        setUserProfile(newProfile);
       }
       setLoading(false);
     };
 
     fetchProfile();
 
-    // Optionally, listen for real-time updates
     const unsubscribe = onSnapshot(userDocRef, (doc) => {
       if (doc.exists()) {
         setUserProfile({ uid: user.uid, ...(doc.data() as Omit<UserProfile, 'uid'>) });
@@ -130,8 +163,6 @@ export const useUser = () => {
       ...data,
       updatedAt: serverTimestamp(),
     });
-    // Optimistically update state
-    setUserProfile(prev => prev ? { ...prev, ...data, updatedAt: serverTimestamp() as Timestamp } : null);
   }, [user]);
 
   return { userProfile, loading, updateUserProfile };
