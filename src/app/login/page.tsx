@@ -32,33 +32,52 @@ export default function LoginPage() {
 
   useEffect(() => {
     const processSignIn = async () => {
+      console.log('LoginPage: useEffect - processSignIn started');
+      console.log('LoginPage: Current URL:', window.location.href);
+
+      // Check if the current URL is the expected continueUrl
+      const expectedContinueUrl = `${window.location.origin}/login`;
+      if (!window.location.href.startsWith(expectedContinueUrl)) {
+        console.log('LoginPage: Current URL is not the expected continueUrl, skipping sign-in process.');
+        return;
+      }
+
       if (isSignInWithEmailLink(auth, window.location.href)) {
+        console.log('LoginPage: isSignInWithEmailLink returned true');
         setLoading(true);
         let emailFromStorage = window.localStorage.getItem('emailForSignIn');
+        console.log('LoginPage: emailFromStorage:', emailFromStorage);
         if (!emailFromStorage) {
           emailFromStorage = window.prompt('確認のため、メールアドレスを再度入力してください。');
+          console.log('LoginPage: emailFromStorage from prompt:', emailFromStorage);
         }
 
         if (emailFromStorage) {
           try {
+            console.log('LoginPage: Attempting signInWithEmailLink with email:', emailFromStorage);
             await signInWithEmailLink(auth, emailFromStorage, window.location.href);
             window.localStorage.removeItem('emailForSignIn');
             toast.success('ログインしました！');
             router.push('/');
+            console.log('LoginPage: signInWithEmailLink successful');
           } catch (err: unknown) {
             const errorMessage = err instanceof Error ? err.message : "不明なエラー";
             setError(errorMessage);
+            console.error('LoginPage: signInWithEmailLink failed:', errorMessage, err);
             toast.error(`ログインに失敗しました: ${errorMessage}`);
             setLoading(false);
           }
         } else {
+            console.log('LoginPage: emailFromStorage is null or empty, showing error toast');
             toast.error('メールアドレスが確認できませんでした。');
             setLoading(false);
         }
+      } else {
+        console.log('LoginPage: isSignInWithEmailLink returned false');
       }
     };
     processSignIn();
-  }, [router]);
+  }, []);
 
 
   const handleEmailLogin = async () => {

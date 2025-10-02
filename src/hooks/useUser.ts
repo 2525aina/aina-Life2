@@ -16,7 +16,7 @@ export interface UserProfile {
   introduction?: string;
   primaryPetId?: string;
   lastLoginAt?: Timestamp; // Timestamp of last login
-  authProvider?: string; // New field for authentication provider name
+  authProvider?: string | null; // New field for authentication provider name
   createdAt: Timestamp;
   updatedAt: Timestamp;
       settings: {
@@ -60,10 +60,10 @@ export const useUser = () => {
         const currentAuthProvider = user.providerData[0]?.providerId;
         const getProviderName = (providerId: string) => {
           if (providerId === 'google.com') return 'Google';
-          if (providerId === 'password') return undefined; // メール認証の場合はプロバイダ名を表示しない
+          if (providerId === 'password') return 'メール認証'; // メール認証の場合は「メール認証」と表示
           return providerId; // Fallback
         };
-        const authProviderName = currentAuthProvider ? getProviderName(currentAuthProvider) : undefined;
+        const authProviderName = user.isAnonymous ? 'GestUser' : (currentAuthProvider ? getProviderName(currentAuthProvider) : null);
 
         if (user.email && existingProfile.authEmail !== user.email) {
           updatedData.authEmail = user.email;
@@ -86,15 +86,15 @@ export const useUser = () => {
         const currentAuthProvider = user.providerData[0]?.providerId;
         const getProviderName = (providerId: string) => {
           if (providerId === 'google.com') return 'Google';
-          if (providerId === 'password') return undefined; // メール認証の場合はプロバイダ名を表示しない
+          if (providerId === 'password') return 'メール認証'; // メール認証の場合は「メール認証」と表示
           return providerId; // Fallback
         };
-        const authProviderName = currentAuthProvider ? getProviderName(currentAuthProvider) : undefined;
+        const authProviderName = user.isAnonymous ? 'GestUser' : (currentAuthProvider ? getProviderName(currentAuthProvider) : null);
 
         const newProfile: UserProfile = {
           uid: user.uid,
-          authEmail: user.email || '',
-          authName: user.displayName || '',
+          authEmail: user.isAnonymous ? 'アカウント未登録者' : user.email || '',
+          authName: user.isAnonymous ? 'ゲストユーザー' : user.displayName || '',
           authProvider: authProviderName,
           createdAt: serverTimestamp() as Timestamp,
           updatedAt: serverTimestamp() as Timestamp,

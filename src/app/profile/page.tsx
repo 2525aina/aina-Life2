@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
@@ -58,15 +58,24 @@ export default function ProfilePage() {
         settings: {
           ...userProfile.settings,
           logDisplayColors: {
-            creatorNameBg: userProfile.settings?.logDisplayColors?.creatorNameBg || "#e5e7eb",
-            creatorNameText: userProfile.settings?.logDisplayColors?.creatorNameText || "#6b7280",
+            creatorNameBg:
+              userProfile.settings?.logDisplayColors?.creatorNameBg ||
+              "#e5e7eb",
+            creatorNameText:
+              userProfile.settings?.logDisplayColors?.creatorNameText ||
+              "#6b7280",
             timeBg: userProfile.settings?.logDisplayColors?.timeBg || "#e5e7eb",
-            timeText: userProfile.settings?.logDisplayColors?.timeText || "#4b5563",
-            deletedTaskBg: userProfile.settings?.logDisplayColors?.deletedTaskBg || "#e5e7eb", // New field
-            deletedTaskText: userProfile.settings?.logDisplayColors?.deletedTaskText || "#9ca3af", // New field
+            timeText:
+              userProfile.settings?.logDisplayColors?.timeText || "#4b5563",
+            deletedTaskBg:
+              userProfile.settings?.logDisplayColors?.deletedTaskBg ||
+              "#e5e7eb", // New field
+            deletedTaskText:
+              userProfile.settings?.logDisplayColors?.deletedTaskText ||
+              "#9ca3af", // New field
             enabled: userProfile.settings?.logDisplayColors?.enabled ?? true, // Default to true
           },
-          toastPosition: userProfile.settings?.toastPosition || 'bottom-right', // Default to bottom-right
+          toastPosition: userProfile.settings?.toastPosition || "bottom-right", // Default to bottom-right
         },
       });
     }
@@ -81,8 +90,8 @@ export default function ProfilePage() {
 
   const handleSelectChange = (name: string, value: string) => {
     setFormData((prev) => {
-      if (name.includes('.')) {
-        const [parent, child] = name.split('.');
+      if (name.includes(".")) {
+        const [parent, child] = name.split(".");
         return {
           ...prev,
           [parent]: {
@@ -97,14 +106,14 @@ export default function ProfilePage() {
   };
 
   const handleChangeColor = (
-    category: 'creatorName' | 'time' | 'deletedTask',
-    type: 'Bg' | 'Text',
+    category: "creatorName" | "time" | "deletedTask",
+    type: "Bg" | "Text",
     value: string
   ) => {
     setFormData((prev) => {
       const currentSettings = prev.settings || {
         notifications: { dailySummary: false },
-        theme: 'system',
+        theme: "system",
       };
       const currentLogDisplayColors = currentSettings.logDisplayColors || {};
 
@@ -125,7 +134,7 @@ export default function ProfilePage() {
     setFormData((prev) => {
       const currentSettings = prev.settings || {
         notifications: { dailySummary: false },
-        theme: 'system',
+        theme: "system",
       };
       const currentLogDisplayColors = currentSettings.logDisplayColors || {};
 
@@ -201,10 +210,10 @@ export default function ProfilePage() {
         <CardContent className="grid gap-4">
           <div className="grid gap-2">
             <Label htmlFor="email">メールアドレス</Label>
-            <Input id="email" type="email" value={user.email || ""} readOnly />
+            <Input id="email" type="email" value={userProfile?.authEmail || ""} readOnly />
           </div>
           <div className="grid gap-2">
-            <Label htmlFor="authName">認証プロバイダ名</Label>
+            <Label htmlFor="authName">認証名</Label>
             <Input
               id="authName"
               type="text"
@@ -321,15 +330,25 @@ export default function ProfilePage() {
                 <Input
                   id="creatorNameBg"
                   type="color"
-                  value={formData.settings?.logDisplayColors?.creatorNameBg || "#e5e7eb"}
-                  onChange={(e) => handleChangeColor("creatorName", "Bg", e.target.value)}
+                  value={
+                    formData.settings?.logDisplayColors?.creatorNameBg ||
+                    "#e5e7eb"
+                  }
+                  onChange={(e) =>
+                    handleChangeColor("creatorName", "Bg", e.target.value)
+                  }
                   className="w-1/2"
                   disabled={!formData.settings?.logDisplayColors?.enabled}
                 />
                 <Input
                   type="text"
-                  value={formData.settings?.logDisplayColors?.creatorNameBg || "#e5e7eb"}
-                  onChange={(e) => handleChangeColor("creatorName", "Bg", e.target.value)}
+                  value={
+                    formData.settings?.logDisplayColors?.creatorNameBg ||
+                    "#e5e7eb"
+                  }
+                  onChange={(e) =>
+                    handleChangeColor("creatorName", "Bg", e.target.value)
+                  }
                   placeholder="#RRGGBB"
                   className="w-1/2"
                   disabled={!formData.settings?.logDisplayColors?.enabled}
@@ -342,15 +361,25 @@ export default function ProfilePage() {
                 <Input
                   id="creatorNameText"
                   type="color"
-                  value={formData.settings?.logDisplayColors?.creatorNameText || "#6b7280"}
-                  onChange={(e) => handleChangeColor("creatorName", "Text", e.target.value)}
+                  value={
+                    formData.settings?.logDisplayColors?.creatorNameText ||
+                    "#6b7280"
+                  }
+                  onChange={(e) =>
+                    handleChangeColor("creatorName", "Text", e.target.value)
+                  }
                   className="w-1/2"
                   disabled={!formData.settings?.logDisplayColors?.enabled}
                 />
                 <Input
                   type="text"
-                  value={formData.settings?.logDisplayColors?.creatorNameText || "#6b7280"}
-                  onChange={(e) => handleChangeColor("creatorName", "Text", e.target.value)}
+                  value={
+                    formData.settings?.logDisplayColors?.creatorNameText ||
+                    "#6b7280"
+                  }
+                  onChange={(e) =>
+                    handleChangeColor("creatorName", "Text", e.target.value)
+                  }
                   placeholder="#RRGGBB"
                   className="w-1/2"
                   disabled={!formData.settings?.logDisplayColors?.enabled}
@@ -363,15 +392,23 @@ export default function ProfilePage() {
                 <Input
                   id="timeBg"
                   type="color"
-                  value={formData.settings?.logDisplayColors?.timeBg || "#e5e7eb"}
-                  onChange={(e) => handleChangeColor("time", "Bg", e.target.value)}
+                  value={
+                    formData.settings?.logDisplayColors?.timeBg || "#e5e7eb"
+                  }
+                  onChange={(e) =>
+                    handleChangeColor("time", "Bg", e.target.value)
+                  }
                   className="w-1/2"
                   disabled={!formData.settings?.logDisplayColors?.enabled}
                 />
                 <Input
                   type="text"
-                  value={formData.settings?.logDisplayColors?.timeBg || "#e5e7eb"}
-                  onChange={(e) => handleChangeColor("time", "Bg", e.target.value)}
+                  value={
+                    formData.settings?.logDisplayColors?.timeBg || "#e5e7eb"
+                  }
+                  onChange={(e) =>
+                    handleChangeColor("time", "Bg", e.target.value)
+                  }
                   placeholder="#RRGGBB"
                   className="w-1/2"
                   disabled={!formData.settings?.logDisplayColors?.enabled}
@@ -384,15 +421,23 @@ export default function ProfilePage() {
                 <Input
                   id="timeText"
                   type="color"
-                  value={formData.settings?.logDisplayColors?.timeText || "#4b5563"}
-                  onChange={(e) => handleChangeColor("time", "Text", e.target.value)}
+                  value={
+                    formData.settings?.logDisplayColors?.timeText || "#4b5563"
+                  }
+                  onChange={(e) =>
+                    handleChangeColor("time", "Text", e.target.value)
+                  }
                   className="w-1/2"
                   disabled={!formData.settings?.logDisplayColors?.enabled}
                 />
                 <Input
                   type="text"
-                  value={formData.settings?.logDisplayColors?.timeText || "#4b5563"}
-                  onChange={(e) => handleChangeColor("time", "Text", e.target.value)}
+                  value={
+                    formData.settings?.logDisplayColors?.timeText || "#4b5563"
+                  }
+                  onChange={(e) =>
+                    handleChangeColor("time", "Text", e.target.value)
+                  }
                   placeholder="#RRGGBB"
                   className="w-1/2"
                   disabled={!formData.settings?.logDisplayColors?.enabled}
@@ -406,15 +451,25 @@ export default function ProfilePage() {
                 <Input
                   id="deletedTaskBg"
                   type="color"
-                  value={formData.settings?.logDisplayColors?.deletedTaskBg || "#e5e7eb"}
-                  onChange={(e) => handleChangeColor("deletedTask", "Bg", e.target.value)}
+                  value={
+                    formData.settings?.logDisplayColors?.deletedTaskBg ||
+                    "#e5e7eb"
+                  }
+                  onChange={(e) =>
+                    handleChangeColor("deletedTask", "Bg", e.target.value)
+                  }
                   className="w-1/2"
                   disabled={!formData.settings?.logDisplayColors?.enabled}
                 />
                 <Input
                   type="text"
-                  value={formData.settings?.logDisplayColors?.deletedTaskBg || "#e5e7eb"}
-                  onChange={(e) => handleChangeColor("deletedTask", "Bg", e.target.value)}
+                  value={
+                    formData.settings?.logDisplayColors?.deletedTaskBg ||
+                    "#e5e7eb"
+                  }
+                  onChange={(e) =>
+                    handleChangeColor("deletedTask", "Bg", e.target.value)
+                  }
                   placeholder="#RRGGBB"
                   className="w-1/2"
                   disabled={!formData.settings?.logDisplayColors?.enabled}
@@ -427,15 +482,25 @@ export default function ProfilePage() {
                 <Input
                   id="deletedTaskText"
                   type="color"
-                  value={formData.settings?.logDisplayColors?.deletedTaskText || "#9ca3af"}
-                  onChange={(e) => handleChangeColor("deletedTask", "Text", e.target.value)}
+                  value={
+                    formData.settings?.logDisplayColors?.deletedTaskText ||
+                    "#9ca3af"
+                  }
+                  onChange={(e) =>
+                    handleChangeColor("deletedTask", "Text", e.target.value)
+                  }
                   className="w-1/2"
                   disabled={!formData.settings?.logDisplayColors?.enabled}
                 />
                 <Input
                   type="text"
-                  value={formData.settings?.logDisplayColors?.deletedTaskText || "#9ca3af"}
-                  onChange={(e) => handleChangeColor("deletedTask", "Text", e.target.value)}
+                  value={
+                    formData.settings?.logDisplayColors?.deletedTaskText ||
+                    "#9ca3af"
+                  }
+                  onChange={(e) =>
+                    handleChangeColor("deletedTask", "Text", e.target.value)
+                  }
                   placeholder="#RRGGBB"
                   className="w-1/2"
                   disabled={!formData.settings?.logDisplayColors?.enabled}
@@ -449,7 +514,9 @@ export default function ProfilePage() {
             <div className="grid gap-2">
               <Label htmlFor="toastPosition">表示位置</Label>
               <Select
-                onValueChange={(value) => handleSelectChange("settings.toastPosition", value)}
+                onValueChange={(value) =>
+                  handleSelectChange("settings.toastPosition", value)
+                }
                 value={formData.settings?.toastPosition || "bottom-right"}
               >
                 <SelectTrigger>
@@ -477,13 +544,15 @@ export default function ProfilePage() {
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 更新中...
-              </> 
+              </>
             ) : (
               "プロフィールを更新"
             )}
           </Button>
         </CardFooter>
-        <CardFooter className="mt-4"> {/* Added mt-4 for extra spacing */}
+        <CardFooter className="mt-4">
+          {" "}
+          {/* Added mt-4 for extra spacing */}
           <Button
             className="w-full" // Removed mt-2 as CardFooter itself provides spacing
             variant="destructive"
