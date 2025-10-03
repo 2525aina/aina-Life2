@@ -21,8 +21,16 @@ export function DatePicker({ date, setDate }: DatePickerProps) {
   const handleSelect = (selectedDate: Date | undefined) => {
     if (selectedDate) {
       setDate(selectedDate);
-      setIsOpen(false);
     }
+  };
+
+  const handleReset = () => {
+    setDate(new Date());
+    setIsOpen(false);
+  };
+
+  const handleOk = () => {
+    setIsOpen(false);
   };
 
   return (
@@ -47,6 +55,10 @@ export function DatePicker({ date, setDate }: DatePickerProps) {
           onSelect={handleSelect}
           initialFocus
         />
+        <div className="flex justify-end gap-2 p-4 border-t">
+          <Button variant="outline" onClick={handleReset}>リセット</Button>
+          <Button onClick={handleOk}>OK</Button>
+        </div>
       </PopoverContent>
     </Popover>
   );
