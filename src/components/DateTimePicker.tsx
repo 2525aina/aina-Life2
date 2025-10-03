@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { format } from 'date-fns';
 import { Calendar as CalendarIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -23,6 +23,10 @@ interface DateTimePickerProps {
 export function DateTimePicker({ date, setDate, onOpenChange, isManuallySet, setIsManuallySet }: DateTimePickerProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [time, setTime] = useState(format(date, 'HH:mm:ss'));
+
+  useEffect(() => {
+    setTime(format(date, 'HH:mm:ss'));
+  }, [date]);
 
   const handleOpenChange = (open: boolean) => {
     setIsOpen(open);

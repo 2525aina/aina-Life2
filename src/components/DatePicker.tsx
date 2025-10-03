@@ -36,7 +36,7 @@ export function DatePicker({ date, setDate }: DatePickerProps) {
           )}
         >
           <CalendarIcon className="mr-2 h-4 w-4" />
-          {format(date, "yyyy年MM月dd日 (eee)", { locale: ja })}
+          {format(date, "MM/dd(eee)", { locale: ja })}
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-auto p-0">
