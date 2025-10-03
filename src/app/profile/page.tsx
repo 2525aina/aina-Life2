@@ -397,16 +397,13 @@ export default function ProfilePage() {
                       <thead className="bg-muted/50">
                         <tr>
                           <th className="px-2 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                            項目
+                            表示
                           </th>
                           <th className="px-2 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                             背景色
                           </th>
                           <th className="px-2 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                             文字色
-                          </th>
-                          <th className="px-2 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                            表示
                           </th>
                         </tr>
                       </thead>
@@ -445,65 +442,6 @@ export default function ProfilePage() {
                           },
                         ].map((item) => (
                           <tr key={item.id}>
-                            <td className="px-2 py-4 whitespace-nowrap text-sm font-medium">
-                              {item.label}
-                            </td>
-                            <td className="px-2 py-4 whitespace-nowrap">
-                              <div className="flex items-center gap-2">
-                                <Input
-                                  type="color"
-                                  value={item.bg || item.defaultBg}
-                                  onChange={(e) =>
-                                    handleChangeColor(
-                                      item.id,
-                                      "Bg",
-                                      e.target.value
-                                    )
-                                  }
-                                  className="w-10 h-8 p-1 shrink-0"
-                                />
-                                <Input
-                                  value={item.bg || item.defaultBg}
-                                  onChange={(e) =>
-                                    handleChangeColor(
-                                      item.id,
-                                      "Bg",
-                                      e.target.value
-                                    )
-                                  }
-                                  className="h-8 w-24"
-                                  placeholder="#RRGGBB"
-                                />
-                              </div>
-                            </td>
-                            <td className="px-2 py-4 whitespace-nowrap">
-                              <div className="flex items-center gap-2">
-                                <Input
-                                  type="color"
-                                  value={item.text || item.defaultText}
-                                  onChange={(e) =>
-                                    handleChangeColor(
-                                      item.id,
-                                      "Text",
-                                      e.target.value
-                                    )
-                                  }
-                                  className="w-10 h-8 p-1 shrink-0"
-                                />
-                                <Input
-                                  value={item.text || item.defaultText}
-                                  onChange={(e) =>
-                                    handleChangeColor(
-                                      item.id,
-                                      "Text",
-                                      e.target.value
-                                    )
-                                  }
-                                  className="h-8 w-24"
-                                  placeholder="#RRGGBB"
-                                />
-                              </div>
-                            </td>
                             <td className="px-2 py-4 whitespace-nowrap">
                               <div className="flex items-center justify-center">
                                 <span
@@ -515,6 +453,62 @@ export default function ProfilePage() {
                                 >
                                   {item.previewText}
                                 </span>
+                              </div>
+                            </td>
+                            <td className="px-2 py-4 whitespace-nowrap">
+                              <div className="flex items-center gap-2">
+                                <Input
+                                  type="color"
+                                  value={item.bg || item.defaultBg}
+                                  onChange={(e) =>
+                                    handleChangeColor(
+                                      item.id,
+                                      "Bg",
+                                      e.target.value
+                                    )
+                                  }
+                                  className="w-10 h-8 p-1 shrink-0"
+                                />
+                                <Input
+                                  value={item.bg || item.defaultBg}
+                                  onChange={(e) =>
+                                    handleChangeColor(
+                                      item.id,
+                                      "Bg",
+                                      e.target.value
+                                    )
+                                  }
+                                  className="h-8 w-24"
+                                  placeholder="#RRGGBB"
+                                />
+                              </div>
+                            </td>
+                            <td className="px-2 py-4 whitespace-nowrap">
+                              <div className="flex items-center gap-2">
+                                <Input
+                                  type="color"
+                                  value={item.text || item.defaultText}
+                                  onChange={(e) =>
+                                    handleChangeColor(
+                                      item.id,
+                                      "Text",
+                                      e.target.value
+                                    )
+                                  }
+                                  className="w-10 h-8 p-1 shrink-0"
+                                />
+                                <Input
+                                  value={item.text || item.defaultText}
+                                  onChange={(e) =>
+                                    handleChangeColor(
+                                      item.id,
+                                      "Text",
+                                      e.target.value
+                                    )
+                                  }
+                                  className="h-8 w-24"
+                                  placeholder="#RRGGBB"
+                                />
                               </div>
                             </td>
                           </tr>
