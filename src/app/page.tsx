@@ -4,14 +4,16 @@ import { useAuth } from '@/contexts/AuthContext';
 import { TaskSelector } from '@/components/TaskSelector';
 import { LogTimeline } from '@/components/LogTimeline';
 import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Loader2 } from 'lucide-react';
 import { useUserProfile } from '@/hooks/useUserProfile';
+import { DateNavigator } from '@/components/DateNavigator';
 
 export default function Home() {
   const { user, loading: authLoading } = useAuth();
   const { userProfile, loading: profileLoading } = useUserProfile(user?.uid || null);
   const router = useRouter();
+  const [currentDate, setCurrentDate] = useState(new Date());
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -41,8 +43,9 @@ export default function Home() {
             <div className="md:col-span-1 space-y-4">
               <TaskSelector />
             </div>
-            <div className="md:col-span-2">
-              <LogTimeline timeFormat={userProfile?.settings?.timeFormat} />
+            <div className="md:col-span-2 space-y-4">
+              <DateNavigator onDateChange={setCurrentDate} />
+              <LogTimeline targetDate={currentDate} timeFormat={userProfile?.settings?.timeFormat} />
             </div>
           </div>
         </div>

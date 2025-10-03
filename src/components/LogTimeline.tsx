@@ -4,32 +4,27 @@ import { useState } from "react";
 import { usePetSelection } from "@/contexts/PetSelectionContext";
 import { useLogs, Log, useLogActions } from "@/hooks/useLogs";
 import { Button } from "@/components/ui/button";
-import { format, addDays, subDays } from "date-fns";
+import { format } from "date-fns";
 import { ja } from "date-fns/locale";
 import {
-  CalendarIcon,
   ClipboardListIcon,
   PawPrintIcon,
   PencilIcon,
   Trash2Icon,
 } from "lucide-react";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { Calendar } from "@/components/ui/calendar";
+
+
 import { cn } from "@/lib/utils";
 import { LogFormModal } from "@/components/LogFormModal";
 
 interface LogTimelineProps {
+  targetDate: Date;
   timeFormat?: 'HH:mm:ss' | 'H:m:s' | 'HH:mm' | 'H:m';
 }
 
-export function LogTimeline({ timeFormat = "HH:mm:ss" }: LogTimelineProps) {
+export function LogTimeline({ targetDate, timeFormat = "HH:mm:ss" }: LogTimelineProps) {
   const { selectedPet } = usePetSelection();
-  const [currentDate, setCurrentDate] = useState(new Date());
-  const { logs } = useLogs(currentDate);
+  const { logs } = useLogs(targetDate);
   const { deleteLog } = useLogActions();
   const [isLogFormOpen, setIsLogFormOpen] = useState(false);
   const [logToEdit, setLogToEdit] = useState<Log | null>(null);
@@ -62,50 +57,6 @@ export function LogTimeline({ timeFormat = "HH:mm:ss" }: LogTimelineProps) {
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-wrap items-center justify-center gap-2 mb-4">
-        {" "}
-        {/* Added flex-wrap, changed justify-between to justify-center, added gap-2 */}
-        <Button
-          variant="outline"
-          onClick={() => setCurrentDate(subDays(currentDate, 1))}
-        >
-          前日
-        </Button>
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button
-              variant={"outline"}
-              className={cn(
-                "flex-1 sm:w-[240px] justify-start text-left font-normal",
-                !currentDate && "text-muted-foreground"
-              )}
-            >
-              <CalendarIcon className="mr-2 h-4 w-4" />
-              {currentDate ? (
-                format(currentDate, "yyyy年MM月dd日 (eee)", { locale: ja })
-              ) : (
-                <span>日付を選択</span>
-              )}
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-auto p-0" align="start">
-            <Calendar
-              mode="single"
-              selected={currentDate}
-              onSelect={(date) => date && setCurrentDate(date)}
-              initialFocus
-              locale={ja}
-            />
-          </PopoverContent>
-        </Popover>
-        <Button
-          variant="outline"
-          onClick={() => setCurrentDate(addDays(currentDate, 1))}
-        >
-          翌日
-        </Button>
-      </div>
-
       <div className="flex justify-end mb-4">
         <Button onClick={handleAddLog}>手動でログを追加</Button>
       </div>
@@ -210,7 +161,7 @@ export function LogTimeline({ timeFormat = "HH:mm:ss" }: LogTimelineProps) {
           isOpen={isLogFormOpen}
           onClose={() => setIsLogFormOpen(false)}
           logToEdit={logToEdit}
-          initialDate={currentDate}
+          initialDate={targetDate}
         />
       )}
     </div>

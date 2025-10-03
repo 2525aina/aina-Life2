@@ -12,12 +12,18 @@ export const useTaskLoggerSettings = () => {
   const updateSettings = useCallback(async (newSettings: Partial<typeof settings>) => {
     if (!userProfile) return;
 
+    const currentTaskLoggerSettings = userProfile.settings?.taskLogger || {
+      showDateTime: true,
+      showMemo: true,
+      initialDateTimeOpen: true,
+      initialMemoOpen: true,
+    };
+
     await updateUserProfile({
-      ...userProfile,
       settings: {
         ...userProfile.settings,
         taskLogger: {
-          ...userProfile.settings.taskLogger,
+          ...currentTaskLoggerSettings,
           ...newSettings,
         },
       },
