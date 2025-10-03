@@ -393,16 +393,16 @@ export default function ProfilePage() {
                   }`}
                 >
                   <div className="overflow-x-auto">
-                    <table className="min-w-full divide-y divide-gray-200">
+                    <table className="min-w-full table-fixed divide-y divide-gray-200">
                       <thead className="bg-muted/50">
                         <tr>
-                          <th className="px-2 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                          <th className="w-[33.333333%] px-2 py-3 text-center text-xs font-medium text-muted-foreground uppercase tracking-wider">
                             表示
                           </th>
-                          <th className="px-2 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                          <th className="w-[33.333333%] px-2 py-3 text-center text-xs font-medium text-muted-foreground uppercase tracking-wider">
                             背景色
                           </th>
-                          <th className="px-2 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                          <th className="w-[33.333333%] px-2 py-3 text-center text-xs font-medium text-muted-foreground uppercase tracking-wider">
                             文字色
                           </th>
                         </tr>
@@ -423,7 +423,7 @@ export default function ProfilePage() {
                           {
                             id: "time" as const,
                             label: "時刻",
-                            previewText: "14:05:09",
+                            previewText: "14:05",
                             bg: formData.settings?.logDisplayColors?.timeBg,
                             text: formData.settings?.logDisplayColors?.timeText,
                             defaultBg: "#e5e7eb",
@@ -431,8 +431,8 @@ export default function ProfilePage() {
                           },
                           {
                             id: "deletedTask" as const,
-                            label: "削除ログ",
-                            previewText: "削除",
+                            label: "削除済ログ",
+                            previewText: "削除済",
                             bg: formData.settings?.logDisplayColors
                               ?.deletedTaskBg,
                             text: formData.settings?.logDisplayColors
