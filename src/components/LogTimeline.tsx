@@ -22,7 +22,11 @@ import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
 import { LogFormModal } from "@/components/LogFormModal";
 
-export function LogTimeline() {
+interface LogTimelineProps {
+  timeFormat?: 'HH:mm:ss' | 'H:m:s' | 'HH:mm' | 'H:m';
+}
+
+export function LogTimeline({ timeFormat = "HH:mm:ss" }: LogTimelineProps) {
   const { selectedPet } = usePetSelection();
   const [currentDate, setCurrentDate] = useState(new Date());
   const { logs } = useLogs(currentDate);
@@ -159,7 +163,7 @@ export function LogTimeline() {
                     color: log.timeTextColor,
                   }}
                 >
-                  {format(log.timestamp.toDate(), "HH:mm:ss", { locale: ja })}
+                  {format(log.timestamp.toDate(), timeFormat, { locale: ja })}
                 </span>{" "}
               </div>
               <span

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { doc, getDoc, setDoc, updateDoc, serverTimestamp, Timestamp, onSnapshot } from 'firebase/firestore';
+import { doc, setDoc, updateDoc, serverTimestamp, Timestamp, onSnapshot } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { useAuth } from '@/contexts/AuthContext';
 import type { UserInfo } from "firebase/auth";
@@ -25,6 +25,7 @@ export interface UserProfile {
           dailySummary: boolean;
         };
         theme: 'system' | 'light' | 'dark';
+        timeFormat?: 'HH:mm:ss' | 'H:m:s' | 'HH:mm' | 'H:m';
         toastPosition?: 'top-left' | 'top-center' | 'top-right' | 'bottom-left' | 'bottom-center' | 'bottom-right';
         logDisplayColors?: {
           enabled?: boolean;
@@ -49,13 +50,11 @@ export const useUser = () => {
       return;
     }
 
-    const fetchAndSyncProfile = async () => {
-      setLoading(true);
-      const userDocRef = doc(db, 'users', user.uid);
+    setLoading(true);
+    const userDocRef = doc(db, 'users', user.uid);
 
+    const unsubscribe = onSnapshot(userDocRef, async (docSnap) => {
       try {
-        let docSnap = await getDoc(userDocRef);
-
         const getProviderName = (providerId: string) => {
           if (providerId === 'google.com') return 'Google認証';
           if (providerId === 'password') return 'メール認証';
@@ -96,7 +95,8 @@ export const useUser = () => {
 
           if (Object.keys(updatedData).length > 0) {
             await updateDoc(userDocRef, { ...updatedData, updatedAt: serverTimestamp() });
-            docSnap = await getDoc(userDocRef);
+          } else {
+            setUserProfile({ uid: user.uid, ...existingProfile });
           }
         } else {
           let authProviderName: string | null;
@@ -122,8 +122,7 @@ export const useUser = () => {
               }
           }
 
-          const newProfile: UserProfile = {
-            uid: user.uid,
+          const newProfile: Omit<UserProfile, 'uid'> = {
             authEmail: authEmail,
             authName: authName,
             authProvider: authProviderName,
@@ -132,25 +131,31 @@ export const useUser = () => {
             settings: {
               notifications: { dailySummary: false },
               theme: 'system',
+              timeFormat: 'HH:mm:ss',
             },
           };
           await setDoc(userDocRef, newProfile);
-          docSnap = await getDoc(userDocRef);
         }
 
+        // After potential update or set, the snapshot will trigger again with the latest data.
+        // We can just set the profile from the latest snapshot.
         if (docSnap.exists()) {
-          setUserProfile({ uid: user.uid, ...(docSnap.data() as Omit<UserProfile, 'uid'>) });
+            setUserProfile({ uid: docSnap.id, ...(docSnap.data() as Omit<UserProfile, 'uid'>) });
         }
 
       } catch (error) {
-        console.error("Error fetching or syncing user profile:", error);
+        console.error("Error in user profile snapshot listener:", error);
         setUserProfile(null);
       } finally {
         setLoading(false);
       }
-    };
+    }, (error) => {
+        console.error("Error fetching user profile snapshot:", error);
+        setUserProfile(null);
+        setLoading(false);
+    });
 
-    fetchAndSyncProfile();
+    return () => unsubscribe();
   }, [user]);
 
   const updateUserProfile = useCallback(async (data: Partial<Omit<UserProfile, 'uid' | 'createdAt' | 'authEmail'>>) => {

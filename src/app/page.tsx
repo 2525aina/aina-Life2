@@ -6,16 +6,20 @@ import { LogTimeline } from '@/components/LogTimeline';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import { Loader2 } from 'lucide-react';
+import { useUserProfile } from '@/hooks/useUserProfile';
 
 export default function Home() {
-  const { user, loading } = useAuth();
+  const { user, loading: authLoading } = useAuth();
+  const { userProfile, loading: profileLoading } = useUserProfile(user?.uid || null);
   const router = useRouter();
 
   useEffect(() => {
-    if (!loading && !user) {
+    if (!authLoading && !user) {
       router.push('/login');
     }
-  }, [loading, user, router]);
+  }, [authLoading, user, router]);
+
+  const loading = authLoading || profileLoading;
 
   if (loading) {
     return (
@@ -38,7 +42,7 @@ export default function Home() {
               <TaskSelector />
             </div>
             <div className="md:col-span-2">
-              <LogTimeline />
+              <LogTimeline timeFormat={userProfile?.settings?.timeFormat} />
             </div>
           </div>
         </div>
