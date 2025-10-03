@@ -11,6 +11,18 @@ export const metadata: Metadata = {
   description: "ペットやお子様の食事や体調など、日々の記録を簡単管理。家族やパートナーと情報を共有し、健康管理をもっとスマートに。aina-Lifeで、大切な家族の成長を見守りましょう。",
   manifest: "/manifest.json",
   themeColor: "#000000",
+  robots: {
+    index: false,
+    follow: false,
+    nocache: true,
+    googleBot: {
+      index: false,
+      follow: false,
+      noimageindex: true,
+      'max-video-preview': -1,
+      'max-snippet': -1,
+    },
+  },
   icons: {
     icon: "/icon-512x512.png",
     apple: "/icon-512x512.png",
