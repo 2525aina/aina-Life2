@@ -96,6 +96,7 @@ export function AccountLinker() {
     try {
       await linkWithPopup(auth.currentUser, provider);
       toast.success("Googleアカウントを連携しました！");
+      router.push("/profile");
       router.refresh();
     } catch (err) {
       const isFirebaseError =
