@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { PetSelectionProvider } from "@/contexts/PetSelectionContext";
 import { AuthProvider } from "@/contexts/AuthContext";
@@ -10,7 +10,6 @@ export const metadata: Metadata = {
   title: "aina-Life | 大切な家族との毎日を、もっと豊かに🐾",
   description: "ペットやお子様の食事や体調など、日々の記録を簡単管理。家族やパートナーと情報を共有し、健康管理をもっとスマートに。aina-Lifeで、大切な家族の成長を見守りましょう。",
   manifest: "/manifest.json",
-  themeColor: "#000000",
   robots: {
     index: false,
     follow: false,
@@ -48,6 +47,10 @@ export const metadata: Metadata = {
     description: "ペットやお子様の食事や体調など、日々の記録を簡単管理。家族やパートナーと情報を共有し、健康管理をもっとスマートに。aina-Lifeで、大切な家族の成長を見守りましょう。",
     images: ["https://aina-life-dev.web.app/huku.png"],
   },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#000000",
 };
 
 export default function RootLayout({

@@ -32,7 +32,7 @@ export default function InvitationsPage() {
     try {
       await updateInvitationStatus(petId, memberId, status);
       toast.success(status === 'active' ? '招待を承諾しました。' : '招待を拒否しました。');
-    } catch (error: unknown) {
+    } catch {
       // エラーはフック内でトースト表示される
     }
   };

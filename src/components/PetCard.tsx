@@ -168,7 +168,7 @@ export function PetCard({
       await inviteMember(pet.id, inviteEmail);
       toast.success(`${inviteEmail} を招待しました！`);
       setInviteEmail("");
-    } catch (error) {
+    } catch {
       // エラーはフック内でトースト表示される
     }
   };
@@ -177,7 +177,7 @@ export function PetCard({
     try {
       await removeMember(pet.id, memberId);
       toast.success("メンバーを削除しました。");
-    } catch (error) {
+    } catch {
       // エラーはフック内でトースト表示される
     }
   };
