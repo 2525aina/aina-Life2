@@ -17,7 +17,7 @@ import { usePetSelection } from "@/contexts/PetSelectionContext";
 export default function PetsPage() {
   const { user, loading: authLoading } = useAuth();
   const { pets, loading: petsLoading, deletePet } = usePets();
-  const { selectedPetId } = usePetSelection();
+  const {  } = usePetSelection();
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [petToEdit, setPetToEdit] = useState<Pet | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
