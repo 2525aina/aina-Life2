@@ -36,6 +36,12 @@ export interface UserProfile {
           deletedTaskBg?: string;
           deletedTaskText?: string;
         };
+        taskLogger?: {
+          showDateTime: boolean;
+          showMemo: boolean;
+          initialDateTimeOpen: boolean;
+          initialMemoOpen: boolean;
+        };
       };}
 
 export const useUser = () => {
@@ -132,6 +138,12 @@ export const useUser = () => {
               notifications: { dailySummary: false },
               theme: 'system',
               timeFormat: 'HH:mm:ss',
+              taskLogger: {
+                showDateTime: true,
+                showMemo: true,
+                initialDateTimeOpen: true,
+                initialMemoOpen: true,
+              },
             },
           };
           await setDoc(userDocRef, newProfile);

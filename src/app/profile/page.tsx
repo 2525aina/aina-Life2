@@ -31,6 +31,7 @@ import {
 import { toast } from "sonner";
 import { Textarea } from "@/components/ui/textarea";
 import { AccountLinker } from "@/components/ui/AccountLinker";
+import { TaskLoggerSettings } from "@/components/TaskLoggerSettings";
 
 export default function ProfilePage() {
   const { user, loading: authLoading } = useAuth();
@@ -582,6 +583,10 @@ export default function ProfilePage() {
                   </SelectContent>
                 </Select>
               </div>
+
+              <Separator />
+
+              <TaskLoggerSettings />
             </CardContent>
           </Card>
         </TabsContent>

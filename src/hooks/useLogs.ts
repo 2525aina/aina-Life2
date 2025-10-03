@@ -51,15 +51,15 @@ export const useLogActions = () => {
   const { user } = useAuth();
   const { selectedPet } = usePetSelection();
 
-  const addLog = useCallback(async (task: Task, timestamp?: Date, note?: string) => {
+  const addLog = useCallback(async (task: Task, timestamp: Date, memo?: string) => {
     if (!user || !selectedPet) throw new Error('ユーザーまたはペットが選択されていません。');
     
     const logData = {
       petId: selectedPet.id,
       taskId: task.id,
       taskName: task.name,
-      timestamp: timestamp ? Timestamp.fromDate(timestamp) : serverTimestamp(),
-      note: note || '',
+      timestamp: Timestamp.fromDate(timestamp),
+      note: memo || '',
       createdBy: user.uid,
       updatedBy: user.uid,
       createdAt: serverTimestamp(),

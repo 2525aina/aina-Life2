@@ -7,23 +7,51 @@ import { toast } from "sonner";
 import Link from "next/link";
 import { ClipboardListIcon } from "lucide-react";
 import { usePetSelection } from "@/contexts/PetSelectionContext";
+import { useState, useEffect } from "react";
+import { DateTimePicker } from "./DateTimePicker";
+import { MemoInput } from "./MemoInput";
+import { CollapsibleSection } from "./CollapsibleSection";
+
+import { useTaskLoggerSettings } from "@/hooks/useTaskLoggerSettings";
 
 export function TaskSelector() {
   const { selectedPet } = usePetSelection();
   const { tasks, loading: tasksLoading } = useTasks(selectedPet?.id || "");
   const { addLog } = useLogActions();
+  const { settings, loading: settingsLoading } = useTaskLoggerSettings();
+  const [memo, setMemo] = useState("");
+  const [dateTime, setDateTime] = useState(new Date());
+  const [isDateTimePickerOpen, setIsDateTimePickerOpen] = useState(false);
+  const [isManuallySet, setIsManuallySet] = useState(false);
+
+  useEffect(() => {
+    if (isDateTimePickerOpen || isManuallySet) return;
+    const timer = setInterval(() => {
+      setDateTime(new Date());
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [isDateTimePickerOpen, isManuallySet]);
+
+
+  const handleReset = () => {
+    setDateTime(new Date());
+    setIsManuallySet(false);
+  };
 
   const handleTaskClick = async (task: (typeof tasks)[0]) => {
     try {
-      await addLog(task, new Date());
+      await addLog(task, dateTime, memo);
       toast.success(`ログを記録しました: ${task.name}`);
+      setMemo("");
+      setIsManuallySet(false);
+      setDateTime(new Date());
     } catch (error) {
       console.error("ログの記録に失敗しました", error);
       toast.error("ログの記録に失敗しました。");
     }
   };
 
-  if (tasksLoading) {
+  if (tasksLoading || settingsLoading) {
     return <p>タスクをロード中...</p>;
   }
 
@@ -42,17 +70,38 @@ export function TaskSelector() {
   }
 
   return (
-    <div className="flex flex-wrap gap-2">
-      {tasks.map((task) => (
-        <Button
-          key={task.id}
-          style={{ backgroundColor: task.color, color: task.textColor }}
-          onClick={() => handleTaskClick(task)}
-          className="max-w-[calc(100%-0.5rem)] truncate"
-        >
-          {task.name}
-        </Button>
-      ))}
+    <div>
+      {settings?.showDateTime && (
+        <CollapsibleSection title="日時" initialOpen={settings.initialDateTimeOpen}>
+          <div className="flex items-center gap-2">
+            <DateTimePicker 
+              date={dateTime} 
+              setDate={setDateTime} 
+              onOpenChange={setIsDateTimePickerOpen}
+              isManuallySet={isManuallySet}
+              setIsManuallySet={setIsManuallySet}
+            />
+            <Button variant="outline" onClick={handleReset}>リセット</Button>
+          </div>
+        </CollapsibleSection>
+      )}
+      {settings?.showMemo && (
+        <CollapsibleSection title="メモ" initialOpen={settings.initialMemoOpen}>
+          <MemoInput memo={memo} setMemo={setMemo} />
+        </CollapsibleSection>
+      )}
+      <div className="flex flex-wrap gap-2 mt-4">
+        {tasks.map((task) => (
+          <Button
+            key={task.id}
+            style={{ backgroundColor: task.color, color: task.textColor }}
+            onClick={() => handleTaskClick(task)}
+            className="max-w-[calc(100%-0.5rem)] truncate"
+          >
+            {task.name}
+          </Button>
+        ))}
+      </div>
     </div>
   );
 }
