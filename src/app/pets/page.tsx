@@ -17,12 +17,11 @@ import { usePetSelection } from "@/contexts/PetSelectionContext";
 export default function PetsPage() {
   const { user, loading: authLoading } = useAuth();
   const { pets, loading: petsLoading, deletePet } = usePets();
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { selectedPetId } = usePetSelection(); // selectedPetIdを取得
+  const { selectedPetId } = usePetSelection();
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [petToEdit, setPetToEdit] = useState<Pet | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedTab, setSelectedTab] = useState("all"); // 'all', 'male', 'female', 'other'
+  const [selectedTab, setSelectedTab] = useState("all");
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
   const [petToDeleteId, setPetToDeleteId] = useState<string | null>(null);
   const [openWeightFormForPetId, setOpenWeightFormForPetId] = useState<

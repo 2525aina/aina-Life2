@@ -1,16 +1,24 @@
 "use client";
 
-import { createContext, useContext, useState, useEffect, ReactNode } from "react";
-import { usePets, Pet } from "@/hooks/usePets"; // Pet型をインポート
+import {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  ReactNode,
+} from "react";
+import { usePets, Pet } from "@/hooks/usePets";
 import { useUser } from "@/hooks/useUser";
 
 interface PetSelectionContextType {
   selectedPetId: string | null;
   setSelectedPetId: (id: string | null) => void;
-  selectedPet: Pet | null; // selectedPetも提供
+  selectedPet: Pet | null;
 }
 
-const PetSelectionContext = createContext<PetSelectionContextType | undefined>(undefined);
+const PetSelectionContext = createContext<PetSelectionContextType | undefined>(
+  undefined
+);
 
 export const PetSelectionProvider = ({ children }: { children: ReactNode }) => {
   const { pets, loading: loadingPets } = usePets();
@@ -22,7 +30,9 @@ export const PetSelectionProvider = ({ children }: { children: ReactNode }) => {
 
     if (selectedPetId === null && pets.length > 0) {
       if (userProfile?.primaryPetId) {
-        const primaryPet = pets.find(pet => pet.id === userProfile.primaryPetId);
+        const primaryPet = pets.find(
+          (pet) => pet.id === userProfile.primaryPetId
+        );
         if (primaryPet) {
           setSelectedPetId(primaryPet.id);
           return;
@@ -32,10 +42,14 @@ export const PetSelectionProvider = ({ children }: { children: ReactNode }) => {
     }
   }, [pets, selectedPetId, loadingPets, userProfile, loadingUser]);
 
-  const selectedPet = selectedPetId ? pets.find((pet) => pet.id === selectedPetId) || null : null;
+  const selectedPet = selectedPetId
+    ? pets.find((pet) => pet.id === selectedPetId) || null
+    : null;
 
   return (
-    <PetSelectionContext.Provider value={{ selectedPetId, setSelectedPetId, selectedPet }}>
+    <PetSelectionContext.Provider
+      value={{ selectedPetId, setSelectedPetId, selectedPet }}
+    >
       {children}
     </PetSelectionContext.Provider>
   );
@@ -44,7 +58,9 @@ export const PetSelectionProvider = ({ children }: { children: ReactNode }) => {
 export const usePetSelection = () => {
   const context = useContext(PetSelectionContext);
   if (context === undefined) {
-    throw new Error("usePetSelection must be used within a PetSelectionProvider");
+    throw new Error(
+      "usePetSelection must be used within a PetSelectionProvider"
+    );
   }
   return context;
 };

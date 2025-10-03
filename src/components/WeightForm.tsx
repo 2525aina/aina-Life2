@@ -7,29 +7,44 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { Timestamp } from "firebase/firestore";
-import { format, parseISO } from 'date-fns';
+import { format, parseISO } from "date-fns";
 
 interface WeightFormProps {
   dogId: string;
-  initialWeight?: Weight; // 編集用
+  initialWeight?: Weight;
   onSuccess?: () => void;
   onCancel?: () => void;
 }
 
-export function WeightForm({ dogId, initialWeight, onSuccess, onCancel }: WeightFormProps) {
+export function WeightForm({
+  dogId,
+  initialWeight,
+  onSuccess,
+  onCancel,
+}: WeightFormProps) {
   const { addWeight, updateWeight, loading } = useWeights(dogId);
-  const [value, setValue] = useState<number | string>(initialWeight?.value || "");
+  const [value, setValue] = useState<number | string>(
+    initialWeight?.value || ""
+  );
   const [unit, setUnit] = useState<string>(initialWeight?.unit || "kg");
-  const [date, setDate] = useState<string>(initialWeight?.date ? format(initialWeight.date.toDate(), 'yyyy-MM-dd') : format(new Date(), 'yyyy-MM-dd'));
-  const [time, setTime] = useState<string>(initialWeight?.date ? format(initialWeight.date.toDate(), 'HH:mm') : format(new Date(), 'HH:mm'));
+  const [date, setDate] = useState<string>(
+    initialWeight?.date
+      ? format(initialWeight.date.toDate(), "yyyy-MM-dd")
+      : format(new Date(), "yyyy-MM-dd")
+  );
+  const [time, setTime] = useState<string>(
+    initialWeight?.date
+      ? format(initialWeight.date.toDate(), "HH:mm")
+      : format(new Date(), "HH:mm")
+  );
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     if (initialWeight) {
       setValue(initialWeight.value);
       setUnit(initialWeight.unit);
-      setDate(format(initialWeight.date.toDate(), 'yyyy-MM-dd'));
-      setTime(format(initialWeight.date.toDate(), 'HH:mm'));
+      setDate(format(initialWeight.date.toDate(), "yyyy-MM-dd"));
+      setTime(format(initialWeight.date.toDate(), "HH:mm"));
     }
   }, [initialWeight]);
 
@@ -48,7 +63,6 @@ export function WeightForm({ dogId, initialWeight, onSuccess, onCancel }: Weight
       const recordedAtTimestamp = Timestamp.fromDate(recordedAtDate);
 
       if (initialWeight) {
-        // 更新
         await updateWeight(initialWeight.id, {
           value: value,
           unit: unit,
@@ -56,7 +70,6 @@ export function WeightForm({ dogId, initialWeight, onSuccess, onCancel }: Weight
         });
         toast.success("体重記録を更新しました。");
       } else {
-        // 追加
         await addWeight({
           value: value,
           unit: unit,
@@ -66,7 +79,11 @@ export function WeightForm({ dogId, initialWeight, onSuccess, onCancel }: Weight
       }
       onSuccess?.();
     } catch (error: unknown) {
-      toast.error(error instanceof Error ? error.message : "体重記録の保存中にエラーが発生しました。");
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "体重記録の保存中にエラーが発生しました。"
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -121,7 +138,11 @@ export function WeightForm({ dogId, initialWeight, onSuccess, onCancel }: Weight
       </div>
       {/* 体重記録にはnotesフィールドがないため、一旦コメントアウト */}
       <div className="flex justify-end space-x-2">
-        {onCancel && <Button type="button" variant="outline" onClick={onCancel}>キャンセル</Button>}
+        {onCancel && (
+          <Button type="button" variant="outline" onClick={onCancel}>
+            キャンセル
+          </Button>
+        )}
         <Button type="submit" disabled={isSubmitting || loading}>
           {isSubmitting ? "保存中..." : "保存"}
         </Button>

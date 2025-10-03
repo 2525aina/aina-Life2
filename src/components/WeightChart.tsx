@@ -1,10 +1,18 @@
 "use client";
 
 import { useWeights } from "@/hooks/useWeights";
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { format } from 'date-fns';
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
+import { format } from "date-fns";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Loader2 } from 'lucide-react';
+import { Loader2 } from "lucide-react";
 
 interface WeightChartProps {
   dogId: string;
@@ -53,14 +61,13 @@ export function WeightChart({ dogId }: WeightChartProps) {
     );
   }
 
-  // グラフ表示用にデータを整形
   const chartData = weights
-    .map(weight => ({
+    .map((weight) => ({
       date: weight.date.toDate(),
       value: weight.value,
       unit: weight.unit,
     }))
-    .sort((a, b) => a.date.getTime() - b.date.getTime()); // 日付順にソート
+    .sort((a, b) => a.date.getTime() - b.date.getTime());
 
   return (
     <Card className="w-full">
@@ -79,10 +86,29 @@ export function WeightChart({ dogId }: WeightChartProps) {
             }}
           >
             <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="date" tickFormatter={(tick) => format(tick, 'MM/dd')} />
-            <YAxis label={{ value: `体重 (${chartData[0]?.unit || 'kg'})`, angle: -90, position: 'insideLeft' }} />
-            <Tooltip formatter={(value, name, props) => [`${value} ${props.payload.unit}`, format(props.payload.date, 'yyyy/MM/dd HH:mm')]} />
-            <Line type="monotone" dataKey="value" stroke="#8884d8" activeDot={{ r: 8 }} />
+            <XAxis
+              dataKey="date"
+              tickFormatter={(tick) => format(tick, "MM/dd")}
+            />
+            <YAxis
+              label={{
+                value: `体重 (${chartData[0]?.unit || "kg"})`,
+                angle: -90,
+                position: "insideLeft",
+              }}
+            />
+            <Tooltip
+              formatter={(value, name, props) => [
+                `${value} ${props.payload.unit}`,
+                format(props.payload.date, "yyyy/MM/dd HH:mm"),
+              ]}
+            />
+            <Line
+              type="monotone"
+              dataKey="value"
+              stroke="#8884d8"
+              activeDot={{ r: 8 }}
+            />
           </LineChart>
         </ResponsiveContainer>
       </CardContent>

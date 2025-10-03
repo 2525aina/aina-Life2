@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { useTasks, Task } from '@/hooks/useTasks';
-import { Button } from '@/components/ui/button';
+import { useState, useEffect } from "react";
+import { useTasks, Task } from "@/hooks/useTasks";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -10,23 +10,32 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { toast } from 'sonner';
-import { Loader2 } from 'lucide-react';
-import { ConfirmationModal } from '@/components/ConfirmationModal';
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { toast } from "sonner";
+import { Loader2 } from "lucide-react";
+import { ConfirmationModal } from "@/components/ConfirmationModal";
 
 interface TaskFormProps {
   isOpen: boolean;
   onClose: () => void;
   taskToEdit?: Task | null;
-  petId: string; // Add petId prop
+  petId: string;
 }
 
-export function TaskForm({ isOpen, onClose, taskToEdit, petId }: TaskFormProps) {
+export function TaskForm({
+  isOpen,
+  onClose,
+  taskToEdit,
+  petId,
+}: TaskFormProps) {
   const { addTask, updateTask, deleteTask } = useTasks(petId);
-  const [formData, setFormData] = useState({ name: '', color: '#000000', textColor: '#FFFFFF' });
+  const [formData, setFormData] = useState({
+    name: "",
+    color: "#000000",
+    textColor: "#FFFFFF",
+  });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
 
@@ -36,43 +45,45 @@ export function TaskForm({ isOpen, onClose, taskToEdit, petId }: TaskFormProps) 
         setFormData({
           name: taskToEdit.name,
           color: taskToEdit.color,
-          textColor: taskToEdit.textColor || '#FFFFFF',
+          textColor: taskToEdit.textColor || "#FFFFFF",
         });
       } else {
-        setFormData({ name: '', color: '#000000', textColor: '#FFFFFF' });
+        setFormData({ name: "", color: "#000000", textColor: "#FFFFFF" });
       }
     }
   }, [isOpen, taskToEdit]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
+    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
   const handleSubmit = async () => {
     if (!formData.name) {
-      toast.error('タスク名は必須です。');
+      toast.error("タスク名は必須です。");
       return;
     }
     if (formData.name.length > 15) {
-      toast.error('タスク名は15文字以内で入力してください。');
+      toast.error("タスク名は15文字以内で入力してください。");
       return;
     }
     setIsSubmitting(true);
     try {
       if (taskToEdit) {
-        await updateTask(taskToEdit.id, { name: formData.name, color: formData.color, textColor: formData.textColor });
-        toast.success('タスクを更新しました。');
+        await updateTask(taskToEdit.id, {
+          name: formData.name,
+          color: formData.color,
+          textColor: formData.textColor,
+        });
+        toast.success("タスクを更新しました。");
       } else {
-        // The order property needs to be handled properly.
-        // For now, setting a default value.
         const taskData = { ...formData, order: new Date().getTime() };
         await addTask(taskData);
-        toast.success('タスクを追加しました。');
+        toast.success("タスクを追加しました。");
       }
       onClose();
     } catch (error) {
       console.error(error);
-      toast.error('タスクの保存に失敗しました。');
+      toast.error("タスクの保存に失敗しました。");
     } finally {
       setIsSubmitting(false);
     }
@@ -82,36 +93,80 @@ export function TaskForm({ isOpen, onClose, taskToEdit, petId }: TaskFormProps) 
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>{taskToEdit ? 'タスクを編集' : '新しいタスクを追加'}</DialogTitle>
-          <DialogDescription>タスクの詳細を入力してください。</DialogDescription>
+          <DialogTitle>
+            {taskToEdit ? "タスクを編集" : "新しいタスクを追加"}
+          </DialogTitle>
+          <DialogDescription>
+            タスクの詳細を入力してください。
+          </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
           <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="name" className="text-right">タスク名 *</Label>
-            <Input id="name" name="name" value={formData.name} onChange={handleChange} className="col-span-3" />
+            <Label htmlFor="name" className="text-right">
+              タスク名 *
+            </Label>
+            <Input
+              id="name"
+              name="name"
+              value={formData.name}
+              onChange={handleChange}
+              className="col-span-3"
+            />
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="color" className="text-right">背景色</Label>
-            <Input id="color" name="color" type="color" value={formData.color} onChange={handleChange} className="col-span-1" />
-            <Input type="text" value={formData.color} onChange={handleChange} name="color" className="col-span-2" />
+            <Label htmlFor="color" className="text-right">
+              背景色
+            </Label>
+            <Input
+              id="color"
+              name="color"
+              type="color"
+              value={formData.color}
+              onChange={handleChange}
+              className="col-span-1"
+            />
+            <Input
+              type="text"
+              value={formData.color}
+              onChange={handleChange}
+              name="color"
+              className="col-span-2"
+            />
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="textColor" className="text-right">文字色</Label>
-            <Input id="textColor" name="textColor" type="color" value={formData.textColor} onChange={handleChange} className="col-span-1" />
-            <Input type="text" value={formData.textColor} onChange={handleChange} name="textColor" className="col-span-2" />
+            <Label htmlFor="textColor" className="text-right">
+              文字色
+            </Label>
+            <Input
+              id="textColor"
+              name="textColor"
+              type="color"
+              value={formData.textColor}
+              onChange={handleChange}
+              className="col-span-1"
+            />
+            <Input
+              type="text"
+              value={formData.textColor}
+              onChange={handleChange}
+              name="textColor"
+              className="col-span-2"
+            />
           </div>
         </div>
         <DialogFooter>
           {taskToEdit && (
             <Button
               variant="destructive"
-              onClick={() => setIsDeleteConfirmOpen(true)} // Open modal
+              onClick={() => setIsDeleteConfirmOpen(true)}
               disabled={isSubmitting}
             >
               削除
             </Button>
           )}
-          <Button onClick={onClose} variant="outline">キャンセル</Button>
+          <Button onClick={onClose} variant="outline">
+            キャンセル
+          </Button>
           <Button onClick={handleSubmit} disabled={isSubmitting}>
             {isSubmitting ? (
               <>
@@ -119,7 +174,7 @@ export function TaskForm({ isOpen, onClose, taskToEdit, petId }: TaskFormProps) 
                 保存中...
               </>
             ) : (
-              '保存'
+              "保存"
             )}
           </Button>
         </DialogFooter>
@@ -134,8 +189,8 @@ export function TaskForm({ isOpen, onClose, taskToEdit, petId }: TaskFormProps) 
           onConfirm={async () => {
             if (taskToEdit) {
               await deleteTask(taskToEdit.id);
-              toast.success('タスクを削除しました。');
-              onClose(); // Close TaskForm modal after deletion
+              toast.success("タスクを削除しました。");
+              onClose();
             }
             setIsDeleteConfirmOpen(false);
           }}

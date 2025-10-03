@@ -30,7 +30,6 @@ export function LogTimeline() {
   const [isLogFormOpen, setIsLogFormOpen] = useState(false);
   const [logToEdit, setLogToEdit] = useState<Log | null>(null);
 
-  // Define empty message text locally
   const emptyMessageText = "この日の記録はありません。";
 
   const handleAddLog = () => {
@@ -73,7 +72,7 @@ export function LogTimeline() {
             <Button
               variant={"outline"}
               className={cn(
-                "flex-1 sm:w-[240px] justify-start text-left font-normal", // Changed w-full to flex-1
+                "flex-1 sm:w-[240px] justify-start text-left font-normal",
                 !currentDate && "text-muted-foreground"
               )}
             >

@@ -5,7 +5,7 @@ import { useAuth } from '@/contexts/AuthContext';
 
 export interface Weight {
   id: string;
-  dogId: string; // dogs/{dogId}/weights/{weightId} の構造なので、dogIdもドキュメントに含める
+  dogId: string;
   createdBy: string;
   date: Timestamp;
   unit: string;

@@ -1,12 +1,12 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { User as FirebaseAuthUser } from "firebase/auth"; // User型をインポート
+import { User as FirebaseAuthUser } from "firebase/auth";
 import { usePets, Pet, Member } from "@/hooks/usePets";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
-  User as UserIcon, // 名前が重複するためエイリアスを使用
+  User as UserIcon,
   PawPrintIcon,
   Mars,
   Venus,
@@ -57,7 +57,7 @@ import { useUserProfile } from "@/hooks/useUserProfile";
 
 interface PetCardProps {
   pet: Pet;
-  user: FirebaseAuthUser | null; // Firebase User object
+  user: FirebaseAuthUser | null;
   handleEditPet: (pet: Pet) => void;
   handleDeletePet: (petId: string) => void;
   openWeightFormForPetId: string | null;
@@ -85,7 +85,6 @@ function MemberDisplay({
       };
     }
 
-    // Active members
     if (userProfile) {
       const name = userProfile.nickname || "表示名未設定ユーザー";
       const email =
@@ -95,7 +94,6 @@ function MemberDisplay({
         : "";
       return { name: `${name}${provider}`, email };
     } else {
-      // Fallback for active members without userProfile (e.g., guest user)
       return {
         name: "ゲストユーザー",
         email: undefined,
@@ -168,18 +166,14 @@ export function PetCard({
       await inviteMember(pet.id, inviteEmail);
       toast.success(`${inviteEmail} を招待しました！`);
       setInviteEmail("");
-    } catch {
-      // エラーはフック内でトースト表示される
-    }
+    } catch {}
   };
 
   const handleRemoveMember = async (memberId: string) => {
     try {
       await removeMember(pet.id, memberId);
       toast.success("メンバーを削除しました。");
-    } catch {
-      // エラーはフック内でトースト表示される
-    }
+    } catch {}
   };
 
   return (

@@ -27,10 +27,8 @@ export const useStorage = () => {
         return;
       }
 
-      // Create a storage reference
       const storageRef = ref(storage, `images/${user.uid}/${Date.now()}_${file.name}`);
 
-      // Create an upload task
       const uploadTask = uploadBytesResumable(storageRef, file);
 
       setUploading(true);
@@ -39,19 +37,16 @@ export const useStorage = () => {
       uploadTask.on(
         'state_changed',
         (snapshot) => {
-          // Observe state change events such as progress, pause, and resume
           const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
           setProgress(progress);
         },
         (error) => {
-          // Handle unsuccessful uploads
           console.error("Image upload failed:", error);
           setError(error);
           setUploading(false);
           reject(error);
         },
         () => {
-          // Handle successful uploads on complete
           getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
             setUploading(false);
             resolve(downloadURL);

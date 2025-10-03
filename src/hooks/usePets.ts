@@ -22,14 +22,12 @@ import { db } from '@/lib/firebase';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 
-// ペットの獣医情報
 export interface VetInfo {
   id: string;
   name?: string;
   phone?: string;
 }
 
-// ペットデータ型定義
 export interface Pet {
   id: string;
   name: string;
@@ -41,13 +39,12 @@ export interface Pet {
   microchipId?: string;
   medicalNotes?: string;
   vetInfo?: VetInfo[];
-  deleted?: boolean; // 論理削除フラグ
-  deletedAt?: Timestamp | null; // 削除日時
+  deleted?: boolean;
+  deletedAt?: Timestamp | null;
 }
 
-// 共有メンバーのデータ型定義
 export interface Member {
-  id: string; // documentId which is userId
+  id: string;
   role: 'owner' | 'general' | 'viewer';
   status: 'pending' | 'active' | 'removed' | 'declined';
   uid: string;
@@ -58,7 +55,6 @@ export interface Member {
   updatedAt: Timestamp;
 }
 
-// 保留中の招待データ型定義
 export interface PendingInvitation {
   pet: Pet;
   memberId: string;
@@ -68,7 +64,7 @@ export const usePets = () => {
   const { user } = useAuth();
   const [pets, setPets] = useState<Pet[]>([]);
   const [loading, setLoading] = useState(true);
-  const petListenersRef = useRef<(() => void)[]>([]); // 個別ペットリスナーの解除関数を保持
+  const petListenersRef = useRef<(() => void)[]>([]);
 
   useEffect(() => {
     if (!user) {
@@ -79,7 +75,6 @@ export const usePets = () => {
 
     setLoading(true);
 
-    // ユーザーがログインまたはアカウント連携した際に、保留中の招待を自動的にアクティブ化
     const activatePendingInvitations = async () => {
       if (user && user.email) {
         const pendingMembersQuery = query(
@@ -94,7 +89,7 @@ export const usePets = () => {
           batch.update(memberDoc.ref, {
             uid: user.uid,
             status: 'active',
-            inviteEmail: null, // Clear inviteEmail once activated
+            inviteEmail: null,
             updatedAt: serverTimestamp(),
           });
         });
@@ -103,11 +98,9 @@ export const usePets = () => {
     };
     activatePendingInvitations();
 
-    // 既存の個別ペットリスナーを全て解除
     petListenersRef.current.forEach(unsubscribe => unsubscribe());
     petListenersRef.current = [];
 
-    // ユーザーがメンバーとして登録されているペットのIDを取得するリスナー
     const membersQuery = query(
       collectionGroup(db, 'members'),
       where('uid', '==', user.uid),
@@ -118,7 +111,6 @@ export const usePets = () => {
       const petIds = membersSnapshot.docs.map(memberDoc => memberDoc.ref.parent.parent!.id);
       const uniquePetIds = Array.from(new Set(petIds));
 
-      // 既存の個別ペットリスナーを全て解除
       petListenersRef.current.forEach(unsubscribe => unsubscribe());
       petListenersRef.current = [];
 
@@ -129,7 +121,7 @@ export const usePets = () => {
       }
 
       const currentPetsMap = new Map<string, Pet>();
-      const initialFetches: Promise<void>[] = []; // To track initial data load
+      const initialFetches: Promise<void>[] = [];
 
       uniquePetIds.forEach(petId => {
         const petDocRef = doc(db, 'dogs', petId);
@@ -139,58 +131,52 @@ export const usePets = () => {
           } else {
             currentPetsMap.delete(petId);
           }
-          setPets(Array.from(currentPetsMap.values())); // Update pets whenever any pet changes
+          setPets(Array.from(currentPetsMap.values()));
         }, (error) => {
           console.error(`usePets: ペット ${petId} の取得に失敗しました:`, error);
-          setPets(Array.from(currentPetsMap.values())); // Still update with available pets
+          setPets(Array.from(currentPetsMap.values()));
         });
         petListenersRef.current.push(unsubscribePet);
         initialFetches.push(new Promise(resolve => {
-          // Resolve after the first snapshot for this pet
           const tempUnsubscribe = onSnapshot(petDocRef, () => {
-            tempUnsubscribe(); // Unsubscribe after first data
+            tempUnsubscribe();
             resolve();
           });
         }));
       });
 
-      // Wait for all initial pet data to be loaded
       await Promise.all(initialFetches);
-      setLoading(false); // All initial data loaded
+      setLoading(false);
 
     }, (error) => {
       console.error('usePets: メンバーシップの取得に失敗しました:', error);
       setLoading(false);
     });
 
-    // クリーンアップ関数
     return () => {
       unsubscribeMembers();
       petListenersRef.current.forEach(unsubscribe => unsubscribe());
     };
   }, [user]);
 
-  // 新しいペットを追加する関数
   const addPet = async (petData: Omit<Pet, 'id'>) => {
     if (!user) {
       toast.error('ログインが必要です。');
       return;
     }
     try {
-      // `dogs`コレクションに新しいペットドキュメントを追加
       const newPetRef = await addDoc(collection(db, 'dogs'), {
         ...petData,
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
       });
 
-      // `members`サブコレクションに飼い主（オーナー）を追加
       await addDoc(collection(db, 'dogs', newPetRef.id, 'members'), {
         uid: user.uid,
         inviteEmail: user.email,
         role: 'owner',
         status: 'active',
-        invitedBy: user.uid, // Set the creator as the inviter
+        invitedBy: user.uid,
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
       });
@@ -201,7 +187,6 @@ export const usePets = () => {
     }
   };
 
-  // ペット情報を更新する関数
   const updatePet = async (petId: string, petData: Partial<Omit<Pet, 'id'>>) => {
     if (!user) {
       toast.error('ログインが必要です。');
@@ -218,7 +203,6 @@ export const usePets = () => {
     }
   };
 
-  // ペットを削除する関数
   const deletePet = async (petId: string) => {
     if (!user) {
       toast.error('ログインが必要です。');
@@ -228,14 +212,12 @@ export const usePets = () => {
       const batch = writeBatch(db);
       const petRef = doc(db, 'dogs', petId);
 
-      // 論理削除フラグを設定
       batch.update(petRef, {
         deleted: true,
         deletedAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
       });
 
-      // 関連するタスクを論理削除
       const tasksRef = collection(db, 'dogs', petId, 'tasks');
       const taskDocs = await getDocs(tasksRef);
       taskDocs.docs.forEach(d => {
@@ -246,7 +228,6 @@ export const usePets = () => {
         });
       });
 
-      // 関連するログを論理削除
       const logsRef = collection(db, 'dogs', petId, 'logs');
       const logDocs = await getDocs(logsRef);
       logDocs.docs.forEach(d => {
@@ -266,7 +247,6 @@ export const usePets = () => {
     }
   };
 
-  // 共有メンバーを取得する関数
   const getSharedMembers = useCallback((petId: string, onMembersUpdate: (members: Member[]) => void) => {
     if (!user) {
       onMembersUpdate([]);
@@ -287,7 +267,6 @@ export const usePets = () => {
     return unsubscribe;
   }, [user]);
 
-  // メンバーを招待する関数
   const inviteMember = async (petId: string, email: string) => {
     if (!user) {
       toast.error('ログインが必要です。');
@@ -296,7 +275,7 @@ export const usePets = () => {
     try {
       const membersCollection = collection(db, 'dogs', petId, 'members');
       // TODO: 招待する前に、既にメンバーでないか、招待中でないかを確認する
-      // TODO: 招待される側のUIDが不明なため、document IDは自動生成させる
+      // TODO: 招待される側のUIDが不明なため、メールアドレスから検索し確認し、アプリユーザーであればそのUIDを使用し、アプリに存在しないユーザー場合は招待させないようにする
       await addDoc(membersCollection, {
         inviteEmail: email,
         invitedBy: user.uid,
@@ -314,7 +293,6 @@ export const usePets = () => {
     }
   };
 
-  // 保留中の招待を取得する関数
   const getPendingInvitations = useCallback((onInvitationsUpdate: (invitations: PendingInvitation[]) => void) => {
     if (!user || !user.email) {
       onInvitationsUpdate([]);
@@ -345,7 +323,6 @@ export const usePets = () => {
     return unsubscribe;
   }, [user]);
 
-  // 招待のステータスを更新する関数
   const updateInvitationStatus = useCallback(async (petId: string, memberId: string, newStatus: 'active' | 'declined' | 'removed') => {
     if (!user) {
       toast.error('ログインが必要です。');
@@ -363,7 +340,7 @@ export const usePets = () => {
       };
 
       if (newStatus === 'active') {
-        dataToUpdate.uid = user.uid; // Add UID of the user who accepted
+        dataToUpdate.uid = user.uid;
       }
 
       await updateDoc(memberDocRef, dataToUpdate);
@@ -375,7 +352,6 @@ export const usePets = () => {
     }
   }, [user]);
 
-  // 共有メンバーを削除する関数
   const removeMember = useCallback(async (petId: string, memberId: string) => {
     if (!user) {
       toast.error('ログインが必要です。');

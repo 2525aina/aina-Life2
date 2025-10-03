@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { useState, useEffect } from "react";
 import { usePets, Pet, VetInfo } from "@/hooks/usePets";
@@ -23,10 +23,14 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { PlusIcon, Loader2, UploadCloudIcon, CalendarIcon } from 'lucide-react';
-import Image from 'next/image';
-import { toast } from 'sonner';
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { PlusIcon, Loader2, UploadCloudIcon, CalendarIcon } from "lucide-react";
+import Image from "next/image";
+import { toast } from "sonner";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { format } from "date-fns";
 import { ja } from "date-fns/locale";
@@ -66,7 +70,9 @@ export function PetAddForm({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
   const MAX_STEPS = 2;
-  const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
+  const [validationErrors, setValidationErrors] = useState<
+    Record<string, string>
+  >({});
 
   useEffect(() => {
     if (isModalOpen) {
@@ -98,7 +104,6 @@ export function PetAddForm({
           vetInfo: [],
         });
       }
-      // Reset states on open
       setValidationErrors({});
       setCurrentStep(0);
       setImageFile(null);
@@ -121,7 +126,7 @@ export function PetAddForm({
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      if (file.size > 5 * 1024 * 1024) { // 5MB limit
+      if (file.size > 5 * 1024 * 1024) {
         toast.error("画像サイズは5MBまでです。");
         return;
       }
@@ -141,32 +146,42 @@ export function PetAddForm({
   };
 
   const handleDateChange = (name: string, date: Date | undefined) => {
-    setFormData((prev) => ({ ...prev, [name]: date ? format(date, "yyyy-MM-dd") : "" }));
+    setFormData((prev) => ({
+      ...prev,
+      [name]: date ? format(date, "yyyy-MM-dd") : "",
+    }));
   };
 
-
-  const handleVetInfoChange = (index: number, field: keyof VetInfo, value: string) => {
-    setFormData(prev => ({
+  const handleVetInfoChange = (
+    index: number,
+    field: keyof VetInfo,
+    value: string
+  ) => {
+    setFormData((prev) => ({
       ...prev,
-      vetInfo: prev.vetInfo?.map((vet, i) =>
-        i === index ? { ...vet, [field]: value } : vet
-      ) || [],
+      vetInfo:
+        prev.vetInfo?.map((vet, i) =>
+          i === index ? { ...vet, [field]: value } : vet
+        ) || [],
     }));
   };
 
   const handleAddVetInfo = () => {
     if (formData.vetInfo && formData.vetInfo.length < 5) {
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
-        vetInfo: [...(prev.vetInfo || []), { id: generateUniqueId(), name: '', phone: '' }],
+        vetInfo: [
+          ...(prev.vetInfo || []),
+          { id: generateUniqueId(), name: "", phone: "" },
+        ],
       }));
     }
   };
 
   const handleRemoveVetInfo = (id: string) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      vetInfo: prev.vetInfo?.filter(vet => vet.id !== id) || [],
+      vetInfo: prev.vetInfo?.filter((vet) => vet.id !== id) || [],
     }));
   };
 
@@ -183,7 +198,7 @@ export function PetAddForm({
 
   const handleNext = () => {
     if (validateStep(currentStep)) {
-      setCurrentStep(prev => prev + 1);
+      setCurrentStep((prev) => prev + 1);
     }
   };
 
@@ -229,9 +244,7 @@ export function PetAddForm({
     >
       <DialogTrigger asChild>
         {!petToEdit && (
-          <Button
-            onClick={() => setInternalIsOpen(true)}
-          >
+          <Button onClick={() => setInternalIsOpen(true)}>
             <PlusIcon className="mr-2 h-5 w-5" />
             新しいペットを追加
           </Button>
@@ -240,7 +253,8 @@ export function PetAddForm({
       <DialogContent className="sm:max-w-lg overflow-y-auto max-h-[80vh]">
         <DialogHeader>
           <DialogTitle>
-            {petToEdit ? "ペット情報を編集" : "新しいペットを追加"} (ステップ {currentStep + 1} / {MAX_STEPS + 1})
+            {petToEdit ? "ペット情報を編集" : "新しいペットを追加"} (ステップ{" "}
+            {currentStep + 1} / {MAX_STEPS + 1})
           </DialogTitle>
           <DialogDescription>
             ペットの情報を入力してください。
@@ -251,26 +265,57 @@ export function PetAddForm({
             <>
               <div>
                 <Label htmlFor="name">名前 *</Label>
-                <Input id="name" name="name" value={formData.name} onChange={handleChange} className="w-full" />
-                {validationErrors.name && <p className="text-red-500 text-sm mt-1">{validationErrors.name}</p>}
+                <Input
+                  id="name"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  className="w-full"
+                />
+                {validationErrors.name && (
+                  <p className="text-red-500 text-sm mt-1">
+                    {validationErrors.name}
+                  </p>
+                )}
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="breed">種類</Label>
-                  <Input id="breed" name="breed" value={formData.breed} onChange={handleChange} className="w-full" />
-                  {validationErrors.breed && <p className="text-red-500 text-sm mt-1">{validationErrors.breed}</p>}
+                  <Input
+                    id="breed"
+                    name="breed"
+                    value={formData.breed}
+                    onChange={handleChange}
+                    className="w-full"
+                  />
+                  {validationErrors.breed && (
+                    <p className="text-red-500 text-sm mt-1">
+                      {validationErrors.breed}
+                    </p>
+                  )}
                 </div>
                 <div>
                   <Label htmlFor="gender">性別</Label>
-                  <Select onValueChange={(value) => handleSelectChange("gender", value)} value={formData.gender}>
-                    <SelectTrigger className="w-full"><SelectValue placeholder="性別を選択" /></SelectTrigger>
+                  <Select
+                    onValueChange={(value) =>
+                      handleSelectChange("gender", value)
+                    }
+                    value={formData.gender}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="性別を選択" />
+                    </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="male">男の子</SelectItem>
                       <SelectItem value="female">女の子</SelectItem>
                       <SelectItem value="other">その他</SelectItem>
                     </SelectContent>
                   </Select>
-                  {validationErrors.gender && <p className="text-red-500 text-sm mt-1">{validationErrors.gender}</p>}
+                  {validationErrors.gender && (
+                    <p className="text-red-500 text-sm mt-1">
+                      {validationErrors.gender}
+                    </p>
+                  )}
                 </div>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -278,31 +323,85 @@ export function PetAddForm({
                   <Label htmlFor="birthday">誕生日</Label>
                   <Popover>
                     <PopoverTrigger asChild>
-                      <Button variant={"outline"} className={cn("w-full justify-start text-left font-normal", !formData.birthday && "text-muted-foreground")}>
+                      <Button
+                        variant={"outline"}
+                        className={cn(
+                          "w-full justify-start text-left font-normal",
+                          !formData.birthday && "text-muted-foreground"
+                        )}
+                      >
                         <CalendarIcon className="mr-2 h-4 w-4" />
-                        {formData.birthday ? format(new Date(formData.birthday), "yyyy年MM月dd日", { locale: ja }) : "日付を選択"}
+                        {formData.birthday
+                          ? format(
+                              new Date(formData.birthday),
+                              "yyyy年MM月dd日",
+                              { locale: ja }
+                            )
+                          : "日付を選択"}
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-auto p-0">
-                      <Calendar mode="single" selected={formData.birthday ? new Date(formData.birthday) : undefined} onSelect={(date) => handleDateChange("birthday", date)} initialFocus locale={ja} />
+                      <Calendar
+                        mode="single"
+                        selected={
+                          formData.birthday
+                            ? new Date(formData.birthday)
+                            : undefined
+                        }
+                        onSelect={(date) => handleDateChange("birthday", date)}
+                        initialFocus
+                        locale={ja}
+                      />
                     </PopoverContent>
                   </Popover>
-                  {validationErrors.birthday && <p className="text-red-500 text-sm mt-1">{validationErrors.birthday}</p>}
+                  {validationErrors.birthday && (
+                    <p className="text-red-500 text-sm mt-1">
+                      {validationErrors.birthday}
+                    </p>
+                  )}
                 </div>
                 <div>
                   <Label htmlFor="adoptionDate">お迎え日</Label>
                   <Popover>
                     <PopoverTrigger asChild>
-                      <Button variant={"outline"} className={cn("w-full justify-start text-left font-normal", !formData.adoptionDate && "text-muted-foreground")}>
+                      <Button
+                        variant={"outline"}
+                        className={cn(
+                          "w-full justify-start text-left font-normal",
+                          !formData.adoptionDate && "text-muted-foreground"
+                        )}
+                      >
                         <CalendarIcon className="mr-2 h-4 w-4" />
-                        {formData.adoptionDate ? format(new Date(formData.adoptionDate), "yyyy年MM月dd日", { locale: ja }) : "日付を選択"}
+                        {formData.adoptionDate
+                          ? format(
+                              new Date(formData.adoptionDate),
+                              "yyyy年MM月dd日",
+                              { locale: ja }
+                            )
+                          : "日付を選択"}
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-auto p-0">
-                      <Calendar mode="single" selected={formData.adoptionDate ? new Date(formData.adoptionDate) : undefined} onSelect={(date) => handleDateChange("adoptionDate", date)} initialFocus locale={ja} />
+                      <Calendar
+                        mode="single"
+                        selected={
+                          formData.adoptionDate
+                            ? new Date(formData.adoptionDate)
+                            : undefined
+                        }
+                        onSelect={(date) =>
+                          handleDateChange("adoptionDate", date)
+                        }
+                        initialFocus
+                        locale={ja}
+                      />
                     </PopoverContent>
                   </Popover>
-                  {validationErrors.adoptionDate && <p className="text-red-500 text-sm mt-1">{validationErrors.adoptionDate}</p>}
+                  {validationErrors.adoptionDate && (
+                    <p className="text-red-500 text-sm mt-1">
+                      {validationErrors.adoptionDate}
+                    </p>
+                  )}
                 </div>
               </div>
             </>
@@ -315,7 +414,13 @@ export function PetAddForm({
                 <div className="mt-2 flex items-center gap-4">
                   <div className="w-24 h-24 rounded-full bg-gray-100 flex items-center justify-center overflow-hidden">
                     {imagePreview ? (
-                      <Image src={imagePreview} alt="プレビュー" width={96} height={96} style={{ objectFit: 'cover' }} />
+                      <Image
+                        src={imagePreview}
+                        alt="プレビュー"
+                        width={96}
+                        height={96}
+                        style={{ objectFit: "cover" }}
+                      />
                     ) : (
                       <UploadCloudIcon className="w-10 h-10 text-gray-400" />
                     )}
@@ -329,15 +434,33 @@ export function PetAddForm({
                     disabled={uploading}
                   />
                 </div>
-                {uploading && <p className="text-sm text-blue-500 mt-2">アップロード中: {Math.round(progress)}%</p>}
+                {uploading && (
+                  <p className="text-sm text-blue-500 mt-2">
+                    アップロード中: {Math.round(progress)}%
+                  </p>
+                )}
               </div>
               <div>
                 <Label htmlFor="medicalNotes">メモ</Label>
-                <Textarea id="medicalNotes" name="medicalNotes" value={formData.medicalNotes} onChange={handleChange} className="w-full" placeholder="健康に関するメモなど" />
+                <Textarea
+                  id="medicalNotes"
+                  name="medicalNotes"
+                  value={formData.medicalNotes}
+                  onChange={handleChange}
+                  className="w-full"
+                  placeholder="健康に関するメモなど"
+                />
               </div>
               <div>
                 <Label htmlFor="microchipId">マイクロチップID</Label>
-                <Input id="microchipId" name="microchipId" value={formData.microchipId} onChange={handleChange} className="w-full" placeholder="マイクロチップID" />
+                <Input
+                  id="microchipId"
+                  name="microchipId"
+                  value={formData.microchipId}
+                  onChange={handleChange}
+                  className="w-full"
+                  placeholder="マイクロチップID"
+                />
               </div>
             </>
           )}
@@ -345,30 +468,75 @@ export function PetAddForm({
           {currentStep === 2 && (
             <div className="col-span-4 space-y-2 my-4">
               <Label>かかりつけ医情報 (最大5件)</Label>
-              {formData.vetInfo && formData.vetInfo.map((vet, index) => (
-                <div key={vet.id} className="space-y-2 border p-2 rounded">
-                  <div>
-                    <Label htmlFor={`vetName-${index}`}>名前</Label>
-                    <Input id={`vetName-${index}`} name="name" value={vet.name || ''} onChange={(e) => handleVetInfoChange(index, 'name', e.target.value)} className="w-full" placeholder="病院名または医師名" />
-                    {validationErrors[`vetName-${index}`] && <p className="text-red-500 text-sm mt-1">{validationErrors[`vetName-${index}`]}</p>}
+              {formData.vetInfo &&
+                formData.vetInfo.map((vet, index) => (
+                  <div key={vet.id} className="space-y-2 border p-2 rounded">
+                    <div>
+                      <Label htmlFor={`vetName-${index}`}>名前</Label>
+                      <Input
+                        id={`vetName-${index}`}
+                        name="name"
+                        value={vet.name || ""}
+                        onChange={(e) =>
+                          handleVetInfoChange(index, "name", e.target.value)
+                        }
+                        className="w-full"
+                        placeholder="病院名または医師名"
+                      />
+                      {validationErrors[`vetName-${index}`] && (
+                        <p className="text-red-500 text-sm mt-1">
+                          {validationErrors[`vetName-${index}`]}
+                        </p>
+                      )}
+                    </div>
+                    <div>
+                      <Label htmlFor={`vetPhone-${index}`}>電話番号</Label>
+                      <Input
+                        id={`vetPhone-${index}`}
+                        name="phone"
+                        value={vet.phone || ""}
+                        onChange={(e) =>
+                          handleVetInfoChange(index, "phone", e.target.value)
+                        }
+                        className="w-full"
+                        placeholder="電話番号"
+                      />
+                      {validationErrors[`vetPhone-${index}`] && (
+                        <p className="text-red-500 text-sm mt-1">
+                          {validationErrors[`vetPhone-${index}`]}
+                        </p>
+                      )}
+                    </div>
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      onClick={() => handleRemoveVetInfo(vet.id)}
+                      className="w-full"
+                    >
+                      削除
+                    </Button>
                   </div>
-                  <div>
-                    <Label htmlFor={`vetPhone-${index}`}>電話番号</Label>
-                    <Input id={`vetPhone-${index}`} name="phone" value={vet.phone || ''} onChange={(e) => handleVetInfoChange(index, 'phone', e.target.value)} className="w-full" placeholder="電話番号" />
-                    {validationErrors[`vetPhone-${index}`] && <p className="text-red-500 text-sm mt-1">{validationErrors[`vetPhone-${index}`]}</p>}
-                  </div>
-                  <Button variant="destructive" size="sm" onClick={() => handleRemoveVetInfo(vet.id)} className="w-full">削除</Button>
-                </div>
-              ))}
+                ))}
               {formData.vetInfo && formData.vetInfo.length < 5 && (
-                <Button type="button" variant="outline" onClick={handleAddVetInfo} className="w-full">かかりつけ医を追加</Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handleAddVetInfo}
+                  className="w-full"
+                >
+                  かかりつけ医を追加
+                </Button>
               )}
             </div>
           )}
         </div>
         <DialogFooter>
           {currentStep > 0 && (
-            <Button variant="outline" onClick={() => setCurrentStep(prev => prev - 1)} disabled={isSubmitting}>
+            <Button
+              variant="outline"
+              onClick={() => setCurrentStep((prev) => prev - 1)}
+              disabled={isSubmitting}
+            >
               戻る
             </Button>
           )}
@@ -377,14 +545,18 @@ export function PetAddForm({
               次へ
             </Button>
           ) : (
-            <Button type="submit" onClick={handleSubmit} disabled={isSubmitting || uploading}>
+            <Button
+              type="submit"
+              onClick={handleSubmit}
+              disabled={isSubmitting || uploading}
+            >
               {isSubmitting || uploading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  {uploading ? 'アップロード中...' : '保存中...'}
+                  {uploading ? "アップロード中..." : "保存中..."}
                 </>
               ) : (
-                '保存'
+                "保存"
               )}
             </Button>
           )}

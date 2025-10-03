@@ -19,15 +19,14 @@ import { db } from '@/lib/firebase';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 
-// タスクデータ型定義
 export interface Task {
   id: string;
   name: string;
   color: string;
   order: number;
   textColor?: string;
-  deleted?: boolean; // 論理削除フラグ
-  deletedAt?: Timestamp | null; // 削除日時
+  deleted?: boolean;
+  deletedAt?: Timestamp | null;
 }
 
 export const useTasks = (dogId: string) => {
@@ -51,7 +50,7 @@ export const useTasks = (dogId: string) => {
       const fetchedTasks = snapshot.docs.map((doc) => ({
         id: doc.id,
         ...(doc.data() as Omit<Task, 'id'>),
-      })).filter(task => !task.deleted); // クライアント側で論理削除されたタスクを除外
+      })).filter(task => !task.deleted);
       setTasks(fetchedTasks);
       setLoading(false);
     }, (error) => {
@@ -62,7 +61,6 @@ export const useTasks = (dogId: string) => {
     return () => unsubscribe();
   }, [user, dogId]);
 
-  // タスクを追加
   const addTask = async (taskData: Omit<Task, 'id'>) => {
     if (!user || !dogId) {
       toast.error('ユーザーまたはペットが選択されていません。');
@@ -71,7 +69,7 @@ export const useTasks = (dogId: string) => {
     const tasksCollection = collection(db, 'dogs', dogId, 'tasks');
     await addDoc(tasksCollection, {
       ...taskData,
-      deleted: false, // 新規タスクは論理削除されていない状態
+      deleted: false,
       createdBy: user.uid,
       createdAt: serverTimestamp(),
       updatedBy: user.uid,
@@ -79,7 +77,6 @@ export const useTasks = (dogId: string) => {
     });
   };
 
-  // タスクを更新
   const updateTask = async (taskId: string, updatedData: Partial<Omit<Task, 'id' | 'createdBy' | 'createdAt'>>) => {
     if (!user || !dogId) {
       toast.error('ユーザーまたはペットが選択されていません。');
@@ -89,14 +86,12 @@ export const useTasks = (dogId: string) => {
     const batch = writeBatch(db);
     const taskRef = doc(db, 'dogs', dogId, 'tasks', taskId);
 
-    // Update the task document
     batch.update(taskRef, {
       ...updatedData,
       updatedBy: user.uid,
       updatedAt: serverTimestamp(),
     });
 
-    // If task name is updated, update all associated logs
     if (updatedData.name) {
       const logsQuery = query(
         collection(db, 'dogs', dogId, 'logs'),
@@ -116,7 +111,6 @@ export const useTasks = (dogId: string) => {
     await batch.commit();
   };
 
-  // タスクを削除
   const deleteTask = async (taskId: string) => {
     if (!user || !dogId) {
       toast.error('ユーザーまたはペットが選択されていません。');
@@ -126,7 +120,6 @@ export const useTasks = (dogId: string) => {
     const batch = writeBatch(db);
     const taskRef = doc(db, 'dogs', dogId, 'tasks', taskId);
 
-    // タスクを論理削除
     batch.update(taskRef, {
       deleted: true,
       deletedAt: serverTimestamp(),
@@ -134,7 +127,6 @@ export const useTasks = (dogId: string) => {
       updatedAt: serverTimestamp(),
     });
 
-    // 関連するログも論理削除
     const logsQuery = query(
       collection(db, 'dogs', dogId, 'logs'),
       where('taskId', '==', taskId)
@@ -153,7 +145,6 @@ export const useTasks = (dogId: string) => {
     await batch.commit();
   };
 
-  // タスクの並び順を更新する関数
   const reorderTasks = async (reorderedTasks: Task[]) => {
     if (!user || !dogId) {
       toast.error('ユーザーまたはペットが選択されていません。');
@@ -175,7 +166,6 @@ export const useTasks = (dogId: string) => {
     }
   };
 
-  // 複数のタスクを一括削除
   const bulkDeleteTasks = async (taskIds: string[]) => {
     if (!user || !dogId) {
       toast.error('ユーザーまたはペットが選択されていません。');
@@ -186,7 +176,6 @@ export const useTasks = (dogId: string) => {
 
     for (const taskId of taskIds) {
       const taskRef = doc(db, 'dogs', dogId, 'tasks', taskId);
-      // タスクを論理削除
       batch.update(taskRef, {
         deleted: true,
         deletedAt: serverTimestamp(),
@@ -194,7 +183,6 @@ export const useTasks = (dogId: string) => {
         updatedAt: serverTimestamp(),
       });
 
-      // 関連するログも論理削除
       const logsQuery = query(
         collection(db, 'dogs', dogId, 'logs'),
         where('taskId', '==', taskId)

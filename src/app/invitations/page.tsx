@@ -1,11 +1,11 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import { usePets, PendingInvitation } from '@/hooks/usePets';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { useAuth } from '@/contexts/AuthContext';
-import { toast } from 'sonner';
+import { useEffect, useState } from "react";
+import { usePets, PendingInvitation } from "@/hooks/usePets";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "sonner";
 
 export default function InvitationsPage() {
   const { user } = useAuth();
@@ -28,13 +28,17 @@ export default function InvitationsPage() {
     return () => unsubscribe();
   }, [user, getPendingInvitations]);
 
-  const handleInvitation = async (petId: string, memberId: string, status: 'active' | 'declined') => {
+  const handleInvitation = async (
+    petId: string,
+    memberId: string,
+    status: "active" | "declined"
+  ) => {
     try {
       await updateInvitationStatus(petId, memberId, status);
-      toast.success(status === 'active' ? '招待を承諾しました。' : '招待を拒否しました。');
-    } catch {
-      // エラーはフック内でトースト表示される
-    }
+      toast.success(
+        status === "active" ? "招待を承諾しました。" : "招待を拒否しました。"
+      );
+    } catch {}
   };
 
   if (loading) {
@@ -54,10 +58,17 @@ export default function InvitationsPage() {
               <CardContent>
                 <p>このペットの共有メンバーに招待されています。</p>
                 <div className="flex space-x-2 mt-4">
-                  <Button onClick={() => handleInvitation(pet.id, memberId, 'active')}>
+                  <Button
+                    onClick={() => handleInvitation(pet.id, memberId, "active")}
+                  >
                     承諾
                   </Button>
-                  <Button variant="outline" onClick={() => handleInvitation(pet.id, memberId, 'declined')}>
+                  <Button
+                    variant="outline"
+                    onClick={() =>
+                      handleInvitation(pet.id, memberId, "declined")
+                    }
+                  >
                     拒否
                   </Button>
                 </div>
