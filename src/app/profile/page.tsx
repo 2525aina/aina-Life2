@@ -79,6 +79,12 @@ export default function ProfilePage() {
           },
           timeFormat: userProfile.settings?.timeFormat || "HH:mm:ss",
           toastPosition: userProfile.settings?.toastPosition || "bottom-right",
+          taskLogger: {
+            showDateTime: userProfile.settings?.taskLogger?.showDateTime ?? true,
+            showMemo: userProfile.settings?.taskLogger?.showMemo ?? true,
+            initialDateTimeOpen: userProfile.settings?.taskLogger?.initialDateTimeOpen ?? true,
+            initialMemoOpen: userProfile.settings?.taskLogger?.initialMemoOpen ?? true,
+          },
         },
       });
     }
@@ -105,6 +111,50 @@ export default function ProfilePage() {
       } else {
         return { ...prev, [name]: value };
       }
+    });
+  };
+
+  const handleTaskLoggerSettingsChange = (newSettings: Partial<UserProfile['settings']['taskLogger']>) => {
+    setFormData(prev => {
+      const currentSettings = prev.settings || {
+        notifications: { dailySummary: false },
+        theme: "system",
+        logDisplayColors: {
+          enabled: true,
+          creatorNameBg: "#e5e7eb",
+          creatorNameText: "#6b7280",
+          timeBg: "#e5e7eb",
+          timeText: "#4b5563",
+          deletedTaskBg: "#e5e7eb",
+          deletedTaskText: "#9ca3af",
+        },
+        toastPosition: "bottom-right",
+        timeFormat: "HH:mm:ss",
+        taskLogger: {
+          showDateTime: true,
+          showMemo: true,
+          initialDateTimeOpen: true,
+          initialMemoOpen: true,
+        },
+      };
+
+      const currentTaskLoggerSettings = currentSettings.taskLogger || {
+        showDateTime: true,
+        showMemo: true,
+        initialDateTimeOpen: true,
+        initialMemoOpen: true,
+      };
+
+      return {
+        ...prev,
+        settings: {
+          ...currentSettings,
+          taskLogger: {
+            ...currentTaskLoggerSettings,
+            ...newSettings,
+          },
+        },
+      };
     });
   };
 
@@ -586,7 +636,10 @@ export default function ProfilePage() {
 
               <Separator />
 
-              <TaskLoggerSettings />
+              <TaskLoggerSettings 
+                taskLoggerSettings={formData.settings?.taskLogger}
+                onSettingsChange={handleTaskLoggerSettingsChange}
+              />
             </CardContent>
           </Card>
         </TabsContent>

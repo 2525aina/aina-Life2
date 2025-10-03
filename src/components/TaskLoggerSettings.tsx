@@ -1,18 +1,17 @@
 
 "use client";
 
-import { useTaskLoggerSettings } from "@/hooks/useTaskLoggerSettings";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { UserProfile } from "@/hooks/useUser";
 
-export function TaskLoggerSettings() {
-  const { settings, updateSettings, loading } = useTaskLoggerSettings();
+interface TaskLoggerSettingsProps {
+  taskLoggerSettings: UserProfile['settings']['taskLogger'];
+  onSettingsChange: (newSettings: Partial<UserProfile['settings']['taskLogger']>) => void;
+}
 
-  if (loading) {
-    return <p>設定をロード中...</p>;
-  }
-
+export function TaskLoggerSettings({ taskLoggerSettings, onSettingsChange }: TaskLoggerSettingsProps) {
   return (
     <Card>
       <CardHeader>
@@ -23,34 +22,34 @@ export function TaskLoggerSettings() {
           <Label htmlFor="show-datetime">日時の表示</Label>
           <Switch
             id="show-datetime"
-            checked={settings?.showDateTime}
-            onCheckedChange={(checked) => updateSettings({ showDateTime: checked })}
+            checked={taskLoggerSettings?.showDateTime}
+            onCheckedChange={(checked) => onSettingsChange({ showDateTime: checked })}
           />
         </div>
         <div className="flex items-center justify-between">
           <Label htmlFor="show-memo">メモの表示</Label>
           <Switch
             id="show-memo"
-            checked={settings?.showMemo}
-            onCheckedChange={(checked) => updateSettings({ showMemo: checked })}
+            checked={taskLoggerSettings?.showMemo}
+            onCheckedChange={(checked) => onSettingsChange({ showMemo: checked })}
           />
         </div>
         <div className="flex items-center justify-between">
           <Label htmlFor="initial-datetime-open">日時を最初から開く</Label>
           <Switch
             id="initial-datetime-open"
-            checked={settings?.initialDateTimeOpen}
-            onCheckedChange={(checked) => updateSettings({ initialDateTimeOpen: checked })}
-            disabled={!settings?.showDateTime}
+            checked={taskLoggerSettings?.initialDateTimeOpen}
+            onCheckedChange={(checked) => onSettingsChange({ initialDateTimeOpen: checked })}
+            disabled={!taskLoggerSettings?.showDateTime}
           />
         </div>
         <div className="flex items-center justify-between">
           <Label htmlFor="initial-memo-open">メモを最初から開く</Label>
           <Switch
             id="initial-memo-open"
-            checked={settings?.initialMemoOpen}
-            onCheckedChange={(checked) => updateSettings({ initialMemoOpen: checked })}
-            disabled={!settings?.showMemo}
+            checked={taskLoggerSettings?.initialMemoOpen}
+            onCheckedChange={(checked) => onSettingsChange({ initialMemoOpen: checked })}
+            disabled={!taskLoggerSettings?.showMemo}
           />
         </div>
       </CardContent>
