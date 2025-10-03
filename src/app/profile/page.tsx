@@ -365,15 +365,15 @@ export default function ProfilePage() {
             <CardContent className="space-y-6">
               {/* Log Color Settings */}
               <div className="space-y-4">
-                <h3 className="text-md font-medium">ログの配色設定</h3>
+                <h3 className="text-md font-medium">ログの配色</h3>
                 <div className="flex items-center justify-between space-x-2 rounded-lg border p-4">
                   <Label
                     htmlFor="enableCustomColors"
-                    className="flex flex-col space-y-1"
+                    className="block text-left"
                   >
-                    <span>カスタムカラー</span>
-                    <span className="font-normal leading-snug text-muted-foreground">
-                      ログの作成者や時刻の背景色・文字色をカスタマイズします。
+                    <span className="block">配色をカスタマイズ</span>
+                    <span className="block font-normal leading-snug text-muted-foreground">
+                      ログの各要素の色を個別に設定します。
                     </span>
                   </Label>
                   <input
@@ -392,111 +392,136 @@ export default function ProfilePage() {
                     "opacity-50 pointer-events-none"
                   }`}
                 >
-                  <div className="grid grid-cols-[1fr,1fr,1fr] items-center px-4 py-2 font-medium bg-muted/50 text-sm">
-                    <Label>項目</Label>
-                    <Label>背景色</Label>
-                    <Label>文字色</Label>
+                  <div className="overflow-x-auto">
+                    <table className="min-w-full divide-y divide-gray-200">
+                      <thead className="bg-muted/50">
+                        <tr>
+                          <th className="px-2 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                            項目
+                          </th>
+                          <th className="px-2 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                            背景色
+                          </th>
+                          <th className="px-2 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                            文字色
+                          </th>
+                          <th className="px-2 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                            表示
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody className="bg-white divide-y divide-gray-200">
+                        {[
+                          {
+                            id: "creatorName" as const,
+                            label: "作成者名",
+                            previewText: "作成者",
+                            bg: formData.settings?.logDisplayColors
+                              ?.creatorNameBg,
+                            text: formData.settings?.logDisplayColors
+                              ?.creatorNameText,
+                            defaultBg: "#e5e7eb",
+                            defaultText: "#6b7280",
+                          },
+                          {
+                            id: "time" as const,
+                            label: "時刻",
+                            previewText: "14:05:09",
+                            bg: formData.settings?.logDisplayColors?.timeBg,
+                            text: formData.settings?.logDisplayColors?.timeText,
+                            defaultBg: "#e5e7eb",
+                            defaultText: "#4b5563",
+                          },
+                          {
+                            id: "deletedTask" as const,
+                            label: "削除ログ",
+                            previewText: "削除",
+                            bg: formData.settings?.logDisplayColors
+                              ?.deletedTaskBg,
+                            text: formData.settings?.logDisplayColors
+                              ?.deletedTaskText,
+                            defaultBg: "#e5e7eb",
+                            defaultText: "#9ca3af",
+                          },
+                        ].map((item) => (
+                          <tr key={item.id}>
+                            <td className="px-2 py-4 whitespace-nowrap text-sm font-medium">
+                              {item.label}
+                            </td>
+                            <td className="px-2 py-4 whitespace-nowrap">
+                              <div className="flex items-center gap-2">
+                                <Input
+                                  type="color"
+                                  value={item.bg || item.defaultBg}
+                                  onChange={(e) =>
+                                    handleChangeColor(
+                                      item.id,
+                                      "Bg",
+                                      e.target.value
+                                    )
+                                  }
+                                  className="w-10 h-8 p-1 shrink-0"
+                                />
+                                <Input
+                                  value={item.bg || item.defaultBg}
+                                  onChange={(e) =>
+                                    handleChangeColor(
+                                      item.id,
+                                      "Bg",
+                                      e.target.value
+                                    )
+                                  }
+                                  className="h-8 w-24"
+                                  placeholder="#RRGGBB"
+                                />
+                              </div>
+                            </td>
+                            <td className="px-2 py-4 whitespace-nowrap">
+                              <div className="flex items-center gap-2">
+                                <Input
+                                  type="color"
+                                  value={item.text || item.defaultText}
+                                  onChange={(e) =>
+                                    handleChangeColor(
+                                      item.id,
+                                      "Text",
+                                      e.target.value
+                                    )
+                                  }
+                                  className="w-10 h-8 p-1 shrink-0"
+                                />
+                                <Input
+                                  value={item.text || item.defaultText}
+                                  onChange={(e) =>
+                                    handleChangeColor(
+                                      item.id,
+                                      "Text",
+                                      e.target.value
+                                    )
+                                  }
+                                  className="h-8 w-24"
+                                  placeholder="#RRGGBB"
+                                />
+                              </div>
+                            </td>
+                            <td className="px-2 py-4 whitespace-nowrap">
+                              <div className="flex items-center justify-center">
+                                <span
+                                  className="px-2 py-1 rounded-md text-sm"
+                                  style={{
+                                    backgroundColor: item.bg || item.defaultBg,
+                                    color: item.text || item.defaultText,
+                                  }}
+                                >
+                                  {item.previewText}
+                                </span>
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
                   </div>
-                  <Separator />
-                  {[
-                    {
-                      id: "creatorName" as const,
-                      label: "作成者名",
-                      bg: formData.settings?.logDisplayColors?.creatorNameBg,
-                      text: formData.settings?.logDisplayColors
-                        ?.creatorNameText,
-                      defaultBg: "#e5e7eb",
-                      defaultText: "#6b7280",
-                    },
-                    {
-                      id: "time" as const,
-                      label: "時刻",
-                      bg: formData.settings?.logDisplayColors?.timeBg,
-                      text: formData.settings?.logDisplayColors?.timeText,
-                      defaultBg: "#e5e7eb",
-                      defaultText: "#4b5563",
-                    },
-                    {
-                      id: "deletedTask" as const,
-                      label: "削除済みタスク",
-                      bg: formData.settings?.logDisplayColors?.deletedTaskBg,
-                      text: formData.settings?.logDisplayColors
-                        ?.deletedTaskText,
-                      defaultBg: "#e5e7eb",
-                      defaultText: "#9ca3af",
-                    },
-                  ].map((item, index) => (
-                    <div key={item.id}>
-                      <div className="grid grid-cols-[1fr,1fr,1fr] items-center gap-4 px-4 py-3">
-                        <p className="text-sm font-medium">{item.label}</p>
-                        <div className="flex items-center gap-2">
-                          <Input
-                            type="color"
-                            value={item.bg || item.defaultBg}
-                            onChange={(e) =>
-                              handleChangeColor(
-                                item.id as
-                                  | "creatorName"
-                                  | "time"
-                                  | "deletedTask",
-                                "Bg",
-                                e.target.value
-                              )
-                            }
-                            className="w-10 h-8 p-1 shrink-0"
-                          />
-                          <Input
-                            value={item.bg || item.defaultBg}
-                            onChange={(e) =>
-                              handleChangeColor(
-                                item.id as
-                                  | "creatorName"
-                                  | "time"
-                                  | "deletedTask",
-                                "Bg",
-                                e.target.value
-                              )
-                            }
-                            className="h-8"
-                            placeholder="#RRGGBB"
-                          />
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Input
-                            type="color"
-                            value={item.text || item.defaultText}
-                            onChange={(e) =>
-                              handleChangeColor(
-                                item.id as
-                                  | "creatorName"
-                                  | "time"
-                                  | "deletedTask",
-                                "Text",
-                                e.target.value
-                              )
-                            }
-                            className="w-10 h-8 p-1 shrink-0"
-                          />
-                          <Input
-                            value={item.text || item.defaultText}
-                            onChange={(e) =>
-                              handleChangeColor(
-                                item.id as
-                                  | "creatorName"
-                                  | "time"
-                                  | "deletedTask",
-                                "Text",
-                                e.target.value
-                              )
-                            }
-                            className="h-8"
-                            placeholder="#RRGGBB"
-                          />
-                        </div>
-                      </div>
-                      {index < 2 && <Separator />}
-                    </div>
-                  ))}
                 </div>
               </div>
 
@@ -504,7 +529,7 @@ export default function ProfilePage() {
 
               {/* Time Format Settings */}
               <div className="space-y-2">
-                <h3 className="text-md font-medium">時刻の表示形式</h3>
+                <h3 className="text-md font-medium">時刻フォーマット</h3>
                 <Label
                   htmlFor="timeFormat"
                   className="text-sm font-normal text-muted-foreground"
