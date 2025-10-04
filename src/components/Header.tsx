@@ -3,10 +3,15 @@
 import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
 import { PetSwitcher } from '@/components/PetSwitcher';
-import { Bell } from 'lucide-react';
+import { Bell, RefreshCw } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 export function Header() {
   const { user } = useAuth();
+
+  const handleReload = () => {
+    window.location.reload();
+  };
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-primary text-primary-foreground p-4 shadow-md">
@@ -16,6 +21,15 @@ export function Header() {
         </Link>
         {user && (
           <div className="flex items-center space-x-4">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={handleReload}
+              aria-label="ページをリロード"
+              className="text-primary-foreground hover:bg-primary-foreground/10"
+            >
+              <RefreshCw className="h-6 w-6" />
+            </Button>
             <Link href="/invitations" className="text-primary-foreground hover:text-primary-foreground/80">
               <Bell className="h-6 w-6" />
             </Link>

@@ -1,4 +1,3 @@
-
 "use client";
 
 import { Switch } from "@/components/ui/switch";
@@ -7,11 +6,16 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { UserProfile } from "@/hooks/useUser";
 
 interface TaskLoggerSettingsProps {
-  taskLoggerSettings: UserProfile['settings']['taskLogger'];
-  onSettingsChange: (newSettings: Partial<UserProfile['settings']['taskLogger']>) => void;
+  taskLoggerSettings: UserProfile["settings"]["taskLogger"];
+  onSettingsChange: (
+    newSettings: Partial<UserProfile["settings"]["taskLogger"]>
+  ) => void;
 }
 
-export function TaskLoggerSettings({ taskLoggerSettings, onSettingsChange }: TaskLoggerSettingsProps) {
+export function TaskLoggerSettings({
+  taskLoggerSettings,
+  onSettingsChange,
+}: TaskLoggerSettingsProps) {
   return (
     <Card>
       <CardHeader>
@@ -23,7 +27,9 @@ export function TaskLoggerSettings({ taskLoggerSettings, onSettingsChange }: Tas
           <Switch
             id="show-datetime"
             checked={taskLoggerSettings?.showDateTime}
-            onCheckedChange={(checked) => onSettingsChange({ showDateTime: checked })}
+            onCheckedChange={(checked) =>
+              onSettingsChange({ showDateTime: checked })
+            }
           />
         </div>
         <div className="flex items-center justify-between">
@@ -31,7 +37,9 @@ export function TaskLoggerSettings({ taskLoggerSettings, onSettingsChange }: Tas
           <Switch
             id="show-memo"
             checked={taskLoggerSettings?.showMemo}
-            onCheckedChange={(checked) => onSettingsChange({ showMemo: checked })}
+            onCheckedChange={(checked) =>
+              onSettingsChange({ showMemo: checked })
+            }
           />
         </div>
         <div className="flex items-center justify-between">
@@ -39,7 +47,9 @@ export function TaskLoggerSettings({ taskLoggerSettings, onSettingsChange }: Tas
           <Switch
             id="initial-datetime-open"
             checked={taskLoggerSettings?.initialDateTimeOpen}
-            onCheckedChange={(checked) => onSettingsChange({ initialDateTimeOpen: checked })}
+            onCheckedChange={(checked) =>
+              onSettingsChange({ initialDateTimeOpen: checked })
+            }
             disabled={!taskLoggerSettings?.showDateTime}
           />
         </div>
@@ -48,7 +58,9 @@ export function TaskLoggerSettings({ taskLoggerSettings, onSettingsChange }: Tas
           <Switch
             id="initial-memo-open"
             checked={taskLoggerSettings?.initialMemoOpen}
-            onCheckedChange={(checked) => onSettingsChange({ initialMemoOpen: checked })}
+            onCheckedChange={(checked) =>
+              onSettingsChange({ initialMemoOpen: checked })
+            }
             disabled={!taskLoggerSettings?.showMemo}
           />
         </div>
