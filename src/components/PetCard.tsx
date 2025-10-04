@@ -56,6 +56,8 @@ import { TaskForm } from "@/components/TaskForm";
 import { TaskHistory } from "@/components/TaskHistory";
 import { useUserProfile } from "@/hooks/useUserProfile";
 
+const EMAIL_REGEX = /^[\w.-]+@[\w.-]+\.[A-Za-z]{2,3}$/;
+
 interface PetCardProps {
   pet: Pet;
   user: FirebaseAuthUser | null;
@@ -238,6 +240,10 @@ export function PetCard({
   const handleInviteMember = async () => {
     if (!inviteEmail) {
       toast.error("メールアドレスを入力してください。");
+      return;
+    }
+    if (!EMAIL_REGEX.test(inviteEmail)) {
+      toast.error("有効なメールアドレス形式で入力してください。");
       return;
     }
     try {
