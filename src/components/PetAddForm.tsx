@@ -132,6 +132,8 @@ export function PetAddForm({
         maxSizeMB: 1,           // (max file size in MB)
         maxWidthOrHeight: 1024, // (max width or height in pixels)
         useWebWorker: true,     // (use web worker for faster compression)
+        fileType: 'image/webp', // Convert to WebP for better compression
+        quality: 0.8,           // Adjust quality (0 to 1, default is 0.75)
       };
       try {
         toast.info("画像を圧縮中...");
