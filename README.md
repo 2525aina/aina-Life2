@@ -62,6 +62,7 @@ aina-Life2は、Next.jsとFirebaseで構築された、ペットの健康と日�
     ```bash
     rm -rf .next
     rm -rf node_modules
+    sudo chown -R 501:20 "/Users/nakajimadaichi/.npm"
     npm install
     npm run dev
     ```
