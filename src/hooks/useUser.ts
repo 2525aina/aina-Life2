@@ -139,6 +139,15 @@ export const useUser = () => {
               theme: 'system',
               timeFormat: 'HH:mm:ss',
               toastPosition: 'top-center',
+              logDisplayColors: {
+                enabled: true,
+                creatorNameBg: "#e5e7eb",
+                creatorNameText: "#6b7280",
+                timeBg: "#e5e7eb",
+                timeText: "#4b5563",
+                deletedTaskBg: "#e5e7eb",
+                deletedTaskText: "#9ca3af",
+              },
               taskLogger: {
                 showDateTime: true,
                 showMemo: true,
