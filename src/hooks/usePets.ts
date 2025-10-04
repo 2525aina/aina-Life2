@@ -48,7 +48,7 @@ export interface Member {
   role: 'owner' | 'general' | 'viewer';
   status: 'pending' | 'active' | 'removed' | 'declined';
   uid: string;
-  inviteEmail: string;
+  inviteEmail: string | null;
   invitedBy?: string;
   invitedAt?: Timestamp;
   createdAt: Timestamp;
@@ -74,29 +74,6 @@ export const usePets = () => {
     }
 
     setLoading(true);
-
-    const activatePendingInvitations = async () => {
-      if (user && user.email) {
-        const pendingMembersQuery = query(
-          collectionGroup(db, 'members'),
-          where('inviteEmail', '==', user.email),
-          where('status', '==', 'pending')
-        );
-        const pendingMembersSnapshot = await getDocs(pendingMembersQuery);
-        const batch = writeBatch(db);
-
-        pendingMembersSnapshot.docs.forEach(memberDoc => {
-          batch.update(memberDoc.ref, {
-            uid: user.uid,
-            status: 'active',
-            inviteEmail: null,
-            updatedAt: serverTimestamp(),
-          });
-        });
-        await batch.commit();
-      }
-    };
-    activatePendingInvitations();
 
     petListenersRef.current.forEach(unsubscribe => unsubscribe());
     petListenersRef.current = [];
@@ -334,6 +311,7 @@ export const usePets = () => {
         status: 'active' | 'declined' | 'removed';
         updatedAt: FieldValue;
         uid?: string;
+        inviteEmail?: null;
       } = { 
         status: newStatus,
         updatedAt: serverTimestamp(),
