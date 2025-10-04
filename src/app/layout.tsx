@@ -5,6 +5,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { Header } from "@/components/Header";
 import { FooterNav } from "@/components/FooterNav";
 import { ToastProvider } from "@/components/ToastProvider";
+import { ServiceWorkerUpdater } from "@/components/ServiceWorkerUpdater";
 
 export const metadata: Metadata = {
   title: "aina-Life | 大切な家族との毎日を、もっと豊かに🐾",
@@ -69,6 +70,7 @@ export default function RootLayout({
             </main>
             <FooterNav />
             <ToastProvider />
+            <ServiceWorkerUpdater />
           </PetSelectionProvider>
         </AuthProvider>
       </body>

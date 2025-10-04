@@ -1,7 +1,0 @@
-fix: 未使用変数とany型に関する警告を解消
-
-- `src/app/pets/page.tsx`:
-  - `selectedPetId` の未使用に関するESLint警告を無効にするコメントを追加。
-- `src/components/WeightForm.tsx`:
-  - `useWeights` から取得した未使用の `error` 変数を削除。
-  - `catch (error: any)` を `catch (error: unknown)` に変更し、エラーメッセージの取得方法を修正。
