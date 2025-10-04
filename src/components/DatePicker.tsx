@@ -14,11 +14,12 @@ import {
 } from "@/components/ui/popover";
 
 interface DatePickerProps {
-  date: Date;
+  date: Date | undefined;
   setDate: (date: Date) => void;
+  className?: string;
 }
 
-export function DatePicker({ date, setDate }: DatePickerProps) {
+export function DatePicker({ date, setDate, className }: DatePickerProps) {
   const [isOpen, setIsOpen] = useState(false);
 
   const handleSelect = (selectedDate: Date | undefined) => {
@@ -43,11 +44,12 @@ export function DatePicker({ date, setDate }: DatePickerProps) {
           variant={"outline"}
           className={cn(
             "justify-start text-left font-normal",
-            !date && "text-muted-foreground"
+            !date && "text-muted-foreground",
+            className
           )}
         >
           <CalendarIcon className="mr-2 h-4 w-4" />
-          {format(date, "MM/dd(eee)", { locale: ja })}
+          {date ? format(date, "MM/dd(eee)", { locale: ja }) : "日付を選択"}
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-auto p-0">

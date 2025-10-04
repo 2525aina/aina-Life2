@@ -7,12 +7,14 @@ import { Timestamp } from "firebase/firestore";
 
 import { useTasks } from "@/hooks/useTasks";
 
-import { Calendar } from "@/components/ui/calendar";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+import { CalendarIcon } from "lucide-react";
+import { format } from "date-fns";
+import { ja } from "date-fns/locale";
+import { cn } from "@/lib/utils";
+import { usePetSelection } from "../contexts/PetSelectionContext";
+import { TimePicker } from "./TimePicker";
+import { DatePicker } from "./DatePicker";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -32,12 +34,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { CalendarIcon } from "lucide-react";
-import { format } from "date-fns";
-import { ja } from "date-fns/locale";
-import { cn } from "@/lib/utils";
-import { usePetSelection } from "../contexts/PetSelectionContext";
-import { TimePicker } from "./TimePicker";
 
 interface LogFormModalProps {
   isOpen: boolean;
@@ -67,7 +63,6 @@ export function LogFormModal({
   );
   const [note, setNote] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
@@ -96,6 +91,20 @@ export function LogFormModal({
       setSelectedTaskId(tasks[0].id);
     }
   }, [isOpen, selectedPet, tasks, selectedTaskId]);
+
+  useEffect(() => {
+    if (!selectedTime) return;
+
+    const [hours, minutes, seconds = 0] = selectedTime.split(':').map(Number);
+
+    setSelectedDate(prevDate => {
+      if (!prevDate) return prevDate;
+
+      const newDate = new Date(prevDate);
+      newDate.setHours(hours, minutes, seconds);
+      return newDate;
+    });
+  }, [selectedTime]);
 
   const handleSubmit = async () => {
     if (!selectedPet) {
@@ -185,86 +194,16 @@ export function LogFormModal({
             <Label htmlFor="date" className="text-right">
               日付
             </Label>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  variant={"outline"}
-                  className={cn(
-                    "col-span-3 justify-start text-left font-normal",
-                    !selectedDate && "text-muted-foreground"
-                  )}
-                >
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {selectedDate ? (
-                    format(selectedDate, "yyyy/MM/dd", { locale: ja })
-                  ) : (
-                    <span>日付を選択</span>
-                  )}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0">
-                <Calendar
-                  mode="single"
-                  selected={selectedDate}
-                  onSelect={(date) => {
-                    if (date) {
-                      const newDate = new Date(date);
-                      if (selectedDate) {
-                        newDate.setHours(selectedDate.getHours());
-                        newDate.setMinutes(selectedDate.getMinutes());
-                        newDate.setSeconds(selectedDate.getSeconds());
-                      }
-                      setSelectedDate(newDate);
-                    }
-                  }}
-                  initialFocus
-                  locale={ja}
-                />
-                <div className="flex justify-end gap-2 p-4 border-t">
-                  <Button
-                    variant="outline"
-                    onClick={() => {
-                      setSelectedDate(new Date());
-                      setIsDatePickerOpen(false);
-                    }}
-                  >
-                    リセット
-                  </Button>
-                  <Button
-                    onClick={() => {
-                      setIsDatePickerOpen(false);
-                    }}
-                  >
-                    OK
-                  </Button>
-                </div>
-              </PopoverContent>
-            </Popover>
+            <DatePicker date={selectedDate} setDate={setSelectedDate} className="col-span-3" />
           </div>
 
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="time" className="text-right">
               時刻
             </Label>
-            <Input
-              id="time"
-              type="time"
-              value={selectedTime}
-              onChange={(e) => {
-                const timeParts = e.target.value.split(":").map(Number);
-                const hours = timeParts[0];
-                const minutes = timeParts[1];
-                const seconds = timeParts[2] || 0;
-
-                if (selectedDate) {
-                  const newDate = new Date(selectedDate);
-                  newDate.setHours(hours);
-                  newDate.setMinutes(minutes);
-                  newDate.setSeconds(seconds);
-                  setSelectedDate(newDate);
-                }
-                setSelectedTime(e.target.value);
-              }}
+            <TimePicker
+              time={selectedTime}
+              setTime={setSelectedTime}
               className="col-span-3"
             />
           </div>

@@ -5,13 +5,15 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Clock } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface TimePickerProps {
   time: string;
   setTime: (time: string) => void;
+  className?: string;
 }
 
-export function TimePicker({ time, setTime }: TimePickerProps) {
+export function TimePicker({ time, setTime, className }: TimePickerProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [localTime, setLocalTime] = useState(time);
 
@@ -31,7 +33,7 @@ export function TimePicker({ time, setTime }: TimePickerProps) {
       <PopoverTrigger asChild>
         <Button
           variant={'outline'}
-          className="w-full justify-start text-left font-normal"
+          className={cn("w-full justify-start text-left font-normal", className)}
         >
           <Clock className="mr-2 h-4 w-4" />
           {time}
