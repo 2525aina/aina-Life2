@@ -139,23 +139,28 @@ export function PetCard({
 
   const [inviteEmail, setInviteEmail] = useState<string>("");
   const [sharedMembers, setSharedMembers] = useState<Member[]>([]);
+  const [petOwnerUid, setPetOwnerUid] = useState<string | null>(null);
   const [selectedSharingTab, setSelectedSharingTab] = useState<string | null>(
     null
   );
   const [isAddTaskFormOpen, setIsAddTaskFormOpen] = useState(false);
 
   useEffect(() => {
-    if (selectedSharingTab !== "sharing") {
-      setSharedMembers([]);
-      return;
-    }
-
     const unsubscribe = getSharedMembers(pet.id, (members) => {
       setSharedMembers(members);
+      const owner = members.find(member => member.role === 'owner');
+      setPetOwnerUid(owner ? owner.uid : null);
     });
 
     return () => unsubscribe();
-  }, [selectedSharingTab, pet.id, getSharedMembers]);
+  }, [pet.id, getSharedMembers]);
+
+  useEffect(() => {
+    if (selectedSharingTab !== "sharing") {
+      return;
+    }
+    // sharedMembers state is already updated by the other useEffect
+  }, [selectedSharingTab]);
 
   const handleInviteMember = async () => {
     if (!inviteEmail) {
@@ -231,13 +236,15 @@ export function PetCard({
                   <Pencil className="mr-2 h-4 w-4" />
                   <span>編集</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={() => handleDeletePet(pet.id)}
-                  className="text-red-500 focus:text-red-500 focus:bg-red-50"
-                >
-                  <Trash2 className="mr-2 h-4 w-4" />
-                  <span>削除</span>
-                </DropdownMenuItem>
+                {user?.uid === petOwnerUid && (
+                  <DropdownMenuItem
+                    onClick={() => handleDeletePet(pet.id)}
+                    className="text-red-500 focus:text-red-500 focus:bg-red-50"
+                  >
+                    <Trash2 className="mr-2 h-4 w-4" />
+                    <span>削除</span>
+                  </DropdownMenuItem>
+                )}
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
