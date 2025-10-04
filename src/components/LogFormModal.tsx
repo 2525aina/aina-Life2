@@ -251,16 +251,14 @@ export function LogFormModal({
               type="time"
               value={selectedTime}
               onChange={(e) => {
-                const timeParts = e.target.value.split(":").map(Number);
-                const hours = timeParts[0];
-                const minutes = timeParts[1];
-                const seconds = timeParts[2] || 0;
+                const [hoursStr, minutesStr, secondsStr] = e.target.value.split(":");
+                const hours = parseInt(hoursStr, 10);
+                const minutes = parseInt(minutesStr, 10);
+                const seconds = secondsStr ? parseInt(secondsStr, 10) : 0;
 
                 if (selectedDate) {
                   const newDate = new Date(selectedDate);
-                  newDate.setHours(hours);
-                  newDate.setMinutes(minutes);
-                  newDate.setSeconds(seconds);
+                  newDate.setHours(hours, minutes, seconds);
                   setSelectedDate(newDate);
                 }
                 setSelectedTime(e.target.value);
