@@ -87,7 +87,14 @@ function MemberDisplay({
   const getDisplayInfo = () => {
     if (member.status === "pending") {
       return {
-        name: member.inviteEmail,
+        name: "招待ユーザー",
+        email: member.inviteEmail,
+      };
+    }
+
+    if (member.status === "declined") {
+      return {
+        name: "辞退ユーザー",
         email: member.inviteEmail,
       };
     }
@@ -118,7 +125,13 @@ function MemberDisplay({
           <p className="text-sm text-gray-500">{displayEmail}</p>
         )}
         <p className="text-sm text-gray-500">
-          ステータス: {member.status}
+          ステータス: {
+            member.status === "pending" ? "招待中" :
+            member.status === "active" ? "有効" :
+            member.status === "removed" ? "削除済" :
+            member.status === "declined" ? "拒否済" :
+            member.status
+          }
         </p>
       </div>
       <div className="flex flex-col items-end space-y-2">
