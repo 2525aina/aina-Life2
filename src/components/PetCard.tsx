@@ -242,7 +242,7 @@ export function PetCard({
       toast.error("メールアドレスを入力してください。");
       return;
     }
-    if (sharedMembers.some(member => member.inviteEmail === inviteEmail || (member.status === 'active' && user?.email === inviteEmail))) {
+    if (sharedMembers.some(member => member.inviteEmail === inviteEmail && (member.status === 'active' || member.status === 'pending'))) {
       toast.error("このメールアドレスはすでに共有メンバーとして存在します。");
       return;
     }
