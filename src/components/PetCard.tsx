@@ -242,8 +242,8 @@ export function PetCard({
       toast.error("メールアドレスを入力してください。");
       return;
     }
-    if (!EMAIL_REGEX.test(inviteEmail)) {
-      toast.error("有効なメールアドレス形式で入力してください。");
+    if (sharedMembers.some(member => member.inviteEmail === inviteEmail || (member.status === 'active' && user?.email === inviteEmail))) {
+      toast.error("このメールアドレスはすでに共有メンバーとして存在します。");
       return;
     }
     try {
