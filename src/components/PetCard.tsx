@@ -73,6 +73,7 @@ function MemberDisplay({
   onRemoveMember,
   onUpdateMemberRole,
   isOnlyOwner,
+  canManage,
 }: {
   member: Member;
   petId: string;
@@ -81,8 +82,16 @@ function MemberDisplay({
   onRemoveMember: (memberId: string) => Promise<void>;
   onUpdateMemberRole: (petId: string, memberId: string, newRole: 'owner' | 'editor' | 'viewer') => Promise<void>;
   isOnlyOwner: boolean;
+  canManage: boolean;
 }) {
   const { userProfile } = useUserProfile(member.uid);
+
+  // Define roleTranslations here
+  const roleTranslations: { [key: string]: string } = {
+    owner: '管理',
+    editor: '編集',
+    viewer: '閲覧',
+  };
 
   const getDisplayInfo = () => {
     if (member.status === "pending") {
@@ -135,7 +144,7 @@ function MemberDisplay({
         </p>
       </div>
       <div className="flex flex-col items-end space-y-2">
-        {currentUserId === petOwnerUid ? (
+        {canManage ? (
           <Select
             value={member.role}
             onValueChange={(newRole: 'owner' | 'editor' | 'viewer') => {
@@ -152,9 +161,9 @@ function MemberDisplay({
             </SelectContent>
           </Select>
         ) : (
-          <p className="text-sm text-gray-500">役割: {member.role}</p>
+          <p className="text-sm text-gray-500">役割: {roleTranslations[member.role]}</p>
         )}
-        {currentUserId === petOwnerUid && member.role !== "owner" && (
+        {canManage && member.role !== "owner" && (
           <Button
             variant="destructive"
             size="sm"
@@ -182,7 +191,14 @@ export function PetCard({
 
   const [inviteEmail, setInviteEmail] = useState<string>("");
   const [sharedMembers, setSharedMembers] = useState<Member[]>([]);
+  const [isEditing, setIsEditing] = useState(false);
+  const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
+  const [isConfirmingLeave, setIsConfirmingLeave] = useState(false);
   const [petOwnerUid, setPetOwnerUid] = useState<string | null>(null);
+  const [currentUserMember, setCurrentUserMember] = useState<SharedMember | null>(
+    null
+  );
+  const [canManage, setCanManage] = useState<boolean>(false);
   const [canEdit, setCanEdit] = useState<boolean>(false);
   const [isOnlyOwner, setIsOnlyOwner] = useState<boolean>(false);
   const [selectedSharingTab, setSelectedSharingTab] = useState<string | null>(
@@ -201,8 +217,10 @@ export function PetCard({
 
       const currentUserMember = members.find(member => member.uid === user?.uid);
       if (currentUserMember) {
+        setCanManage(currentUserMember.role === 'owner');
         setCanEdit(currentUserMember.role === 'owner' || currentUserMember.role === 'editor');
       } else {
+        setCanManage(false);
         setCanEdit(false);
       }
     });
@@ -293,7 +311,7 @@ export function PetCard({
                     <span>編集</span>
                   </DropdownMenuItem>
                 )}
-                {user?.uid === petOwnerUid && (
+                {canManage && (
                   <DropdownMenuItem
                     onClick={() => handleDeletePet(pet.id)}
                     className="text-red-500 focus:text-red-500 focus:bg-red-50"
@@ -494,6 +512,7 @@ export function PetCard({
                         onRemoveMember={handleRemoveMember}
                         onUpdateMemberRole={updateMemberRole}
                         isOnlyOwner={isOnlyOwner}
+                        canManage={canManage}
                       />
                     ))}
                   </div>
