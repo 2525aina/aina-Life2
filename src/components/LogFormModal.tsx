@@ -35,6 +35,7 @@ import { format } from "date-fns";
 import { ja } from "date-fns/locale";
 import { cn } from "@/lib/utils";
 import { usePetSelection } from "../contexts/PetSelectionContext";
+import { TimePicker } from "./TimePicker";
 
 interface LogFormModalProps {
   isOpen: boolean;
@@ -64,6 +65,7 @@ export function LogFormModal({
   );
   const [note, setNote] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
@@ -111,6 +113,12 @@ export function LogFormModal({
     try {
       const task = tasks.find((t) => t.id === selectedTaskId);
       if (task) {
+        const [hours, minutes, seconds] = selectedTime.split(":").map(Number);
+        const logDateTime = new Date(selectedDate);
+        logDateTime.setHours(hours);
+        logDateTime.setMinutes(minutes);
+        logDateTime.setSeconds(seconds);
+
         if (logToEdit) {
           await updateLog(logToEdit.id, {
             taskId: task.id,
@@ -120,16 +128,16 @@ export function LogFormModal({
           });
           toast.success(
             `ログを更新しました: ${task.name} (${format(
-              selectedDate,
-              "yyyy/MM/dd"
+              logDateTime,
+              "yyyy/MM/dd HH:mm:ss"
             )})`
           );
         } else {
-          await addLog(task, selectedDate, note);
+          await addLog(task, logDateTime, note);
           toast.success(
             `ログを記録しました: ${task.name} (${format(
-              selectedDate,
-              "yyyy/MM/dd"
+              logDateTime,
+              "yyyy/MM/dd HH:mm:ss"
             )})`
           );
         }
@@ -202,6 +210,7 @@ export function LogFormModal({
                       if (selectedDate) {
                         newDate.setHours(selectedDate.getHours());
                         newDate.setMinutes(selectedDate.getMinutes());
+                        newDate.setSeconds(selectedDate.getSeconds());
                       }
                       setSelectedDate(newDate);
                     }
@@ -209,6 +218,24 @@ export function LogFormModal({
                   initialFocus
                   locale={ja}
                 />
+                <div className="flex justify-end gap-2 p-4 border-t">
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      setSelectedDate(new Date());
+                      setIsDatePickerOpen(false);
+                    }}
+                  >
+                    リセット
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      setIsDatePickerOpen(false);
+                    }}
+                  >
+                    OK
+                  </Button>
+                </div>
               </PopoverContent>
             </Popover>
           </div>
