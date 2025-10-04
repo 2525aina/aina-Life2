@@ -138,6 +138,7 @@ export const useUser = () => {
               notifications: { dailySummary: false },
               theme: 'system',
               timeFormat: 'HH:mm:ss',
+              toastPosition: 'top-center',
               taskLogger: {
                 showDateTime: true,
                 showMemo: true,

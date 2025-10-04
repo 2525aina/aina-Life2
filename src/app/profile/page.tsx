@@ -78,7 +78,7 @@ export default function ProfilePage() {
             enabled: userProfile.settings?.logDisplayColors?.enabled ?? true,
           },
           timeFormat: userProfile.settings?.timeFormat || "HH:mm:ss",
-          toastPosition: userProfile.settings?.toastPosition || "bottom-right",
+          toastPosition: userProfile.settings?.toastPosition || "top-center",
           taskLogger: {
             showDateTime: userProfile.settings?.taskLogger?.showDateTime ?? true,
             showMemo: userProfile.settings?.taskLogger?.showMemo ?? true,
@@ -618,7 +618,7 @@ export default function ProfilePage() {
                   onValueChange={(value) =>
                     handleSelectChange("settings.toastPosition", value)
                   }
-                  value={formData.settings?.toastPosition || "bottom-right"}
+                  value={formData.settings?.toastPosition || "top-center"}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="位置を選択" />
