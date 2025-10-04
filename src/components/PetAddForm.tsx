@@ -24,6 +24,7 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { PlusIcon, Loader2, UploadCloudIcon, CalendarIcon } from "lucide-react";
+import imageCompression from 'browser-image-compression';
 import Image from "next/image";
 import { toast } from "sonner";
 import {
@@ -123,16 +124,27 @@ export function PetAddForm({
     });
   };
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      if (file.size > 5 * 1024 * 1024) {
-        toast.error("画像サイズは5MBまでです。");
-        return;
+      // Option for image compression
+      const options = {
+        maxSizeMB: 1,           // (max file size in MB)
+        maxWidthOrHeight: 1024, // (max width or height in pixels)
+        useWebWorker: true,     // (use web worker for faster compression)
+      };
+      try {
+        toast.info("画像を圧縮中...");
+        const compressedFile = await imageCompression(file, options);
+        toast.success("画像の圧縮が完了しました。");
+
+        setImageFile(compressedFile);
+        const previewUrl = URL.createObjectURL(compressedFile);
+        setImagePreview(previewUrl);
+      } catch (error) {
+        console.error("画像圧縮に失敗しました:", error);
+        toast.error("画像の圧縮に失敗しました。");
       }
-      setImageFile(file);
-      const previewUrl = URL.createObjectURL(file);
-      setImagePreview(previewUrl);
     }
   };
 
