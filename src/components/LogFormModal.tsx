@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useState, useEffect } from "react";
 import { useLogActions, Log } from "@/hooks/useLogs";
 import { toast } from "sonner";
