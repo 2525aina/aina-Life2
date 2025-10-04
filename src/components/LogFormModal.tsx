@@ -7,10 +7,10 @@ import { Timestamp } from "firebase/firestore";
 
 import { useTasks } from "@/hooks/useTasks";
 
-import { CalendarIcon } from "lucide-react";
+
 import { format } from "date-fns";
-import { ja } from "date-fns/locale";
-import { cn } from "@/lib/utils";
+
+
 import { usePetSelection } from "../contexts/PetSelectionContext";
 import { TimePicker } from "./TimePicker";
 import { DatePicker } from "./DatePicker";

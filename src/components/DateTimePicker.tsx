@@ -19,6 +19,7 @@ interface DateTimePickerProps {
   setIsManuallySet: (isManuallySet: boolean) => void;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function DateTimePicker({ date, setDate, onOpenChange, isManuallySet, setIsManuallySet }: DateTimePickerProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [time, setTime] = useState(format(date, 'HH:mm:ss'));

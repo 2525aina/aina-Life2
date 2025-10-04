@@ -300,23 +300,22 @@ export const usePets = () => {
     return unsubscribe;
   }, [user]);
 
-  const updateInvitationStatus = useCallback(async (petId: string, memberId: string, newStatus: 'active' | 'declined' | 'removed') => {
+  const updateInvitationStatus = useCallback(async (petId: string, memberId: string, newStatus: 'active' | 'declined' | 'removed' | 'pending') => {
     if (!user) {
       toast.error('ログインが必要です。');
       throw new Error('ログインが必要です。');
     }
     try {
       const memberDocRef = doc(db, 'dogs', petId, 'members', memberId);
-      const dataToUpdate: { 
-        status: 'active' | 'declined' | 'removed';
-        updatedAt: FieldValue;
-        uid?: string;
-        inviteEmail?: null;
-      } = { 
-        status: newStatus,
-        updatedAt: serverTimestamp(),
-      };
-
+            const dataToUpdate: {
+              status: 'active' | 'declined' | 'removed' | 'pending';
+              updatedAt: FieldValue;
+              uid?: string;
+              inviteEmail?: null;
+            } = {
+              status: newStatus,
+              updatedAt: serverTimestamp(),
+            };
       if (newStatus === 'active') {
         dataToUpdate.uid = user.uid;
       }

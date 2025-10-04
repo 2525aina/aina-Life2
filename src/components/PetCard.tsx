@@ -56,7 +56,6 @@ import { TaskForm } from "@/components/TaskForm";
 import { TaskHistory } from "@/components/TaskHistory";
 import { useUserProfile } from "@/hooks/useUserProfile";
 
-const EMAIL_REGEX = /^[\w.-]+@[\w.-]+\.[A-Za-z]{2,3}$/;
 
 interface PetCardProps {
   pet: Pet;
@@ -70,6 +69,7 @@ interface PetCardProps {
 function MemberDisplay({
   member,
   petId,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   currentUserId,
   petOwnerUid,
   onRemoveMember,
@@ -200,13 +200,7 @@ export function PetCard({
 
   const [inviteEmail, setInviteEmail] = useState<string>("");
   const [sharedMembers, setSharedMembers] = useState<Member[]>([]);
-  const [isEditing, setIsEditing] = useState(false);
-  const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
-  const [isConfirmingLeave, setIsConfirmingLeave] = useState(false);
   const [petOwnerUid, setPetOwnerUid] = useState<string | null>(null);
-  const [currentUserMember, setCurrentUserMember] = useState<SharedMember | null>(
-    null
-  );
   const [canManage, setCanManage] = useState<boolean>(false);
   const [canEdit, setCanEdit] = useState<boolean>(false);
   const [isOnlyOwner, setIsOnlyOwner] = useState<boolean>(false);
