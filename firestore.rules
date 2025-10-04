@@ -2,54 +2,62 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
-    // appSettings コレクションのルール: admin: true のカスタムクレームを持つユーザーのみ読み書き可能
+
+    // -------- appSettings --------
     match /appSettings/{document} {
       allow read, write: if request.auth != null && request.auth.token.admin == true;
     }
 
-    // dogs コレクションのルール:
-    // - admin: true のカスタムクレームを持つユーザーはすべて読み書き可能
-    // - それ以外のユーザーは、自分がメンバーであるペットのみ読み書き可能
+    // -------- dogs --------
     match /dogs/{petId} {
-      allow read, write: if request.auth != null && request.auth.token.admin == true;
-
-      // ユーザーがペットのメンバーであるかどうかのチェック
-      function isPetMember(petId) {
-        return exists(/databases/$(database)/documents/dogs/$(petId)/members/$(request.auth.uid));
+      function isAdmin() {
+        return request.auth != null && request.auth.token.admin == true;
       }
 
-      // メンバーはペットのドキュメントを読み書きできる
-      allow read, write: if request.auth != null && isPetMember(petId);
+      function isPetMember() {
+        return request.auth != null &&
+               exists(/databases/$(database)/documents/dogs/$(petId)/members/$(request.auth.uid));
+      }
 
-      // members サブコレクションのルール
+      // 管理者は全権限
+      allow read, write: if isAdmin();
+
+      // 一般ユーザーは自分のペットのみ可
+      allow read, write: if isPetMember();
+
+      // ---- members サブコレクション ----
       match /members/{memberId} {
-        // admin: true のカスタムクレームを持つユーザーはすべて読み書き可能
-        allow read, write: if request.auth != null && request.auth.token.admin == true;
-
-        // メンバーは自分のメンバーシップドキュメントを読み書きできる
-        allow read, write: if request.auth != null && request.auth.uid == memberId;
+        allow read, write: if isAdmin()
+                           || (request.auth != null && request.auth.uid == memberId);
       }
 
-      // tasks サブコレクションのルール
+      // ---- tasks サブコレクション ----
       match /tasks/{taskId} {
-        allow read, write: if request.auth != null && isPetMember(petId);
+        allow read, write: if isAdmin() || isPetMember();
       }
 
-      // logs サブコレクションのルール
+      // ---- logs サブコレクション ----
       match /logs/{logId} {
-        allow read, write: if request.auth != null && isPetMember(petId);
+        allow read, write: if isAdmin() || isPetMember();
       }
     }
 
-    // 'members' コレクショングループに対する明示的なルール
-    // 認証されており、かつドキュメントの inviteEmail が自身のメールアドレスと一致する場合に読み取りを許可
+    // -------- members (コレクショングループ) --------
     match /{path=**}/members/{memberId} {
-      allow read: if request.auth != null && resource.data.inviteEmail == request.auth.token.email;
+      allow read: if request.auth != null &&
+                  (resource.data.inviteEmail == request.auth.token.email ||
+                   resource.data.uid == request.auth.uid);
+      allow write: if false; // セキュリティのため直接書き込み禁止
     }
-    // users コレクションのルール: admin: true のカスタムクレームを持つユーザーのみ読み書き可能
+
+    // -------- users --------
     match /users/{userId} {
-      allow read, write: if request.auth != null && request.auth.token.admin == true;
-      // TODO: ユーザーは自分のプロフィールのみ読み書き可能にするルールを追加
+      function isAdmin() {
+        return request.auth != null && request.auth.token.admin == true;
+      }
+
+      allow read, write: if isAdmin()
+                         || (request.auth != null && request.auth.uid == userId);
     }
   }
 }
