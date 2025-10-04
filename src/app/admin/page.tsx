@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { Loader2 } from 'lucide-react';
 import { GlobalSettingsForm } from '@/components/admin/GlobalSettingsForm';
+import { PetListAdmin } from '@/components/admin/PetListAdmin';
 
 const AdminPage = () => {
   const { user, loading, isAdmin } = useAuth();
@@ -34,6 +35,7 @@ const AdminPage = () => {
 
 
 
+
 // Only render the admin panel if user is logged in and is an admin
   return (
     <div className="container mx-auto p-4">
@@ -41,6 +43,7 @@ const AdminPage = () => {
       <p className="mb-6">Welcome, Admin! Here you can manage app settings and pet data.</p>
       <div className="space-y-8"> {/* Added a div for spacing */}
         <GlobalSettingsForm /> {/* Integrated the settings form */}
+        <PetListAdmin /> {/* Integrated the pet list */}
         {/* Other admin features will be added here */} 
       </div>
     </div>
