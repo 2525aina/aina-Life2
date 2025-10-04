@@ -129,7 +129,7 @@ export function PetAddForm({
     if (file) {
       // Option for image compression
       const options = {
-        maxSizeMB: 1,           // (max file size in MB)
+        maxSizeMB: 0.25,        // (max file size in MB, aiming for 250KB)
         maxWidthOrHeight: 1024, // (max width or height in pixels)
         useWebWorker: true,     // (use web worker for faster compression)
         fileType: 'image/webp', // Convert to WebP for better compression
