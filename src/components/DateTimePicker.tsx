@@ -51,7 +51,12 @@ export function DateTimePicker({ date, setDate, onOpenChange, isManuallySet, set
   const handleTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newTime = e.target.value;
     setTime(newTime);
-    const [hours, minutes, seconds] = newTime.split(':').map(Number);
+    // Robustly parse hours, minutes, and seconds
+    const timeParts = newTime.split(':').map(part => parseInt(part, 10));
+    const hours = timeParts[0] || 0;
+    const minutes = timeParts[1] || 0;
+    const seconds = timeParts[2] || 0; // Default to 0 if seconds are not provided
+
     const newDate = new Date(
       date.getFullYear(),
       date.getMonth(),
