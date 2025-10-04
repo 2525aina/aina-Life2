@@ -110,6 +110,13 @@ function MemberDisplay({
       };
     }
 
+    if (member.status === "removed") {
+      return {
+        name: "削除済ユーザー",
+        email: member.inviteEmail, // Assuming inviteEmail is still relevant for removed members
+      };
+    }
+
     if (userProfile) {
       const name = userProfile.nickname || "表示名未設定ユーザー";
       const email =
