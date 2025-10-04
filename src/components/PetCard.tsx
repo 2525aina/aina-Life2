@@ -142,7 +142,7 @@ function MemberDisplay({
               onUpdateMemberRole(petId, member.id, newRole);
             }}
           >
-            <SelectTrigger className="w-[95px]">
+            <SelectTrigger className="w-[63px] px-1 text-center justify-center">
               <SelectValue placeholder="役割" />
             </SelectTrigger>
             <SelectContent>
@@ -159,7 +159,9 @@ function MemberDisplay({
             variant="destructive"
             size="sm"
             onClick={() => onRemoveMember(member.id)}
+            className="w-[63px] flex items-center gap-1"
           >
+            <Trash2 className="h-4 w-4" />
             削除
           </Button>
         )}
