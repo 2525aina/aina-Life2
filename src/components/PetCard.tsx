@@ -140,6 +140,7 @@ export function PetCard({
   const [inviteEmail, setInviteEmail] = useState<string>("");
   const [sharedMembers, setSharedMembers] = useState<Member[]>([]);
   const [petOwnerUid, setPetOwnerUid] = useState<string | null>(null);
+  const [canEdit, setCanEdit] = useState<boolean>(false);
   const [selectedSharingTab, setSelectedSharingTab] = useState<string | null>(
     null
   );
@@ -150,6 +151,13 @@ export function PetCard({
       setSharedMembers(members);
       const owner = members.find(member => member.role === 'owner');
       setPetOwnerUid(owner ? owner.uid : null);
+
+      const currentUserMember = members.find(member => member.uid === user?.uid);
+      if (currentUserMember) {
+        setCanEdit(currentUserMember.role === 'owner' || currentUserMember.role === 'general');
+      } else {
+        setCanEdit(false);
+      }
     });
 
     return () => unsubscribe();
@@ -232,10 +240,12 @@ export function PetCard({
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => handleEditPet(pet)}>
-                  <Pencil className="mr-2 h-4 w-4" />
-                  <span>編集</span>
-                </DropdownMenuItem>
+                {canEdit && (
+                  <DropdownMenuItem onClick={() => handleEditPet(pet)}>
+                    <Pencil className="mr-2 h-4 w-4" />
+                    <span>編集</span>
+                  </DropdownMenuItem>
+                )}
                 {user?.uid === petOwnerUid && (
                   <DropdownMenuItem
                     onClick={() => handleDeletePet(pet.id)}
