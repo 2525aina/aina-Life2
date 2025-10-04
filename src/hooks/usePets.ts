@@ -45,7 +45,7 @@ export interface Pet {
 
 export interface Member {
   id: string;
-  role: 'owner' | 'general' | 'viewer';
+  role: 'owner' | 'editor' | 'viewer';
   status: 'pending' | 'active' | 'removed' | 'declined';
   uid: string;
   inviteEmail: string | null;
@@ -346,5 +346,25 @@ export const usePets = () => {
     }
   }, [user]);
 
-  return { pets, loading, addPet, updatePet, deletePet, getSharedMembers, inviteMember, getPendingInvitations, updateInvitationStatus, removeMember };
+  const updateMemberRole = useCallback(async (petId: string, memberId: string, newRole: 'owner' | 'editor' | 'viewer') => {
+    if (!user) {
+      toast.error('ログインが必要です。');
+      throw new Error('ログインが必要です。');
+    }
+    try {
+      const memberDocRef = doc(db, 'dogs', petId, 'members', memberId);
+      await updateDoc(memberDocRef, {
+        role: newRole,
+        updatedAt: serverTimestamp(),
+      });
+      toast.success('メンバーの役割を更新しました。');
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : "不明なエラー";
+      console.error('メンバーの役割の更新に失敗しました:', errorMessage);
+      toast.error('メンバーの役割の更新に失敗しました。');
+      throw new Error('メンバーの役割の更新に失敗しました。');
+    }
+  }, [user]);
+
+  return { pets, loading, addPet, updatePet, deletePet, getSharedMembers, inviteMember, getPendingInvitations, updateInvitationStatus, removeMember, updateMemberRole };
 };

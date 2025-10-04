@@ -34,6 +34,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import {
   Collapsible,
@@ -68,12 +69,18 @@ function MemberDisplay({
   member,
   petId,
   currentUserId,
+  petOwnerUid,
   onRemoveMember,
+  onUpdateMemberRole,
+  isOnlyOwner,
 }: {
   member: Member;
   petId: string;
   currentUserId: string | undefined;
+  petOwnerUid: string | null;
   onRemoveMember: (memberId: string) => Promise<void>;
+  onUpdateMemberRole: (petId: string, memberId: string, newRole: 'owner' | 'editor' | 'viewer') => Promise<void>;
+  isOnlyOwner: boolean;
 }) {
   const { userProfile } = useUserProfile(member.uid);
 
@@ -111,18 +118,39 @@ function MemberDisplay({
           <p className="text-sm text-gray-500">{displayEmail}</p>
         )}
         <p className="text-sm text-gray-500">
-          役割: {member.role} / ステータス: {member.status}
+          ステータス: {member.status}
         </p>
       </div>
-      {currentUserId === petId && member.role !== "owner" && (
-        <Button
-          variant="destructive"
-          size="sm"
-          onClick={() => onRemoveMember(member.id)}
-        >
-          削除
-        </Button>
-      )}
+      <div className="flex flex-col items-end space-y-2">
+        {currentUserId === petOwnerUid ? (
+          <Select
+            value={member.role}
+            onValueChange={(newRole: 'owner' | 'editor' | 'viewer') => {
+              onUpdateMemberRole(petId, member.id, newRole);
+            }}
+          >
+            <SelectTrigger className="w-[95px]">
+              <SelectValue placeholder="役割" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="owner">管理</SelectItem>
+              <SelectItem value="editor" disabled={isOnlyOwner && member.uid === petOwnerUid}>編集</SelectItem>
+              <SelectItem value="viewer" disabled={isOnlyOwner && member.uid === petOwnerUid}>閲覧</SelectItem>
+            </SelectContent>
+          </Select>
+        ) : (
+          <p className="text-sm text-gray-500">役割: {member.role}</p>
+        )}
+        {currentUserId === petOwnerUid && member.role !== "owner" && (
+          <Button
+            variant="destructive"
+            size="sm"
+            onClick={() => onRemoveMember(member.id)}
+          >
+            削除
+          </Button>
+        )}
+      </div>
     </div>
   );
 }
@@ -135,12 +163,13 @@ export function PetCard({
   openWeightFormForPetId,
   setOpenWeightFormForPetId,
 }: PetCardProps) {
-  const { inviteMember, getSharedMembers, removeMember } = usePets();
+  const { inviteMember, getSharedMembers, removeMember, updateMemberRole } = usePets();
 
   const [inviteEmail, setInviteEmail] = useState<string>("");
   const [sharedMembers, setSharedMembers] = useState<Member[]>([]);
   const [petOwnerUid, setPetOwnerUid] = useState<string | null>(null);
   const [canEdit, setCanEdit] = useState<boolean>(false);
+  const [isOnlyOwner, setIsOnlyOwner] = useState<boolean>(false);
   const [selectedSharingTab, setSelectedSharingTab] = useState<string | null>(
     null
   );
@@ -152,16 +181,19 @@ export function PetCard({
       const owner = members.find(member => member.role === 'owner');
       setPetOwnerUid(owner ? owner.uid : null);
 
+      const ownerCount = members.filter(member => member.role === 'owner').length;
+      setIsOnlyOwner(ownerCount === 1 && user?.uid === (owner ? owner.uid : null));
+
       const currentUserMember = members.find(member => member.uid === user?.uid);
       if (currentUserMember) {
-        setCanEdit(currentUserMember.role === 'owner' || currentUserMember.role === 'general');
+        setCanEdit(currentUserMember.role === 'owner' || currentUserMember.role === 'editor');
       } else {
         setCanEdit(false);
       }
     });
 
     return () => unsubscribe();
-  }, [pet.id, getSharedMembers]);
+  }, [pet.id, getSharedMembers, user?.uid]);
 
   useEffect(() => {
     if (selectedSharingTab !== "sharing") {
@@ -443,7 +475,10 @@ export function PetCard({
                         member={member}
                         petId={pet.id}
                         currentUserId={user?.uid}
+                        petOwnerUid={petOwnerUid}
                         onRemoveMember={handleRemoveMember}
+                        onUpdateMemberRole={updateMemberRole}
+                        isOnlyOwner={isOnlyOwner}
                       />
                     ))}
                   </div>
