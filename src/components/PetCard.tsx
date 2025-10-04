@@ -189,7 +189,7 @@ export function PetCard({
   openWeightFormForPetId,
   setOpenWeightFormForPetId,
 }: PetCardProps) {
-  const { inviteMember, getSharedMembers, removeMember, updateMemberRole } = usePets();
+  const { inviteMember, getSharedMembers, removeMember, updateMemberRole, updateInvitationStatus } = usePets();
 
   const [inviteEmail, setInviteEmail] = useState<string>("");
   const [sharedMembers, setSharedMembers] = useState<Member[]>([]);
@@ -242,10 +242,28 @@ export function PetCard({
       toast.error("メールアドレスを入力してください。");
       return;
     }
-    if (sharedMembers.some(member => member.inviteEmail === inviteEmail && (member.status === 'active' || member.status === 'pending'))) {
-      toast.error("このメールアドレスはすでに共有メンバーとして存在します。");
-      return;
+    const existingMember = sharedMembers.find(member => member.inviteEmail === inviteEmail);
+
+    if (existingMember) {
+      if (existingMember.status === 'active' || existingMember.status === 'pending') {
+        toast.error("このメールアドレスはすでに共有メンバーとして存在します。");
+        return;
+      } else {
+        // Member exists but status is not active or pending (e.g., removed, declined)
+        // Update their status to pending
+        try {
+          await updateInvitationStatus(pet.id, existingMember.id, 'pending');
+          toast.success(`${inviteEmail} の招待ステータスを保留中に更新しました！`);
+          setInviteEmail("");
+          return;
+        } catch (error) {
+          console.error("招待ステータスの更新に失敗しました:", error);
+          toast.error("招待ステータスの更新に失敗しました。");
+          return;
+        }
+      }
     }
+
     try {
       await inviteMember(pet.id, inviteEmail);
       toast.success(`${inviteEmail} を招待しました！`);
