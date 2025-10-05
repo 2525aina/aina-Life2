@@ -5,6 +5,7 @@ import { useParams } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { useChat } from "@/hooks/useChat";
 import { useUserProfile } from "@/hooks/useUserProfile";
+import { usePets } from "@/hooks/usePets";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -20,6 +21,8 @@ export default function PetChatPage() {
   const { user } = useAuth();
   const { userProfile } = useUserProfile(user?.uid || null);
   const { messages, loading, error, sendMessage } = useChat(petId);
+  const { pets } = usePets();
+  const currentPet = pets.find(pet => pet.id === petId);
   const [newMessage, setNewMessage] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -69,7 +72,7 @@ export default function PetChatPage() {
   return (
     <div className="flex flex-col h-screen bg-gray-50">
       <header className="bg-white shadow-sm p-4 flex items-center justify-between">
-        <h1 className="text-xl font-bold">ペットチャット</h1>
+        <h1 className="text-xl font-bold">{currentPet ? `${currentPet.name} とのチャット` : 'ペットチャット'}</h1>
         <Link href={`/pets/${petId}`}>
           <Button variant="outline">ペット詳細へ戻る</Button>
         </Link>
@@ -106,7 +109,7 @@ export default function PetChatPage() {
                 <span className={`text-xs mt-1 ${
                   msg.senderId === user?.uid ? "text-blue-200" : "text-gray-500"
                 }`}>
-                  {format(msg.timestamp.toDate(), "yyyy/MM/dd HH:mm", { locale: ja })}
+                  {msg.timestamp ? format(msg.timestamp.toDate(), "yyyy/MM/dd HH:mm", { locale: ja }) : 'Invalid Date'}
                 </span>
               </div>
               {msg.senderId === user?.uid && (
