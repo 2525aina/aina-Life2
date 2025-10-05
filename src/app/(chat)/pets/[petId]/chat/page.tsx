@@ -73,8 +73,8 @@ export default function PetChatPage() {
     <div className="flex flex-col h-screen bg-gray-50">
       <header className="bg-white shadow-sm p-4 flex items-center justify-between">
         <h1 className="text-xl font-bold">{currentPet ? `${currentPet.name} とのチャット` : 'ペットチャット'}</h1>
-        <Link href={`/pets/${petId}`}>
-          <Button variant="outline">ペット詳細へ戻る</Button>
+        <Link href="/pets">
+          <Button variant="outline">ペット一覧へ戻る</Button>
         </Link>
       </header>
 

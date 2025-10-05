@@ -19,6 +19,7 @@ import {
   StethoscopeIcon,
   CakeIcon,
   NotebookText,
+  MessageCircle, // New import
 } from "lucide-react";
 import Image from "next/image";
 import {
@@ -284,6 +285,15 @@ export function PetCard({
     <Collapsible key={pet.id} asChild>
       <Card className="overflow-hidden hover:shadow-lg transition-shadow duration-300">
         <div className="relative">
+          <Link href={`/pets/${pet.id}/chat`} className="absolute top-2 left-2 z-20"> {/* Chat icon link */}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 rounded-full bg-black/20 hover:bg-black/50 text-white"
+            >
+              <MessageCircle className="h-4 w-4" />
+            </Button>
+          </Link>
           <CollapsibleTrigger className="w-full text-left group">
             <div className="relative w-full h-48 bg-gray-100 flex items-center justify-center overflow-hidden cursor-pointer">
               {pet.profileImageUrl ? (
