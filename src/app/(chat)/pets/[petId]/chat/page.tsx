@@ -85,7 +85,7 @@ export default function PetChatPage() {
           messages.map((msg) => (
             <div
               key={msg.id}
-              className={`flex items-start gap-3 ${msg.senderId === user?.uid ? "justify-end" : "justify-start"}`}
+              className={`flex gap-3 ${msg.senderId === user?.uid ? "justify-end" : "justify-start"}`}
             >
               {msg.senderId !== user?.uid && (
                 <Avatar className="h-8 w-8">
@@ -93,32 +93,25 @@ export default function PetChatPage() {
                   <AvatarFallback>{msg.senderName.charAt(0)}</AvatarFallback>
                 </Avatar>
               )}
-              <div className={`flex flex-col ${msg.senderId === user?.uid ? "items-end" : "items-start"} w-full`}> {/* Wrapper for name, bubble, and timestamp */}
-                <div className={`text-xs text-gray-500 mb-1 ${msg.senderId === user?.uid ? "text-right" : "text-left"}`}> {/* Smaller sender name */}
-                  {msg.senderId !== user?.uid && msg.senderName}
+
+              <div className={`flex flex-col max-w-[70%] ${msg.senderId === user?.uid ? "items-end" : "items-start"}`}>
+                {msg.senderId !== user?.uid && (
+                  <div className="text-xs text-gray-500 mb-1 text-left">{msg.senderName}</div>
+                )}
+
+                <div className={`p-3 rounded-lg break-words ${
+                  msg.senderId === user?.uid
+                    ? "bg-blue-500 text-white rounded-br-none"
+                    : "bg-gray-200 text-gray-800 rounded-bl-none"
+                }`}>
+                  <p className="text-sm break-words">{msg.messageText}</p>
                 </div>
-                <div className="flex items-end gap-1"> {/* Wrapper for bubble and timestamp */}
-                  {msg.senderId === user?.uid && (
-                    <span className="text-xs text-gray-500">
-                      {msg.timestamp ? format(msg.timestamp.toDate(), "HH:mm", { locale: ja }) : 'Invalid Date'}
-                    </span>
-                  )}
-                  <div
-                    className={`flex flex-col max-w-[70%] p-3 rounded-lg ${
-                      msg.senderId === user?.uid
-                        ? "bg-blue-500 text-white rounded-br-none"
-                        : "bg-gray-200 text-gray-800 rounded-bl-none"
-                    }`}
-                  >
-                    <p className="text-sm break-words">{msg.messageText}</p>
-                  </div>
-                  {msg.senderId !== user?.uid && (
-                    <span className="text-xs text-gray-500">
-                      {msg.timestamp ? format(msg.timestamp.toDate(), "HH:mm", { locale: ja }) : 'Invalid Date'}
-                    </span>
-                  )}
-                </div>
+
+                <span className={`text-xs text-gray-500 mt-1 ${msg.senderId === user?.uid ? "text-right" : "text-left"}`}>
+                  {msg.timestamp ? format(msg.timestamp.toDate(), "HH:mm", { locale: ja }) : 'Invalid Date'}
+                </span>
               </div>
+
               {msg.senderId === user?.uid && (
                 <Avatar className="h-8 w-8">
                   <AvatarImage src={msg.senderProfileImageUrl} alt={msg.senderName} />
