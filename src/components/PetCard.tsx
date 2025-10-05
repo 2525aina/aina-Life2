@@ -55,6 +55,7 @@ import { WeightHistory } from "@/components/WeightHistory";
 import { TaskForm } from "@/components/TaskForm";
 import { TaskHistory } from "@/components/TaskHistory";
 import { useUserProfile } from "@/hooks/useUserProfile";
+import Link from "next/link";
 
 
 interface PetCardProps {
@@ -510,6 +511,11 @@ export function PetCard({
                 <TaskHistory dogId={pet.id} />
               </TabsContent>
               <TabsContent value="sharing" className="mt-4">
+                <div className="mb-4">
+                  <Link href={`/pets/${pet.id}/chat`}>
+                    <Button className="w-full">チャットルームへ</Button>
+                  </Link>
+                </div>
                 <h3 className="text-lg font-semibold mb-2">メンバーを招待</h3>
                 <div className="flex space-x-2 mb-4">
                   <Input
