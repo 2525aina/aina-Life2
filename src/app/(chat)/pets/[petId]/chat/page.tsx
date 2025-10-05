@@ -94,19 +94,21 @@ export default function PetChatPage() {
         ) : (
           messages.map((msg, index) => {
             const prevMsg = messages[index - 1];
-            const prevDate = prevMsg
+            const prevDate = prevMsg && prevMsg.timestamp
               ? format(prevMsg.timestamp.toDate(), "yyyy-MM-dd")
               : null;
-            const currentDate = format(msg.timestamp.toDate(), "yyyy-MM-dd");
+            const currentDate = msg.timestamp
+              ? format(msg.timestamp.toDate(), "yyyy-MM-dd")
+              : null;
             const showDate = prevDate !== currentDate;
 
             return (
               <div key={msg.id}>
                 {showDate && (
                   <div className="text-center text-gray-400 text-xs my-2">
-                    {format(msg.timestamp.toDate(), "yyyy年MM月dd日 (E)", {
+                    {msg.timestamp ? format(msg.timestamp.toDate(), "yyyy年MM月dd日 (E)", {
                       locale: ja,
-                    })}
+                    }) : 'Invalid Date'}
                   </div>
                 )}
                 <div
