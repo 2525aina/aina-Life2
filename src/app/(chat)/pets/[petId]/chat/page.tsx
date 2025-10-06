@@ -36,7 +36,7 @@ const MessageContent = ({ messageText, isUnsent }: { messageText: string, isUnse
     <>
       <p
         ref={contentRef}
-        className={`text-sm break-words whitespace-pre-wrap ${!isExpanded ? 'max-h-48 overflow-y-auto' : ''}`}
+        className={`text-sm break-words break-all whitespace-pre-wrap ${!isExpanded ? 'max-h-48 overflow-y-auto' : ''}`}
       >
         {messageText}
       </p>
@@ -249,7 +249,7 @@ export default function PetChatPage() {
                     </Avatar>
                   )}
 
-                  <div className={`flex flex-col max-w-[70%] ${msg.senderId === user?.uid ? "items-end" : "items-start"}`}>
+                  <div className={`flex flex-col max-w-[80%] min-w-0 ${msg.senderId === user?.uid ? "items-end" : "items-start"}`}>
                     {msg.senderId !== user?.uid && (
                       <div className="text-xs text-gray-500 mb-1 text-left">{msg.senderName}</div>
                     )}
