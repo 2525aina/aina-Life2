@@ -62,6 +62,14 @@ export default function PetChatPage() {
   const currentPet = pets.find((pet) => pet.id === petId);
   const [newMessage, setNewMessage] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [currentTime, setCurrentTime] = useState(new Date());
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -148,7 +156,7 @@ export default function PetChatPage() {
             const showDate = prevDate !== currentDate;
 
             const canUnsend = msg.senderId === user?.uid && msg.timestamp &&
-                              differenceInSeconds(new Date(), msg.timestamp.toDate()) < (1 * 1 * 60) &&
+                              differenceInSeconds(currentTime, msg.timestamp.toDate()) < 10 &&
                               !msg.isUnsent;
 
             const canRestore = msg.senderId === user?.uid && msg.isUnsent;
