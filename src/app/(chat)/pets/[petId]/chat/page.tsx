@@ -6,7 +6,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useChat } from "@/hooks/useChat";
 import { useUserProfile } from "@/hooks/useUserProfile";
 import { usePets } from "@/hooks/usePets";
-import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Send, Loader2 } from "lucide-react";
@@ -169,17 +169,18 @@ export default function PetChatPage() {
       </div>
 
       <div className="bg-white p-4 flex items-center gap-2 shadow-md">
-        <Input
-          type="text"
+        <Textarea
           value={newMessage}
           onChange={(e) => setNewMessage(e.target.value)}
           placeholder="メッセージを入力..."
-          className="flex-1"
-          onKeyPress={(e) => {
-            if (e.key === "Enter") {
+          className="flex-1 min-h-[40px]"
+          onKeyDown={(e) => {
+            if (e.key === "Enter" && e.shiftKey) {
+              e.preventDefault();
               handleSendMessage();
             }
           }}
+          rows={1}
         />
         <Button onClick={handleSendMessage} disabled={!newMessage.trim()}>
           <Send className="h-5 w-5" />
