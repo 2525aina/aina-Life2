@@ -15,6 +15,40 @@ import Link from "next/link";
 import { format } from "date-fns";
 import { ja } from "date-fns/locale";
 
+const MessageContent = ({ messageText }: { messageText: string }) => {
+  const [isExpanded, setIsExpanded] = useState(false);
+  const contentRef = useRef<HTMLParagraphElement>(null);
+  const [showReadMore, setShowReadMore] = useState(false);
+
+  useEffect(() => {
+    if (contentRef.current) {
+      // Check if content overflows after initial render
+      setShowReadMore(contentRef.current.scrollHeight > contentRef.current.clientHeight);
+    }
+  }, [messageText]);
+
+  return (
+    <>
+      <p
+        ref={contentRef}
+        className={`text-sm break-words whitespace-pre-wrap ${!isExpanded ? 'max-h-48 overflow-y-auto' : ''}`}
+      >
+        {messageText}
+      </p>
+      {showReadMore && (
+        <Button
+          variant="link"
+          size="sm"
+          onClick={() => setIsExpanded(!isExpanded)}
+          className="p-0 h-auto text-xs mt-1"
+        >
+          {isExpanded ? "閉じる" : "もっと見る"}
+        </Button>
+      )}
+    </>
+  );
+};
+
 export const dynamic = "force-dynamic";
 export default function PetChatPage() {
   const { petId } = useParams<{ petId: string }>();
@@ -141,7 +175,7 @@ export default function PetChatPage() {
           : "bg-gray-200 text-gray-800 rounded-bl-none"
       }`}
     >
-      <p className="text-sm break-words whitespace-pre-wrap max-h-40 overflow-y-auto">{msg.messageText}</p>
+      <MessageContent messageText={msg.messageText} />
     </div>
     <span className="text-[10px] text-gray-500 whitespace-nowrap">
       {msg.timestamp ? format(msg.timestamp.toDate(), "HH:mm", { locale: ja }) : ""}
