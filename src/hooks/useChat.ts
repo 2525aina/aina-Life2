@@ -7,8 +7,6 @@ import { toast } from 'sonner';
 export interface Message {
   id: string;
   senderId: string;
-  senderName: string;
-  senderProfileImageUrl?: string;
   messageText: string;
   timestamp: Timestamp;
   isUnsent?: boolean;
@@ -49,7 +47,7 @@ export const useChat = (petId: string) => {
     return () => unsubscribe();
   }, [user, petId]);
 
-  const sendMessage = useCallback(async (messageText: string, senderName: string, senderProfileImageUrl?: string) => {
+  const sendMessage = useCallback(async (messageText: string) => {
     if (!user || !petId || !messageText.trim()) {
       toast.error("メッセージを送信できませんでした。");
       return;
@@ -58,8 +56,6 @@ export const useChat = (petId: string) => {
     try {
       await addDoc(collection(db, 'dogs', petId, 'chats'), {
         senderId: user.uid,
-        senderName,
-        senderProfileImageUrl: senderProfileImageUrl || null,
         messageText: messageText.trim(),
         timestamp: serverTimestamp(),
         isUnsent: false,

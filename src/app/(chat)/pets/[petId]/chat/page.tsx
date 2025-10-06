@@ -1,10 +1,11 @@
 "use client";
 
 import { useParams, useRouter } from "next/navigation";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useChat } from "@/hooks/useChat";
-import { useUserProfile, UserProfile } from "@/hooks/useUserProfile";
+import { useUserProfile } from "@/hooks/useUserProfile";
+import { useUserProfiles } from "@/hooks/useUserProfiles"; // Import the new hook
 import { usePets } from "@/hooks/usePets";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
@@ -61,7 +62,18 @@ export default function PetChatPage() {
   const { user } = useAuth();
   const { userProfile, updateUserProfile } = useUserProfile(user?.uid || null);
   const { messages, loading, error, sendMessage, unsendMessage, restoreMessage } = useChat(petId);
-  const participantCount = new Set(messages.map(msg => msg.senderId)).size;
+
+  const senderIds = useMemo(() => {
+    const ids = new Set<string>();
+    messages.forEach(msg => ids.add(msg.senderId));
+    if (user?.uid) ids.add(user.uid); // Ensure current user's profile is also fetched
+    return Array.from(ids);
+  }, [messages, user?.uid]);
+
+  const { userProfiles, loading: userProfilesLoading } = useUserProfiles(senderIds);
+
+  const participantCount = senderIds.length;
+
   const { pets } = usePets();
   const currentPet = pets.find((pet) => pet.id === petId);
   const [newMessage, setNewMessage] = useState("");
@@ -142,11 +154,7 @@ export default function PetChatPage() {
       return;
     }
 
-    await sendMessage(
-      newMessage,
-      userProfile.nickname,
-      userProfile.profileImageUrl
-    );
+    await sendMessage(newMessage);
     setNewMessage("");
   };
 
@@ -168,7 +176,7 @@ export default function PetChatPage() {
     }
   };
 
-  if (loading) {
+  if (loading || userProfilesLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <Loader2 className="h-8 w-8 animate-spin" />
@@ -221,6 +229,10 @@ export default function PetChatPage() {
               : null;
             const showDate = prevDate !== currentDate;
 
+            const senderProfile = userProfiles[msg.senderId];
+            const senderName = senderProfile?.nickname || "Unknown";
+            const senderProfileImageUrl = senderProfile?.profileImageUrl;
+
             const canUnsend = msg.senderId === user?.uid && msg.timestamp &&
                               differenceInSeconds(currentTime, msg.timestamp.toDate()) < (24 * 60 * 60) &&
                               !msg.isUnsent;
@@ -244,18 +256,18 @@ export default function PetChatPage() {
                   {msg.senderId !== user?.uid && (
                     <Avatar className="h-8 w-8">
                       <AvatarImage
-                        src={msg.senderProfileImageUrl}
-                        alt={msg.senderName}
+                        src={senderProfileImageUrl}
+                        alt={senderName}
                       />
                       <AvatarFallback>
-                        {msg.senderName.charAt(0)}
+                        {senderName.charAt(0)}
                       </AvatarFallback>
                     </Avatar>
                   )}
 
                   <div className={`flex flex-col max-w-[80%] min-w-0 ${msg.senderId === user?.uid ? "items-end" : "items-start"}`}>
                     {msg.senderId !== user?.uid && (
-                      <div className="text-xs text-gray-500 mb-1 text-left">{msg.senderName}</div>
+                      <div className="text-xs text-gray-500 mb-1 text-left">{senderName}</div>
                     )}
 
                     <div className={`flex items-end gap-1 ${msg.senderId === user?.uid ? "flex-row-reverse" : "flex-row"}`}>
@@ -309,11 +321,11 @@ export default function PetChatPage() {
                   {msg.senderId === user?.uid && (
                     <Avatar className="h-8 w-8">
                       <AvatarImage
-                        src={msg.senderProfileImageUrl}
-                        alt={msg.senderName}
+                        src={senderProfileImageUrl}
+                        alt={senderName}
                       />
                       <AvatarFallback>
-                        {msg.senderName.charAt(0)}
+                        {senderName.charAt(0)}
                       </AvatarFallback>
                     </Avatar>
                   )}
