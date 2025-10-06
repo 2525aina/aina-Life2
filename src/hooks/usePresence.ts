@@ -1,11 +1,11 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { doc, setDoc, onSnapshot, serverTimestamp, collection, query, where } from 'firebase/firestore';
+import { doc, setDoc, onSnapshot, serverTimestamp, collection, query, where, Timestamp } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { useAuth } from '@/contexts/AuthContext';
 
 interface PresenceStatus {
   state: 'online' | 'offline';
-  last_changed: any; // serverTimestamp() type
+  last_changed: Timestamp;
 }
 
 export const usePresence = (userIdsToMonitor: string[] = []) => {

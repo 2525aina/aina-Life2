@@ -1,15 +1,19 @@
-import * as functions from "firebase-functions";
+import {onDocumentCreated} from "firebase-functions/v2/firestore";
 import * as admin from "firebase-admin";
 
 admin.initializeApp();
 
 const db = admin.firestore();
 
-export const sendChatMessageNotification = functions.firestore
-  .document("dogs/{petId}/chats/{chatId}")
-  .onCreate(async (snapshot, context) => {
+export const sendChatMessageNotification = onDocumentCreated("dogs/{petId}/chats/{chatId}", async (event) => {
+    const snapshot = event.data;
+    if (!snapshot) {
+        console.log("No data associated with the event");
+        return;
+    }
+
     const chatMessage = snapshot.data();
-    const petId = context.params.petId;
+    const petId = event.params.petId;
     const senderId = chatMessage.senderId;
     const senderName = chatMessage.senderName;
     const messageText = chatMessage.messageText;
@@ -20,29 +24,30 @@ export const sendChatMessageNotification = functions.firestore
 
     if (!petData || !petData.members) {
       console.log("Pet or members not found.");
-      return null;
+      return;
     }
 
     const memberIds = petData.members as string[];
 
     // Get FCM tokens for all members except the sender
-    const recipientTokens: string[] = [];
+    const recipientTokens: {token: string, userId: string}[] = [];
     for (const memberId of memberIds) {
       if (memberId === senderId) continue; // Don't send notification to the sender
 
-      const userProfileDoc = await db.collection("userProfiles").doc(memberId).get();
+      const userProfileDoc = await db.collection("users").doc(memberId).get();
       const userProfile = userProfileDoc.data();
 
       if (userProfile && userProfile.fcmTokens && userProfile.fcmTokens.length > 0) {
-        // Filter out duplicate tokens and ensure they are strings
-        const uniqueTokens = Array.from(new Set(userProfile.fcmTokens.filter((token: any) => typeof token === 'string')));
-        recipientTokens.push(...uniqueTokens);
+        const uniqueTokens: string[] = Array.from(new Set(userProfile.fcmTokens.filter((token: string) => typeof token === 'string')));
+        uniqueTokens.forEach(token => {
+            recipientTokens.push({token, userId: memberId});
+        });
       }
     }
 
     if (recipientTokens.length === 0) {
       console.log("No recipient tokens found.");
-      return null;
+      return;
     }
 
     // Construct the notification message
@@ -60,24 +65,26 @@ export const sendChatMessageNotification = functions.firestore
       }
     };
 
+    const tokensToSend = recipientTokens.map(t => t.token);
+
     // Send notifications to all unique recipient tokens
     try {
-      const response = await admin.messaging().sendToDevice(recipientTokens, payload);
+      const response = await admin.messaging().sendToDevice(tokensToSend, payload);
       console.log("Successfully sent message:", response);
 
       // Clean up invalid tokens (optional but recommended)
-      const tokensToRemove: Promise<any>[] = [];
+      const tokensToRemove: Promise<admin.firestore.WriteResult>[] = [];
       response.results.forEach((result, index) => {
         const error = result.error;
         if (error) {
-          console.error("Failure sending notification to", recipientTokens[index], error);
+          const recipient = recipientTokens[index];
+          console.error("Failure sending notification to", recipient.token, error);
           // Cleanup the token from the user's profile
           if (error.code === 'messaging/invalid-registration-token' ||
               error.code === 'messaging/registration-token-not-registered') {
-            const invalidToken = recipientTokens[index];
             tokensToRemove.push(
-              db.collection("userProfiles").doc(memberIds[index]).update({
-                fcmTokens: admin.firestore.FieldValue.arrayRemove(invalidToken)
+              db.collection("users").doc(recipient.userId).update({
+                fcmTokens: admin.firestore.FieldValue.arrayRemove(recipient.token)
               })
             );
           }
@@ -88,6 +95,4 @@ export const sendChatMessageNotification = functions.firestore
     } catch (error) {
       console.error("Error sending message:", error);
     }
-
-    return null;
-  });
+});

@@ -1,7 +1,5 @@
 'use strict';
 
-/* eslint-disable no-undef */
-
 // Firebase SDK (互換版) をCDN経由で読み込み
 importScripts("https://www.gstatic.com/firebasejs/10.14.0/firebase-app-compat.js");
 importScripts("https://www.gstatic.com/firebasejs/10.14.0/firebase-messaging-compat.js");

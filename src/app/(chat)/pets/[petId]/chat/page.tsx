@@ -4,7 +4,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useState, useEffect, useRef, useMemo } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useChat } from "@/hooks/useChat";
-import { useUserProfile } from "@/hooks/useUserProfile";
+import { useUser } from "@/hooks/useUser";
 import { usePresence } from "@/hooks/usePresence"; // Import usePresence
 import { useUserProfiles } from "@/hooks/useUserProfiles"; // Import the new hook
 import { usePets } from "@/hooks/usePets";
@@ -83,7 +83,7 @@ export default function PetChatPage() {
   const { petId } = useParams<{ petId: string }>();
   const router = useRouter();
   const { user } = useAuth();
-  const { userProfile, updateUserProfile } = useUserProfile(user?.uid || null);
+  const { userProfile, updateUserProfile } = useUser();
   const { messages, loading, error, sendMessage, unsendMessage, restoreMessage } = useChat(petId);
 
   const senderIds = useMemo(() => {
@@ -148,12 +148,13 @@ export default function PetChatPage() {
     const messaging = getMessaging(app);
     const unsubscribe = onMessage(messaging, (payload) => {
       console.log("Message received. ", payload);
+      const url = payload.data?.url;
       toast.info(payload.notification?.title || "新しい通知", {
         description: payload.notification?.body,
         duration: 5000,
-        action: payload.data?.url ? {
+        action: url ? {
           label: "開く",
-          onClick: () => window.open(payload.data.url, "_blank"),
+          onClick: () => window.open(url, "_blank"),
         } : undefined,
       });
     });

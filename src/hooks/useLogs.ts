@@ -19,7 +19,7 @@ import { db } from '@/lib/firebase';
 import { useAuth } from '@/contexts/AuthContext';
 import { usePetSelection } from '@/contexts/PetSelectionContext';
 import { Task } from './useTasks';
-import { UserProfile } from './useUser';
+import type { UserProfile } from '@/lib/types';
 
 export interface Log {
   id: string;
