@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
 import { useParams } from "next/navigation";
+import { useState, useEffect, useRef } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useChat } from "@/hooks/useChat";
-import { useUserProfile } from "@/hooks/useUserProfile";
+import { useUserProfile, UserProfile } from "@/hooks/useUserProfile";
 import { usePets } from "@/hooks/usePets";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
@@ -14,6 +14,8 @@ import { toast } from "sonner";
 import Link from "next/link";
 import { format, differenceInSeconds } from "date-fns";
 import { ja } from "date-fns/locale";
+import { getMessaging, getToken, onMessage } from "firebase/messaging";
+import { app } from "@/lib/firebase";
 
 const MessageContent = ({ messageText, isUnsent }: { messageText: string, isUnsent?: boolean }) => {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -56,7 +58,7 @@ export const dynamic = "force-dynamic";
 export default function PetChatPage() {
   const { petId } = useParams<{ petId: string }>();
   const { user } = useAuth();
-  const { userProfile } = useUserProfile(user?.uid || null);
+  const { userProfile, updateUserProfile } = useUserProfile(user?.uid || null);
   const { messages, loading, error, sendMessage, unsendMessage, restoreMessage } = useChat(petId);
   const { pets } = usePets();
   const currentPet = pets.find((pet) => pet.id === petId);
@@ -70,6 +72,56 @@ export default function PetChatPage() {
     }, 1000);
     return () => clearInterval(timer);
   }, []);
+
+  useEffect(() => {
+    if (!user || !updateUserProfile) return;
+
+    const requestPermissionAndSaveToken = async () => {
+      try {
+        const permission = await Notification.requestPermission();
+        if (permission === "granted") {
+          const messaging = getMessaging(app);
+          const currentToken = await getToken(messaging, {
+            vapidKey: "BIPmppmNKFhoBYKGh0hHA6IqM_XCnFCk-Ac2BQPmFekuwiG2HhZrllyI5UVBtVvTv_9uA8WnPjRaCLC_2k-oTOY",
+          });
+
+          if (currentToken) {
+            // Save the token to user's profile in Firestore
+            const currentTokens = userProfile?.fcmTokens || [];
+            if (!currentTokens.includes(currentToken)) {
+              await updateUserProfile({ fcmTokens: [...currentTokens, currentToken] });
+              toast.success("プッシュ通知が有効になりました！");
+            }
+          } else {
+            console.log("No registration token available. Request permission to generate one.");
+          }
+        } else {
+          console.log("Notification permission denied.");
+        }
+      } catch (err) {
+        console.error("An error occurred while retrieving token.", err);
+        toast.error("プッシュ通知の登録に失敗しました。");
+      }
+    };
+
+    requestPermissionAndSaveToken();
+
+    // Handle foreground messages
+    const messaging = getMessaging(app);
+    const unsubscribe = onMessage(messaging, (payload) => {
+      console.log("Message received. ", payload);
+      toast.info(payload.notification?.title || "新しい通知", {
+        description: payload.notification?.body,
+        duration: 5000,
+        action: payload.data?.url ? {
+          label: "開く",
+          onClick: () => window.open(payload.data.url, "_blank"),
+        } : undefined,
+      });
+    });
+
+    return () => unsubscribe();
+  }, [user, userProfile, updateUserProfile]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
