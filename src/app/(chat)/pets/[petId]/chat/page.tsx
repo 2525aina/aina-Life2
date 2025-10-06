@@ -1,6 +1,6 @@
 "use client";
 
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useState, useEffect, useRef } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useChat } from "@/hooks/useChat";
@@ -9,7 +9,7 @@ import { usePets } from "@/hooks/usePets";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Send, Loader2 } from "lucide-react";
+import { Send, Loader2, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 import Link from "next/link";
 import { format, differenceInSeconds } from "date-fns";
@@ -57,9 +57,11 @@ const MessageContent = ({ messageText, isUnsent }: { messageText: string, isUnse
 export const dynamic = "force-dynamic";
 export default function PetChatPage() {
   const { petId } = useParams<{ petId: string }>();
+  const router = useRouter();
   const { user } = useAuth();
   const { userProfile, updateUserProfile } = useUserProfile(user?.uid || null);
   const { messages, loading, error, sendMessage, unsendMessage, restoreMessage } = useChat(petId);
+  const participantCount = new Set(messages.map(msg => msg.senderId)).size;
   const { pets } = usePets();
   const currentPet = pets.find((pet) => pet.id === petId);
   const [newMessage, setNewMessage] = useState("");
@@ -193,12 +195,14 @@ export default function PetChatPage() {
   return (
     <div className="flex flex-col h-screen bg-gray-50">
       <header className="bg-white shadow-sm p-4 flex items-center justify-between">
-        <h1 className="text-xl font-bold">
-          {currentPet ? `${currentPet.name} とのチャット` : "ペットチャット"}
-        </h1>
-        <Link href="/pets">
-          <Button variant="outline">ペット一覧へ戻る</Button>
-        </Link>
+        <div className="flex items-center">
+          <Button variant="ghost" size="icon" onClick={() => router.push("/pets")}>
+            <ArrowLeft className="h-5 w-5" />
+          </Button>
+          <h1 className="text-xl font-bold ml-2">
+            {currentPet ? `${currentPet.name} (${participantCount}人)` : "ペットチャット"}
+          </h1>
+        </div>
       </header>
 
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
