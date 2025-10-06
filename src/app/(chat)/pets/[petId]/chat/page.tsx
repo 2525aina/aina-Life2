@@ -12,20 +12,23 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Send, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import Link from "next/link";
-import { format } from "date-fns";
+import { format, differenceInSeconds } from "date-fns";
 import { ja } from "date-fns/locale";
 
-const MessageContent = ({ messageText }: { messageText: string }) => {
+const MessageContent = ({ messageText, isUnsent }: { messageText: string, isUnsent?: boolean }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const contentRef = useRef<HTMLParagraphElement>(null);
   const [showReadMore, setShowReadMore] = useState(false);
 
   useEffect(() => {
     if (contentRef.current) {
-      // Check if content overflows after initial render
       setShowReadMore(contentRef.current.scrollHeight > contentRef.current.clientHeight);
     }
   }, [messageText]);
+
+  if (isUnsent) {
+    return <p className="text-sm italic text-gray-500">このメッセージは取り消されました。</p>;
+  }
 
   return (
     <>
@@ -54,7 +57,7 @@ export default function PetChatPage() {
   const { petId } = useParams<{ petId: string }>();
   const { user } = useAuth();
   const { userProfile } = useUserProfile(user?.uid || null);
-  const { messages, loading, error, sendMessage } = useChat(petId);
+  const { messages, loading, error, sendMessage, unsendMessage, restoreMessage } = useChat(petId);
   const { pets } = usePets();
   const currentPet = pets.find((pet) => pet.id === petId);
   const [newMessage, setNewMessage] = useState("");
@@ -83,6 +86,14 @@ export default function PetChatPage() {
       userProfile.profileImageUrl
     );
     setNewMessage("");
+  };
+
+  const handleUnsendMessage = async (messageId: string) => {
+    await unsendMessage(messageId);
+  };
+
+  const handleRestoreMessage = async (messageId: string) => {
+    await restoreMessage(messageId);
   };
 
   if (loading) {
@@ -136,6 +147,12 @@ export default function PetChatPage() {
               : null;
             const showDate = prevDate !== currentDate;
 
+            const canUnsend = msg.senderId === user?.uid && msg.timestamp &&
+                              differenceInSeconds(new Date(), msg.timestamp.toDate()) < (1 * 1 * 60) &&
+                              !msg.isUnsent;
+
+            const canRestore = msg.senderId === user?.uid && msg.isUnsent;
+
             return (
               <div key={msg.id}>
                 {showDate && (
@@ -162,26 +179,46 @@ export default function PetChatPage() {
                     </Avatar>
                   )}
 
-<div className={`flex flex-col max-w-[70%] ${msg.senderId === user?.uid ? "items-end" : "items-start"}`}>
-  {msg.senderId !== user?.uid && (
-    <div className="text-xs text-gray-500 mb-1 text-left">{msg.senderName}</div>
-  )}
+                  <div className={`flex flex-col max-w-[70%] ${msg.senderId === user?.uid ? "items-end" : "items-start"}`}>
+                    {msg.senderId !== user?.uid && (
+                      <div className="text-xs text-gray-500 mb-1 text-left">{msg.senderName}</div>
+                    )}
 
-  <div className={`flex items-end gap-1 ${msg.senderId === user?.uid ? "flex-row-reverse" : "flex-row"}`}>
-    <div
-      className={`p-3 rounded-lg break-words ${
-        msg.senderId === user?.uid
-          ? "bg-blue-500 text-white rounded-br-none"
-          : "bg-gray-200 text-gray-800 rounded-bl-none"
-      }`}
-    >
-      <MessageContent messageText={msg.messageText} />
-    </div>
-    <span className="text-[10px] text-gray-500 whitespace-nowrap">
-      {msg.timestamp ? format(msg.timestamp.toDate(), "HH:mm", { locale: ja }) : ""}
-    </span>
-  </div>
-</div>
+                    <div className={`flex items-end gap-1 ${msg.senderId === user?.uid ? "flex-row-reverse" : "flex-row"}`}>
+                      <div
+                        className={`p-3 rounded-lg break-words ${
+                          msg.senderId === user?.uid
+                            ? "bg-blue-500 text-white rounded-br-none"
+                            : "bg-gray-200 text-gray-800 rounded-bl-none"
+                        }`}
+                      >
+                        <MessageContent messageText={msg.messageText} isUnsent={msg.isUnsent} />
+                      </div>
+                      <span className="text-[10px] text-gray-500 whitespace-nowrap">
+                        {msg.timestamp ? format(msg.timestamp.toDate(), "HH:mm", { locale: ja }) : ""}
+                      </span>
+                      {canUnsend && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleUnsendMessage(msg.id)}
+                          className="p-0 h-auto text-xs text-gray-500 hover:text-red-500"
+                        >
+                          取消
+                        </Button>
+                      )}
+                      {canRestore && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleRestoreMessage(msg.id)}
+                          className="p-0 h-auto text-xs text-gray-500 hover:text-green-500"
+                        >
+                          復元
+                        </Button>
+                      )}
+                    </div>
+                  </div>
 
                   {msg.senderId === user?.uid && (
                     <Avatar className="h-8 w-8">

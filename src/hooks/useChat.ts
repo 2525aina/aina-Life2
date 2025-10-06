@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { collection, query, orderBy, limit, addDoc, serverTimestamp, onSnapshot, Timestamp } from 'firebase/firestore';
+import { collection, query, orderBy, limit, addDoc, serverTimestamp, onSnapshot, Timestamp, updateDoc, doc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
@@ -11,6 +11,7 @@ export interface Message {
   senderProfileImageUrl?: string;
   messageText: string;
   timestamp: Timestamp;
+  isUnsent?: boolean;
 }
 
 export const useChat = (petId: string) => {
@@ -61,6 +62,7 @@ export const useChat = (petId: string) => {
         senderProfileImageUrl: senderProfileImageUrl || null,
         messageText: messageText.trim(),
         timestamp: serverTimestamp(),
+        isUnsent: false,
       });
     } catch (err) {
       console.error("Error sending message:", err);
@@ -68,5 +70,41 @@ export const useChat = (petId: string) => {
     }
   }, [user, petId]);
 
-  return { messages, loading, error, sendMessage };
+  const unsendMessage = useCallback(async (messageId: string) => {
+    if (!user || !petId || !messageId) {
+      toast.error("メッセージを取り消しできませんでした。");
+      return;
+    }
+
+    try {
+      const messageRef = doc(db, 'dogs', petId, 'chats', messageId);
+      await updateDoc(messageRef, {
+        isUnsent: true,
+      });
+      toast.success("メッセージを取り消しました。");
+    } catch (err) {
+      console.error("Error unsending message:", err);
+      toast.error("メッセージの取り消しに失敗しました。");
+    }
+  }, [user, petId]);
+
+  const restoreMessage = useCallback(async (messageId: string) => {
+    if (!user || !petId || !messageId) {
+      toast.error("メッセージを復元できませんでした。");
+      return;
+    }
+
+    try {
+      const messageRef = doc(db, 'dogs', petId, 'chats', messageId);
+      await updateDoc(messageRef, {
+        isUnsent: false,
+      });
+      toast.success("メッセージを復元しました。");
+    } catch (err) {
+      console.error("Error restoring message:", err);
+      toast.error("メッセージの復元に失敗しました。");
+    }
+  }, [user, petId]);
+
+  return { messages, loading, error, sendMessage, unsendMessage, restoreMessage };
 };
