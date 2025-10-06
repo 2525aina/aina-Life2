@@ -51,6 +51,7 @@ export default function ProfilePage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [imageFile, setImageFile] = useState<File | null>(null); // State for the selected image file
   const [imagePreview, setImagePreview] = useState<string | null>(null); // State for image preview URL
+  const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -103,6 +104,11 @@ export default function ProfilePage() {
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+    setValidationErrors((prev) => {
+      const newErrors = { ...prev };
+      delete newErrors[name];
+      return newErrors;
+    });
   };
 
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -239,9 +245,20 @@ export default function ProfilePage() {
     });
   };
 
+  const validateProfileForm = () => {
+    const errors: Record<string, string> = {};
+    if (!formData.nickname || formData.nickname.trim() === "") {
+      errors.nickname = "表示名は必須です。";
+    } else if (formData.nickname.length > 20) {
+      errors.nickname = "表示名は20文字以内で入力してください。";
+    }
+    setValidationErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
   const handleUpdateProfile = async () => {
-    if (!formData.nickname) {
-      toast.error("表示名は必須です。");
+    if (!validateProfileForm()) {
+      toast.error("入力内容に不備があります。ご確認ください。");
       return;
     }
     setIsSubmitting(true);
@@ -316,13 +333,19 @@ export default function ProfilePage() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid gap-2">
-                <Label htmlFor="nickname">表示名</Label>
+                <Label htmlFor="nickname">表示名 *</Label>
                 <Input
                   id="nickname"
                   name="nickname"
                   value={formData.nickname || ""}
                   onChange={handleChange}
+                  maxLength={20} // Add maxLength attribute
                 />
+                {validationErrors.nickname && (
+                  <p className="text-red-500 text-sm mt-1">
+                    {validationErrors.nickname}
+                  </p>
+                )}
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="introduction">自己紹介</Label>
