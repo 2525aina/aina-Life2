@@ -141,7 +141,7 @@ export default function PetChatPage() {
           : "bg-gray-200 text-gray-800 rounded-bl-none"
       }`}
     >
-      <p className="text-sm break-words">{msg.messageText}</p>
+      <p className="text-sm break-words whitespace-pre-wrap">{msg.messageText}</p>
     </div>
     <span className="text-[10px] text-gray-500 whitespace-nowrap">
       {msg.timestamp ? format(msg.timestamp.toDate(), "HH:mm", { locale: ja }) : ""}
