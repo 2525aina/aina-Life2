@@ -5,6 +5,7 @@ import { useState, useEffect, useRef, useMemo } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useChat } from "@/hooks/useChat";
 import { useUserProfile } from "@/hooks/useUserProfile";
+import { usePresence } from "@/hooks/usePresence"; // Import usePresence
 import { useUserProfiles } from "@/hooks/useUserProfiles"; // Import the new hook
 import { usePets } from "@/hooks/usePets";
 import { Textarea } from "@/components/ui/textarea";
@@ -71,6 +72,7 @@ export default function PetChatPage() {
   }, [messages, user?.uid]);
 
   const { userProfiles, loading: userProfilesLoading } = useUserProfiles(senderIds);
+  const { isUserOnline } = usePresence(senderIds); // Call usePresence
 
   const participantCount = senderIds.length;
 
@@ -254,15 +256,20 @@ export default function PetChatPage() {
                   }`}
                 >
                   {msg.senderId !== user?.uid && (
-                    <Avatar className="h-8 w-8">
-                      <AvatarImage
-                        src={senderProfileImageUrl}
-                        alt={senderName}
-                      />
-                      <AvatarFallback>
-                        {senderName.charAt(0)}
-                      </AvatarFallback>
-                    </Avatar>
+                    <div className="relative">
+                      <Avatar className="h-8 w-8">
+                        <AvatarImage
+                          src={senderProfileImageUrl}
+                          alt={senderName}
+                        />
+                        <AvatarFallback>
+                          {senderName.charAt(0)}
+                        </AvatarFallback>
+                      </Avatar>
+                      {isUserOnline(msg.senderId) && (
+                        <div className="absolute top-0 right-0 h-2 w-2 rounded-full bg-green-500 ring-1 ring-white" />
+                      )}
+                    </div>
                   )}
 
                   <div className={`flex flex-col max-w-[80%] min-w-0 ${msg.senderId === user?.uid ? "items-end" : "items-start"}`}>
