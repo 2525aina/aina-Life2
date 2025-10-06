@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { User as FirebaseAuthUser } from "firebase/auth";
-import { usePets, Pet, Member } from "@/hooks/usePets";
+import { usePets } from "@/hooks/usePets";
+import type { Pet, Member } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {

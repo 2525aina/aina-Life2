@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { usePets, Pet, VetInfo } from "@/hooks/usePets";
+import { usePets } from "@/hooks/usePets";
+import type { Pet, VetInfo } from "@/lib/types";
 import { useStorage } from "@/hooks/useStorage";
 import { Button } from "@/components/ui/button";
 import {

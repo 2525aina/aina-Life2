@@ -1,16 +1,9 @@
 import { useState, useEffect, useCallback } from 'react';
-import { collection, query, orderBy, limit, addDoc, serverTimestamp, onSnapshot, Timestamp, updateDoc, doc } from 'firebase/firestore';
+import { collection, query, orderBy, limit, addDoc, serverTimestamp, onSnapshot, updateDoc, doc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
-
-export interface Message {
-  id: string;
-  senderId: string;
-  messageText: string;
-  timestamp: Timestamp;
-  isUnsent?: boolean;
-}
+import type { Message } from '@/lib/types';
 
 export const useChat = (petId: string) => {
   const { user } = useAuth();
