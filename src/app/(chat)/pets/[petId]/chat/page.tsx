@@ -34,13 +34,35 @@ const MessageContent = ({ messageText, isUnsent }: { messageText: string, isUnse
     return <p className="text-sm italic text-gray-500">このメッセージは取り消されました。</p>;
   }
 
+  const renderTextWithLinks = (text: string) => {
+    const urlRegex = /(https?:\/\/[^\s]+)/g;
+    const parts = text.split(urlRegex);
+
+    return parts.map((part, index) => {
+      if (part.match(urlRegex)) {
+        return (
+          <a
+            key={index}
+            href={part}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-indigo-600 hover:underline"
+          >
+            {part}
+          </a>
+        );
+      }
+      return part;
+    });
+  };
+
   return (
     <>
       <p
         ref={contentRef}
         className={`text-sm break-words break-all whitespace-pre-wrap ${!isExpanded ? 'max-h-48 overflow-y-auto' : ''}`}
       >
-        {messageText}
+        {renderTextWithLinks(messageText)}
       </p>
       {showReadMore && (
         <Button
