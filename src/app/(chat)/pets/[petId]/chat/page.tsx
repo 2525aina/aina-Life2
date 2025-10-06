@@ -156,6 +156,16 @@ export default function PetChatPage() {
     await restoreMessage(messageId);
   };
 
+  const handleCopyMessage = async (messageText: string) => {
+    try {
+      await navigator.clipboard.writeText(messageText);
+      toast.success("メッセージをコピーしました！");
+    } catch (err) {
+      console.error("Failed to copy message:", err);
+      toast.error("メッセージのコピーに失敗しました。");
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -208,7 +218,7 @@ export default function PetChatPage() {
             const showDate = prevDate !== currentDate;
 
             const canUnsend = msg.senderId === user?.uid && msg.timestamp &&
-                              differenceInSeconds(currentTime, msg.timestamp.toDate()) < 10 &&
+                              differenceInSeconds(currentTime, msg.timestamp.toDate()) < (24 * 60 * 60) &&
                               !msg.isUnsent;
 
             const canRestore = msg.senderId === user?.uid && msg.isUnsent;
@@ -254,29 +264,41 @@ export default function PetChatPage() {
                       >
                         <MessageContent messageText={msg.messageText} isUnsent={msg.isUnsent} />
                       </div>
-                      <span className="text-[10px] text-gray-500 whitespace-nowrap">
-                        {msg.timestamp ? format(msg.timestamp.toDate(), "HH:mm", { locale: ja }) : ""}
-                      </span>
-                      {canUnsend && (
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleUnsendMessage(msg.id)}
-                          className="p-0 h-auto text-xs text-gray-500 hover:text-red-500"
-                        >
-                          取消
-                        </Button>
-                      )}
-                      {canRestore && (
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleRestoreMessage(msg.id)}
-                          className="p-0 h-auto text-xs text-gray-500 hover:text-green-500"
-                        >
-                          復元
-                        </Button>
-                      )}
+                      <div className={`flex flex-col items-${msg.senderId === user?.uid ? "end" : "start"} gap-1`}>
+                        <div className="flex gap-1">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleCopyMessage(msg.messageText)}
+                            className="p-0 h-auto text-xs text-gray-500 hover:text-blue-500"
+                          >
+                            コピー
+                          </Button>
+                          {canUnsend && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleUnsendMessage(msg.id)}
+                              className="p-0 h-auto text-xs text-gray-500 hover:text-red-500"
+                            >
+                              取消
+                            </Button>
+                          )}
+                          {canRestore && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleRestoreMessage(msg.id)}
+                              className="p-0 h-auto text-xs text-gray-500 hover:text-green-500"
+                            >
+                              復元
+                            </Button>
+                          )}
+                        </div>
+                        <span className="text-[10px] text-gray-500 whitespace-nowrap">
+                          {msg.timestamp ? format(msg.timestamp.toDate(), "HH:mm", { locale: ja }) : ""}
+                        </span>
+                      </div>
                     </div>
                   </div>
 
