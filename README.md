@@ -41,6 +41,9 @@ aina-Life2は、Next.jsとFirebaseで構築された、ペットの健康と日�
 
 3.  **Firebaseプロジェクトの設定:**
     *   [Firebaseコンソール](https://console.firebase.google.com/)で新しいプロジェクトを作成し、Webアプリを追加します。
+    *   Firebase コンソールで、左側のナビゲーションメニューから「Authentication」を選択し、「Sign-in method」タブで「Google」プロバイダを有効にします。
+    *   同様に、「Anonymous」プロバイダと「Email/Password」プロバイダ（「Email link (passwordless sign-in)」を有効にする）も有効にしてください。
+    *   左側のナビゲーションメニューから「Firestore Database」を選択し、データベースが作成されていない場合は「データベースを作成(データベースの場所: asia-northeast1)」ボタンをクリックして初期化してください。
     *   プロジェクトのルートディレクトリに `.env.local` ファイルを作成し、Firebaseの構成情報を設定します。以下は例です。
         ```
         NEXT_PUBLIC_FIREBASE_API_KEY="YOUR_API_KEY"
@@ -62,7 +65,7 @@ aina-Life2は、Next.jsとFirebaseで構築された、ペットの健康と日�
     ```bash
     rm -rf .next
     rm -rf node_modules
-    sudo chown -R 501:20 "/Users/nakajimadaichi/.npm"
+    # sudo chown -R 501:20 "/Users/nakajimadaichi/.npm"
     npm install
     npm run dev
     ```
@@ -70,9 +73,13 @@ aina-Life2は、Next.jsとFirebaseで構築された、ペットの健康と日�
 5.  ブラウザで `http://localhost:3000` にアクセスすると、アプリケーションが表示されます。
 6.  公開
     ```bash
+    firebase login
+    firebase init
+    firebase deploy
     npm run lint
     npm run build
     firebase deploy --only hosting
+    firebase deploy --only firestore:rules
     ```
 
 ## 使い方

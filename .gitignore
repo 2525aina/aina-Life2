@@ -48,3 +48,9 @@ next-env.d.ts
 # PWA generated files
 /public/sw.js
 /public/workbox-*.js
+
+# Environment variables
+.env.development
+.env.staging
+.env.production
+.env.local

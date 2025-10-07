@@ -1,5 +1,7 @@
 {
   "projects": {
-    "default": "aina-life-dev"
+    "dev": "aina-life-dev",
+    "stg": "aina-life-stg",
+    "prod": "aina-life-prod"
   }
 }
