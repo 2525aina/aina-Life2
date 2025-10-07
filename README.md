@@ -4,6 +4,43 @@
 
 aina-Life2は、Next.jsとFirebaseで構築された、ペットの健康と日々の活動を管理するためのモダンなWebアプリケーションです。大切なペットとの生活をより豊かに、そして楽しくサポートすることを目的としています。
 
+## 🚀 デプロイ (CI/CD)
+
+[![Firebase Deploy](https://github.com/2525aina/aina-Life/actions/workflows/deploy.yml/badge.svg)](https://github.com/2525aina/aina-Life/actions/workflows/deploy.yml)
+
+このプロジェクトはGitHub Actionsによる自動デプロイに対応しています。
+以下のブランチにプッシュすると、対応するFirebase環境に自動でデプロイが実行されます。
+
+| ブランチ | デプロイ先環境 | URL |
+|----------|----------------|-----|
+| `main`   | Production     | `https://aina-life-prod.web.app` |
+| `stg`    | Staging        | `https://aina-life-stg.web.app` |
+| `dev`    | Development    | `https://aina-life-dev.web.app` |
+
+<details>
+<summary>CI/CD設定の詳細（管理者向け）</summary>
+
+このリポジトリのCI/CDは以下の手順で設定されています。将来的にキーの更新などが必要になった際の備忘録です。
+
+1.  **Firebaseサービスアカウントの作成**
+    - Google Cloudコンソールで、デプロイ対象のプロジェクト（例: `aina-life-prod`）にアクセス。
+    - IAMと管理 > サービスアカウント で `github-actions-deployer` という名前のアカウントを作成。
+    - **Firebase 管理者 (Firebase Admin)** ロールを付与。
+    - 作成したアカウントの「キー」タブから、JSON形式の新しいキーを作成し、ダウンロードする。
+
+    > **重要:** 作成したサービスアカウントのメールアドレスをコピーし、`dev`環境と`stg`環境のIAMページで、同じく「Firebase 管理者」としてメンバーに追加してください。これにより、1つのサービスアカウントで全環境にデプロイできるようになります。
+
+2.  **GitHub Secretsへの登録**
+    - このリポジトリの `Settings` > `Secrets and variables` > `Actions` に移動。
+    - `New repository secret` をクリック。
+    - **Name**: `FIREBASE_SERVICE_ACCOUNT_KEY`
+    - **Secret**: ダウンロードしたJSONファイルの中身を全て貼り付け。
+
+3.  **ワークフローファイルの配置**
+    - 上記の認証情報を使ってデプロイを実行するワークフローを `.github/workflows/deploy.yml` に配置済み。
+
+</details>
+
 ## 主な機能
 
 -   **ユーザー認証:** パスワードレスのメールリンク認証、Googleアカウント、匿名ログインによる安全なログイン機能を提供します。匿名ユーザーは後から正規アカウントに連携し、データを引き継ぐことができます。
